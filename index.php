@@ -15,8 +15,8 @@ session_start();
     <p>Este sistema web é uma ferramenta de busca para animais perdidos ou encontrados.</p>
 
     <!-- Botões principais -->
-    <a href="buscar_perdido.php"><button>Buscar Animal Perdido</button></a>
-    <a href="buscar_encontrado.php"><button>Buscar Animal Encontrado</button></a>
+    <a href="buscar_animais_perdidos.php"><button>Buscar Animal Perdido</button></a>
+    <a href="buscar_animais_encontrados.php"><button>Buscar Animal Encontrado</button></a>
 
     <?php if (isset($_SESSION['usuario_id'])): ?>
         <!-- Se o usuário estiver logado -->

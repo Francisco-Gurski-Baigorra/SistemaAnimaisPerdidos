@@ -2,150 +2,118 @@
 session_start();
 include('conecta.php');
 
-// Se o usuário não estiver logado, redireciona
 if (!isset($_SESSION['usuario_id'])) {
-    echo "<script>alert('Você precisa fazer login para registrar um animal.'); window.location='login.php';</script>";
+    echo "<script>alert('Você precisa estar logado para registrar um animal.'); window.location='login.php';</script>";
     exit;
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $usuario_id = $_SESSION['usuario_id'];
-    $situacao = $_POST['situacao'];
-    $especie = $_POST['especie'];
-    $genero = $_POST['genero'];
-    $raca_id = $_POST['raca_id'];
-    $porte = $_POST['porte'];
-    $cor_predominante = $_POST['cor_predominante'];
-    $idade = $_POST['idade'];
-    $nome = $_POST['nome'];
-    $descricao = $_POST['descricao'];
-    $telefone_contato = $_POST['telefone_contato'];
-    $data_ocorrido = !empty($_POST['data_ocorrido']) ? $_POST['data_ocorrido'] : NULL;
-
-    // Upload da foto
-    $foto_nome = null;
-    if (!empty($_FILES["foto"]["name"])) {
-        $foto_nome = uniqid() . "_" . basename($_FILES["foto"]["name"]);
-        $destino = "uploads/" . $foto_nome;
-        move_uploaded_file($_FILES["foto"]["tmp_name"], $destino);
-    }
-
-    $sql = "INSERT INTO animais 
-        (usuario_id, situacao, especie, genero, raca_id, porte, cor_predominante, idade, nome, descricao, data_ocorrido, telefone_contato, foto)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    $stmt = $conexao->prepare($sql);
-    $stmt->bind_param(
-        "isssiisssssss",
-        $usuario_id,
-        $situacao,
-        $especie,
-        $genero,
-        $raca_id,
-        $porte,
-        $cor_predominante,
-        $idade,
-        $nome,
-        $descricao,
-        $data_ocorroido,
-        $telefone_contato,
-        $foto_nome
-    );
-
-    if ($stmt->execute()) {
-        echo "<script>alert('Animal registrado com sucesso!'); window.location='index.php';</script>";
-    } else {
-        echo "Erro ao registrar animal: " . $stmt->error;
-    }
-
-    $stmt->close();
-    $conexao->close();
+$racas = [];
+$sql = "SELECT id, racas FROM racas ORDER BY racas";
+$res = $conexao->query($sql);
+while ($row = $res->fetch_assoc()) {
+    $racas[] = $row;
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>Registrar Animal</title>
+<meta charset="UTF-8">
+<title>Mapa de Animais Perdidos</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<style>
+#map { height: 600px; width: 100%; }
+.popup-form input, .popup-form select, .popup-form textarea { width: 100%; margin-bottom: 6px; }
+.popup-form button { background: #4CAF50; color: white; border: none; padding: 8px 12px; cursor: pointer; }
+.popup-form button:hover { background: #45a049; }
+</style>
 </head>
 <body>
 
-<h2>Registrar Animal</h2>
+<h2>🐶 Mapa de Animais Perdidos / Encontrados</h2>
+<p>Clique no mapa para cadastrar um animal.</p>
 
-<form action="registrar_animal.php" method="POST" enctype="multipart/form-data">
-    <label>Situação:</label><br>
-    <select name="situacao" required>
-        <option value="perdido">Animal Perdido</option>
-        <option value="encontrado">Animal Encontrado</option>
-    </select><br><br>
+<div id="map"></div>
 
-    <label>Espécie:</label><br>
-    <select name="especie" required>
-        <option value="cachorro">Cachorro</option>
-        <option value="gato">Gato</option>
-        <option value="outro">Outro</option>
-    </select><br><br>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+var map = L.map('map').setView([-29.78126, -57.10689], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
-    <label>Gênero:</label><br>
-    <select name="genero" required>
-        <option value="macho">Macho</option>
-        <option value="femea">Fêmea</option>
-        <option value="nao_informado">Não informado</option>
-    </select><br><br>
+var racas = <?php echo json_encode($racas, JSON_UNESCAPED_UNICODE); ?>;
 
-    <label>Raça:</label><br>
-    <select name="raca_id" required>
-        <?php
-        $racas = $conexao->query("SELECT id, racas FROM racas WHERE racas IS NOT NULL");
-        while ($r = $racas->fetch_assoc()) {
-            echo "<option value='{$r['id']}'>{$r['racas']}</option>";
-        }
-        ?>
-    </select><br><br>
+map.on('click', function(e){
+    var lat = e.latlng.lat;
+    var lng = e.latlng.lng;
 
-    <label>Porte:</label><br>
-    <select name="porte" required>
-        <option value="pequeno">Pequeno</option>
-        <option value="medio">Médio</option>
-        <option value="grande">Grande</option>
-    </select><br><br>
+    var racasOptions = '<option value="">Selecione</option>';
+    racas.forEach(r => { racasOptions += `<option value="${r.id}">${r.racas}</option>`; });
 
-    <label>Cor predominante:</label><br>
-    <select name="cor_predominante">
-        <option value="preto">Preto</option>
-        <option value="branco">Branco</option>
-        <option value="marrom">Marrom</option>
-        <option value="cinza">Cinza</option>
-        <option value="caramelo">Caramelo</option>
-        <option value="preto e branco">Preto e Branco</option>
-        <option value="outros">Outros</option>
-    </select><br><br>
+    var formHtml = `
+    <form id="formAnimal" class="popup-form" enctype="multipart/form-data">
+        <input type="hidden" name="lat" value="${lat}">
+        <input type="hidden" name="lng" value="${lng}">
+        <label>Nome:</label><input name="nome" type="text">
+        <label>Espécie:</label>
+        <select name="especie" required>
+            <option value="cachorro">Cachorro</option>
+            <option value="gato">Gato</option>
+            <option value="outros">Outros</option>
+        </select>
+        <label>Gênero:</label>
+        <select name="genero" required>
+            <option value="macho">Macho</option>
+            <option value="femea">Fêmea</option>
+            <option value="nao_informado">Não informado</option>
+        </select>
+        <label>Raça:</label><select name="raca_id">${racasOptions}</select>
+        <label>Porte:</label>
+        <select name="porte" required>
+            <option value="pequeno">Pequeno</option>
+            <option value="medio">Médio</option>
+            <option value="grande">Grande</option>
+        </select>
+        <label>Cor predominante:</label>
+        <select name="cor_predominante">
+            <option value="preto">Preto</option>
+            <option value="branco">Branco</option>
+            <option value="marrom">Marrom</option>
+            <option value="cinza">Cinza</option>
+            <option value="caramelo">Caramelo</option>
+            <option value="preto e branco">Preto e Branco</option>
+            <option value="outros">Outros</option>
+        </select>
+        <label>Idade:</label>
+        <select name="idade" required>
+            <option value="Filhote">Filhote</option>
+            <option value="Adulto">Adulto</option>
+            <option value="Idoso">Idoso</option>
+        </select>
+        <label>Situação:</label>
+        <select name="situacao" required>
+            <option value="perdido">Perdido</option>
+            <option value="encontrado">Encontrado</option>
+        </select>
+        <label>Data do ocorrido:</label><input name="data_ocorrido" type="date">
+        <label>Descrição:</label><textarea name="descricao" rows="2"></textarea>
+        <label>Telefone:</label><input name="telefone_contato" type="text" required>
+        <label>Foto:</label><input name="foto" type="file" accept="image/*">
+        <button type="button" onclick="salvarAnimal()">Salvar</button>
+    </form>
+    `;
 
-    <label>Idade:</label><br>
-    <select name="idade" required>
-        <option value="filhote">Filhote</option>
-        <option value="adulto">Adulto</option>
-        <option value="idoso">Idoso</option>
-    </select><br><br>
+    L.popup().setLatLng(e.latlng).setContent(formHtml).openOn(map);
+});
 
-    <label>Nome do animal (opcional):</label><br>
-    <input type="text" name="nome" maxlength="100"><br><br>
+function salvarAnimal(){
+    var form = document.getElementById('formAnimal');
+    var formData = new FormData(form);
 
-    <label>Descrição (opcional):</label><br>
-    <textarea name="descricao" rows="3" cols="30"></textarea><br><br>
-
-    <label>Data do ocorrido (opcional):</label><br>
-    <input type="date" name="data_ocorrido"><br><br>
-
-    <label>Telefone de contato:</label><br>
-    <input type="text" name="telefone_contato" required maxlength="20"><br><br>
-
-    <label>Foto do animal (opcional):</label><br>
-    <input type="file" name="foto" accept="image/*"><br><br>
-
-    <button type="submit">Registrar</button>
-</form>
+    fetch('salvar_local.php', { method: 'POST', body: formData })
+    .then(res => res.text())
+    .then(txt => { alert(txt); location.reload(); })
+    .catch(err => alert('Erro: ' + err));
+}
+</script>
 
 </body>
 </html>
