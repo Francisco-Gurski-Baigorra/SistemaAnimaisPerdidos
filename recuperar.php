@@ -36,30 +36,42 @@ require_once 'PHPMailer-master/src/Exception.php';
 $mail = new PHPMailer(true);
 
 try {
-    $mail->CharSet = 'UTF-8';
-    $mail->isSMTP();
-    $mail->Host = 'smtp.gmail.com';
-    $mail->SMTPAuth = true;
-    $mail->Username = 'francisco.2023318347@aluno.iffar.edu.br'; 
-    $mail->Password = 'mdnlqoskzdtpsigf'; 
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port = 587;
+   $mail->CharSet = 'UTF-8';
+$mail->isSMTP();
+$mail->Host = 'smtp.gmail.com';
+$mail->SMTPAuth = true;
+$mail->Username = 'francisco.2023318347@aluno.iffar.edu.br';
+$mail->Password = 'mdnlqoskzdtpsigf'; // senha de app gerada no Gmail
+$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // ou 'tls'
+$mail->Port = 587;
 
-    $mail->setFrom('francisco.2023318347@aluno.iffar.edu.br', 'Sistema de Animais Perdidos');
-    $mail->addAddress($email);
+// 🔹 Importante: desabilita verificação de certificado (evita erro SSL no WAMP)
+$mail->SMTPOptions = [
+    'ssl' => [
+        'verify_peer' => false,
+        'verify_peer_name' => false,
+        'allow_self_signed' => true
+    ]
+];
 
-    $link = "http://" . $_SERVER['SERVER_NAME'] . "/sistemaanimaisperdidos/nova_senha.php?email=" . urlencode($email) . "&token=" . urlencode($token);
+$mail->setFrom('francisco.2023318347@aluno.iffar.edu.br', 'Sistema de Animais Perdidos');
+$mail->addAddress($email);
 
-    $mail->isHTML(true);
-    $mail->Subject = 'Recuperação de Senha';
-    $mail->Body = 'Olá!<br>
-    Você solicitou a recuperação da sua conta no nosso sistema.
-    Para isso, clique no link abaixo para redefinir sua senha:<br>
-    <a href="http://' . $_SERVER['SERVER_NAME'] .
-    '/sistemaanimaisperdidos/SistemaAnimaisPerdidos/nova_senha.php?email=' .
-    $email . '&token=' . $token . '">
-    Clique aqui para redefinir sua senha</a><br><br>
-    Atenciosamente,<br>Equipe do Sistema de Animais Perdidos.';
+// 🔹 Gera o link de redefinição de senha corretamente
+$link = "http://localhost/sistemaanimaisperdidos/nova_senha.php?email=" 
+       . urlencode($email) . "&token=" . urlencode($token);
+
+// 🔹 Corpo do e-mail
+$mail->isHTML(true);
+$mail->Subject = 'Recuperação de Senha';
+$mail->Body = "
+    <p>Olá!</p>
+    <p>Você solicitou a recuperação da sua conta no nosso sistema.</p>
+    <p>Para redefinir sua senha, clique no link abaixo:</p>
+    <p><a href='$link'>Clique aqui para redefinir sua senha</a></p>
+    <br>
+    <p>Atenciosamente,<br>Equipe do Sistema de Animais Perdidos.</p>
+";
 
 
     $mail->send();
