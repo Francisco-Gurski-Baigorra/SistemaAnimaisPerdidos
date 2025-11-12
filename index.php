@@ -22,7 +22,7 @@ session_start();
 
         /* Barra superior */
         .navbar {
-            background-color: #b6e388;
+            background-color: #179e46ff;
             padding: 1rem;
         }
 
@@ -124,7 +124,7 @@ session_start();
   <h2 class="fw-bold">Encontre seu animal perdido</h2>
   <p class="text-muted mx-auto" style="max-width: 600px;">
     Este sistema web é uma ferramenta de busca para animais perdidos ou encontrados. 
-    Utilize com o objetivo de encontrar seu animal ou reportar um animal encontrado.
+    Utilize como um objetivo para encontrar seu animal ou reportar um animal encontrado.
   </p>
 
   <!-- Botões principais -->
