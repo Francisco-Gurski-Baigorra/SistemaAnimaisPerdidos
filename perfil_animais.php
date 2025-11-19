@@ -146,9 +146,29 @@ body {
               <a href="editar_animal.php?id=<?= $animal['id'] ?>" class="btn btn-outline-primary w-100 mb-2">
                 <i class="bi bi-pencil"></i> Editar
               </a>
-              <a href="excluir_animal.php?id=<?= $animal['id'] ?>" class="btn btn-outline-danger w-100">
-                <i class="bi bi-trash"></i> Excluir
-              </a>
+              <!-- Botão que mostra a confirmação -->
+<button class="btn btn-outline-danger w-100" 
+        onclick="mostrarConfirmacaoExclusao(<?= $animal['id'] ?>)">
+  <i class="bi bi-trash"></i> Excluir
+</button>
+
+<!-- Área de confirmação (escondida por padrão) -->
+<div id="confirmar<?= $animal['id'] ?>" class="mt-2 d-none text-center">
+  <p class="text-danger fw-bold mb-2">
+    Deseja mesmo excluir este animal?
+  </p>
+
+  <a href="excluir_animal.php?id=<?= $animal['id'] ?>" 
+     class="btn btn-danger w-45">
+      Excluir
+  </a>
+
+  <button class="btn btn-secondary w-45 ms-1"
+          onclick="cancelarConfirmacaoExclusao(<?= $animal['id'] ?>)">
+          Cancelar
+  </button>
+</div>
+
             </div>
           </div>
         </div>
@@ -252,6 +272,18 @@ document.addEventListener('shown.bs.modal', function (event) {
   }
 });
 </script>
+
+<script>
+function mostrarConfirmacaoExclusao(id) {
+    document.getElementById("confirmar" + id).classList.remove("d-none");
+}
+
+function cancelarConfirmacaoExclusao(id) {
+    document.getElementById("confirmar" + id).classList.add("d-none");
+}
+</script>
+
+
 
 </body>
 </html>

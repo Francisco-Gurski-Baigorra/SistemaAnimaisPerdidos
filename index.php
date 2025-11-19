@@ -107,7 +107,7 @@ session_start();
         <div class="ms-auto">
             <?php if (isset($_SESSION['usuario_id'])): ?>
                 <a href="registrar_animal.php" class="btn btn-success me-2">Registrar Animal</a>
-                <a href="perfil_animais.php" class="btn btn-outline-dark me-2"><i class="bi bi-person-circle"></i> Perfil</a>
+                <a href="perfil_animais.php" class="btn btn-outline-dark me-2"><i class="bi bi-person-circle"></i> Perfil Animais</a>
                 <a href="logout.php" class="btn btn-outline-danger">Sair</a>
             <?php else: ?>
                 <a href="login.php" class="btn btn-outline-dark me-2"><i class="bi bi-box-arrow-in-right"></i> Login</a>
@@ -124,7 +124,7 @@ session_start();
   <h2 class="fw-bold">Encontre seu animal perdido</h2>
   <p class="text-muted mx-auto" style="max-width: 600px;">
     Este sistema web é uma ferramenta de busca para animais perdidos ou encontrados. 
-    Utilize como um objetivo para encontrar seu animal ou reportar um animal encontrado.
+    Utilize com o objetivo de encontrar seu animal ou reportar algum animal que encontrou.
   </p>
 
   <!-- Botões principais -->
