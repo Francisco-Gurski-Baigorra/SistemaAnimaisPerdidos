@@ -61,7 +61,7 @@ if (!$stmt) {
 // Tipos corretos:
 // i = int | s = string | d = double (decimal)
 $stmt->bind_param(
-    "issssiisssssdds",
+    "issssisssssddss",
     $usuario_id,
     $situacao,
     $especie,
@@ -78,6 +78,7 @@ $stmt->bind_param(
     $data_ocorrido,
     $telefone_contato
 );
+
 
 if ($stmt->execute()) {
     echo "✅ Animal registrado com sucesso!";

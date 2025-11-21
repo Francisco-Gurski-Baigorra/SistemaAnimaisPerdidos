@@ -6,49 +6,17 @@ include('conecta.php');
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Mapa de Animais Perdidos</title>
+  <title>Mapa - Animais Perdidos</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
   <style>
-    body, html {
-      height: 100%;
-      margin: 0;
-      background-color: #81d181;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .filter-container {
-      background: white;
-      padding: 10px 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      margin-bottom: 8px;
-    }
-
-    #map {
-      flex: 1;
-      width: 100%;
-      border-radius: 10px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    }
-
-    .popup-img {
-      width: 150px;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 5px;
-    }
-
-    .info-popup {
-      font-size: 14px;
-      line-height: 1.4;
-    }
+    body, html { height:100%; margin:0; background-color:#81d181; display:flex; flex-direction:column; }
+    .filter-container { background:white; padding:10px 15px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:8px; }
+    #map { flex:1; width:100%; border-radius:10px; box-shadow:0 0 8px rgba(0,0,0,0.1); }
+    .popup-img { width:150px; height:150px; object-fit:cover; border-radius:8px; margin-bottom:5px; }
+    .info-popup { font-size:14px; line-height:1.4; max-width:260px; }
   </style>
 </head>
-
 <body>
   <div class="container-fluid py-3">
     <div class="text-center mb-2">
@@ -64,7 +32,7 @@ include('conecta.php');
           <option value="">Espécie</option>
           <option value="cachorro">Cachorro</option>
           <option value="gato">Gato</option>
-          <option value="outro">Outro</option>
+          <option value="outros">Outro</option>
         </select>
 
         <select id="filtroRaca" class="form-select form-select-sm w-auto">
@@ -73,7 +41,7 @@ include('conecta.php');
           <option value="poodle">Poodle</option>
           <option value="pitbull">Pitbull</option>
           <option value="labrador">Labrador</option>
-          <option value="siames">Siamês</option>
+          <option value="siamês">Siamês</option>
           <option value="persa">Persa</option>
           <option value="outros">Outros</option>
         </select>
@@ -82,6 +50,7 @@ include('conecta.php');
           <option value="">Gênero</option>
           <option value="macho">Macho</option>
           <option value="femea">Fêmea</option>
+          <option value="nao_informado">Não informado</option>
         </select>
 
         <select id="filtroPorte" class="form-select form-select-sm w-auto">
@@ -104,9 +73,9 @@ include('conecta.php');
 
         <select id="filtroIdade" class="form-select form-select-sm w-auto">
           <option value="">Idade</option>
-          <option value="filhote">Filhote</option>
-          <option value="adulto">Adulto</option>
-          <option value="idoso">Idoso</option>
+          <option value="Filhote">Filhote</option>
+          <option value="Adulto">Adulto</option>
+          <option value="Idoso">Idoso</option>
         </select>
 
         <button id="btnFiltrar" class="btn btn-success btn-sm">🔍 Filtrar</button>
@@ -116,60 +85,156 @@ include('conecta.php');
 
   <div id="map"></div>
 
+  <!-- Modal para mostrar contato / aviso -->
+  <div class="modal fade" id="contatoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">Contato do Responsável</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="contatoModalBody">
+          <!-- preenchido dinamicamente -->
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    var map = L.map('map').setView([-29.78126, -57.10689], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '© OpenStreetMap'
-    }).addTo(map);
+    // Variáveis vindas do PHP
+    const isLogged = <?= isset($_SESSION['usuario_id']) ? 'true' : 'false' ?>;
+    const currentUserId = <?= isset($_SESSION['usuario_id']) ? (int)$_SESSION['usuario_id'] : 'null' ?>;
+
+    const map = L.map('map').setView([-29.78126, -57.10689], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
     let marcadores = [];
 
-    function carregarAnimais() {
-      fetch('carregar_perdidos.php')
-        .then(r => r.json())
-        .then(animais => {
-          marcadores.forEach(m => map.removeLayer(m));
-          marcadores = [];
+    async function carregarAnimais() {
+      try {
+        const res = await fetch('carregar_perdidos.php');
+        const animais = await res.json();
 
-          const especie = filtroEspecie.value.toLowerCase();
-          const raca = filtroRaca.value.toLowerCase();
-          const genero = filtroGenero.value.toLowerCase();
-          const porte = filtroPorte.value.toLowerCase();
-          const cor = filtroCor.value.toLowerCase();
-          const idade = filtroIdade.value.toLowerCase();
+        marcadores.forEach(m => map.removeLayer(m));
+        marcadores = [];
 
-          animais.filter(a => {
-            return (!especie || a.especie.toLowerCase() === especie) &&
-                   (!raca || (a.raca_nome && a.raca_nome.toLowerCase().includes(raca))) &&
-                   (!genero || a.genero.toLowerCase() === genero) &&
-                   (!porte || a.porte.toLowerCase() === porte) &&
-                   (!cor || a.cor_predominante.toLowerCase().includes(cor)) &&
-                   (!idade || a.idade.toLowerCase() === idade);
-          }).forEach(a => {
-            if (!a.latitude || !a.longitude) return;
+        const especie = document.getElementById('filtroEspecie').value.toLowerCase();
+        const raca = document.getElementById('filtroRaca').value.toLowerCase();
+        const genero = document.getElementById('filtroGenero').value.toLowerCase();
+        const porte = document.getElementById('filtroPorte').value.toLowerCase();
+        const cor = document.getElementById('filtroCor').value.toLowerCase();
+        const idade = document.getElementById('filtroIdade').value.toLowerCase();
 
-            const icone = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/616/616408.png', iconSize: [36, 36] });
-            const popup = `
-              <div class="info-popup">
-                <b>${a.nome || 'Sem nome'}</b><br>
-                <b>Espécie:</b> ${a.especie}<br>
-                <b>Raça:</b> ${a.raca_nome || 'Não informada'}<br>
-                <b>Cor:</b> ${a.cor_predominante || 'Não informada'}<br>
-                <b>Gênero:</b> ${a.genero}<br>
-                <b>Idade:</b> ${a.idade}<br>
-                <b>Porte:</b> ${a.porte}<br>
-                <b>Descrição:</b> ${a.descricao || 'Sem descrição'}<br>
-                <b>Telefone:</b> ${a.telefone_contato}<br><br>
-                ${a.foto ? `<img src="uploads/${a.foto}" class="popup-img">` : ''}
-              </div>`;
-            marcadores.push(L.marker([a.latitude, a.longitude], { icon: icone }).addTo(map).bindPopup(popup));
-          });
+        animais.filter(a => {
+          return (!especie || (a.especie && a.especie.toLowerCase() === especie)) &&
+                 (!raca || (a.raca_nome && a.raca_nome.toLowerCase().includes(raca))) &&
+                 (!genero || (a.genero && a.genero.toLowerCase() === genero)) &&
+                 (!porte || (a.porte && a.porte.toLowerCase() === porte)) &&
+                 (!cor || (a.cor_predominante && a.cor_predominante.toLowerCase().includes(cor))) &&
+                 (!idade || (a.idade && a.idade.toLowerCase() === idade));
+        }).forEach(a => {
+          if (!a.latitude || !a.longitude) return;
+
+          const icone = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/616/616408.png', iconSize: [36,36] });
+
+          // Monta conteúdo do popup com botão para ver contato
+          const popupHtml = `
+            <div class="info-popup">
+              <b>${escapeHtml(a.nome) || 'Sem nome'}</b><br>
+              <b>Espécie:</b> ${escapeHtml(a.especie || 'Não informada')}<br>
+              <b>Raça:</b> ${escapeHtml(a.raca_nome || 'Não informada')}<br>
+              <b>Cor:</b> ${escapeHtml(a.cor_predominante || 'Não informada')}<br>
+              <b>Gênero:</b> ${escapeHtml(a.genero || 'Não informado')}<br>
+              <b>Idade:</b> ${escapeHtml(a.idade || 'Não informada')}<br>
+              <b>Porte:</b> ${escapeHtml(a.porte || 'Não informada')}<br>
+              <b>Data:</b> ${formatDate(a.data_ocorrido)}<br>
+              <b>Descrição:</b> ${escapeHtml(a.descricao || 'Sem descrição')}<br><br>
+              ${a.foto ? `<img src="uploads/${encodeURI(a.foto)}" class="popup-img" alt="foto">` : ''}
+              <div class="d-grid gap-2 mt-2">
+                <button class="btn btn-sm btn-outline-primary" onclick="verContato(${a.usuario_id})">Ver contato do responsável</button>
+              </div>
+            </div>`;
+
+          const marker = L.marker([a.latitude, a.longitude], { icon: icone }).addTo(map).bindPopup(popupHtml);
+          marcadores.push(marker);
         });
+
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao carregar animais');
+      }
     }
 
-    btnFiltrar.addEventListener('click', carregarAnimais);
+    document.getElementById('btnFiltrar').addEventListener('click', carregarAnimais);
     carregarAnimais();
+
+    // Função para abrir modal com contato (faz fetch para endpoint seguro)
+    async function verContato(usuarioId) {
+      if (!isLogged) {
+        // mostra modal pedindo cadastro/login
+        const body = `
+          <p>Você precisa estar <strong>logado</strong> para visualizar o contato do responsável.</p>
+          <div class="d-flex justify-content-center gap-2">
+            <a href="login.php" class="btn btn-primary">Entrar</a>
+            <a href="cadastro.php" class="btn btn-success">Cadastrar</a>
+          </div>`;
+        showContatoModal(body);
+        return;
+      }
+
+      try {
+        const res = await fetch(`owner_info.php?usuario_id=${encodeURIComponent(usuarioId)}`, { credentials: 'same-origin' });
+        if (res.status === 200) {
+          const data = await res.json();
+          const body = `
+            <p><strong>Nome:</strong> ${escapeHtml(data.nome || 'Não informado')}</p>
+            <p><strong>Telefone:</strong> ${escapeHtml(data.telefone || 'Não informado')}</p>
+            <p><strong>Email:</strong> ${escapeHtml(data.email || 'Não informado')}</p>
+            <div class="text-muted small">Respeite a privacidade ao contatar o responsável.</div>
+          `;
+          showContatoModal(body);
+        } else if (res.status === 403) {
+          showContatoModal('<p>Acesso negado. Faça login para ver o contato.</p><div class="d-flex justify-content-center gap-2"><a href="login.php" class="btn btn-primary">Entrar</a><a href="cadastro.php" class="btn btn-success">Cadastrar</a></div>');
+        } else {
+          showContatoModal('<p>Não foi possível obter os dados do responsável.</p>');
+        }
+      } catch (err) {
+        console.error(err);
+        showContatoModal('<p>Erro ao buscar contato.</p>');
+      }
+    }
+
+    function showContatoModal(html) {
+      document.getElementById('contatoModalBody').innerHTML = html;
+      const modal = new bootstrap.Modal(document.getElementById('contatoModal'));
+      modal.show();
+    }
+
+    // utilitários
+    function escapeHtml(unsafe) {
+      if (unsafe === null || unsafe === undefined) return '';
+      return String(unsafe)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return 'Não informado';
+      // espera 'YYYY-MM-DD' ou null
+      const parts = dateString.split('-');
+      if (parts.length === 3 && parts[0].length === 4) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+      return dateString;
+    }
   </script>
 </body>
 </html>

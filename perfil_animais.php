@@ -197,7 +197,17 @@ body {
     <li class="list-group-item"><strong>Gênero:</strong> <?= htmlspecialchars($animal['genero'] ?? 'Não informado') ?></li>
     <li class="list-group-item"><strong>Cor predominante:</strong> <?= htmlspecialchars($animal['cor_predominante'] ?? 'Não informado') ?></li>
     <li class="list-group-item"><strong>Idade:</strong> <?= htmlspecialchars($animal['idade'] ?? 'Não informado') ?></li>
-    <li class="list-group-item"><strong>Data do ocorrido:</strong> <?= htmlspecialchars($animal['data_ocorrido'] ?? 'Não informado') ?></li>
+   <li class="list-group-item">
+  <strong>Data do ocorrido:</strong>
+  <?php 
+    if (!empty($animal['data_ocorrido']) && $animal['data_ocorrido'] !== '0000-00-00') {
+       echo date('d/m/Y', strtotime($animal['data_ocorrido']));
+
+    } else {
+        echo 'Não informado';
+    }
+  ?>
+</li>
     <li class="list-group-item"><strong>Descrição:</strong><br><?= nl2br(htmlspecialchars($animal['descricao'] ?? 'Sem descrição')) ?></li>
   </ul>
 
