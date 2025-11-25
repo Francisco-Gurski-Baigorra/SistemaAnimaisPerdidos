@@ -21,8 +21,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['usuario_nome'] = $usuario['nome'];
             $_SESSION['tipo_usuario'] = $usuario['tipo_usuario'];
 
-            header("Location: index.php");
-            exit;
+            // Se for administrador → vai direto pro painel admin
+    if ($usuario['tipo_usuario'] === 'administrador') {
+    header("Location: admin.php"); // ajuste o nome se necessário
+    exit;
+}
+
+// Se for usuário normal → vai para a tela inicial
+header("Location: index.php");
+exit;
+
         } else {
             echo "<script>alert('Senha incorreta!'); window.history.back();</script>";
         }
