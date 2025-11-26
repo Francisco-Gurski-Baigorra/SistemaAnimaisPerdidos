@@ -1,10 +1,10 @@
 <?php
 session_start();
-require '../conecta.php';
+require 'conecta.php'; // Importante: caminho corrigido, pois admin normalmente está em pasta separada
 
 // Verifica se o usuário é admin
-if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'administrador') {
-    header("Location: ../login.php");
+if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo_usuario'] != 'administrador') {
+    header("Location: login.php");
     exit;
 }
 
@@ -17,7 +17,7 @@ $animal_id = intval($_GET['id']);
 
 // Busca dados do animal
 $sql = "SELECT * FROM animais WHERE id = ?";
-$stmt = $conn->prepare($sql);
+$stmt = $conexao->prepare($sql);
 $stmt->bind_param("i", $animal_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -27,6 +27,21 @@ if ($result->num_rows == 0) {
 }
 
 $animal = $result->fetch_assoc();
+
+// Busca o nome da raça na tabela racas
+$raca_nome = "";
+if (!empty($animal['raca_id'])) {
+    $sqlRaca = "SELECT racas FROM racas WHERE id = ?";
+    $stmtRaca = $conexao->prepare($sqlRaca);
+    $stmtRaca->bind_param("i", $animal['raca_id']);
+    $stmtRaca->execute();
+    $resultRaca = $stmtRaca->get_result();
+
+    if ($resultRaca->num_rows > 0) {
+        $rowRaca = $resultRaca->fetch_assoc();
+        $raca_nome = $rowRaca['racas'];
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -72,7 +87,7 @@ $animal = $result->fetch_assoc();
         <div class="col-md-4">
             <label>Foto Atual:</label><br>
             <?php if (!empty($animal['foto'])): ?>
-                <img src="../uploads/<?= $animal['foto'] ?>" class="preview">
+                <img src="uploads/<?= $animal['foto'] ?>" class="preview">
             <?php else: ?>
                 <p class="text-muted">Sem foto</p>
             <?php endif; ?>
@@ -82,7 +97,7 @@ $animal = $result->fetch_assoc();
 
         <div class="col-md-8">
             <label class="form-label">Nome:</label>
-            <input type="text" name="nome" class="form-control" value="<?= $animal['nome'] ?>">
+            <input type="text" name="nome" class="form-control" value="<?= htmlspecialchars($animal['nome']) ?>">
 
             <label class="form-label mt-2">Situação:</label>
             <select name="situacao" class="form-control">
@@ -91,7 +106,7 @@ $animal = $result->fetch_assoc();
             </select>
 
             <label class="form-label mt-2">Espécie:</label>
-            <input type="text" name="especie" class="form-control" value="<?= $animal['especie'] ?>">
+            <input type="text" name="especie" class="form-control" value="<?= htmlspecialchars($animal['especie']) ?>">
 
             <label class="form-label mt-2">Gênero:</label>
             <select name="genero" class="form-control">
@@ -100,19 +115,19 @@ $animal = $result->fetch_assoc();
             </select>
 
             <label class="form-label mt-2">Raça:</label>
-            <input type="text" name="raca" class="form-control" value="<?= $animal['raca'] ?>">
+            <input type="text" name="raca" class="form-control" value="<?= htmlspecialchars($raca_nome) ?>">
 
             <label class="form-label mt-2">Porte:</label>
-            <input type="text" name="porte" class="form-control" value="<?= $animal['porte'] ?>">
+            <input type="text" name="porte" class="form-control" value="<?= htmlspecialchars($animal['porte']) ?>">
 
             <label class="form-label mt-2">Cor:</label>
-            <input type="text" name="cor" class="form-control" value="<?= $animal['cor'] ?>">
+            <input type="text" name="cor" class="form-control" value="<?= htmlspecialchars($animal['cor_predominante']) ?>">
 
             <label class="form-label mt-2">Idade:</label>
-            <input type="text" name="idade" class="form-control" value="<?= $animal['idade'] ?>">
+            <input type="text" name="idade" class="form-control" value="<?= htmlspecialchars($animal['idade']) ?>">
 
             <label class="form-label mt-2">Telefone:</label>
-            <input type="text" name="telefone" class="form-control" value="<?= $animal['telefone'] ?>">
+            <input type="text" name="telefone" class="form-control" value="<?= htmlspecialchars($animal['telefone_contato']) ?>">
         </div>
     </div>
 
@@ -136,7 +151,8 @@ $animal = $result->fetch_assoc();
 let lat = parseFloat("<?= $animal['latitude'] ?>");
 let lng = parseFloat("<?= $animal['longitude'] ?>");
 
-if (!lat || !lng) {
+// Se não tiver localização salva, define um ponto padrão
+if (!lat || !lng || lat === 0 || lng === 0) {
     lat = -29.78;
     lng = -57.10;
 }

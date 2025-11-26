@@ -55,7 +55,7 @@ $result = $conexao->query($sql);
 
 <h2 class="mb-4">🐾 Gerenciar Animais</h2>
 
-<a href="painel_admin.php" class="btn btn-secondary mb-3">⬅ Voltar</a>
+<a href="admin.php" class="btn btn-secondary mb-3">⬅ Voltar</a>
 
 <table class="table table-bordered table-striped">
     <thead class="table-success">
