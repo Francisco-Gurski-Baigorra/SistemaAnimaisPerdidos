@@ -60,7 +60,7 @@ $result = $conexao->query($sql);
 <table class="table table-bordered table-striped">
     <thead class="table-success">
         <tr>
-            <th>ID</th>
+            <th>ID Animal</th>
             <th>ID Usuário</th>
             <th>Foto</th>
             <th>Nome</th>
@@ -72,7 +72,6 @@ $result = $conexao->query($sql);
             <th>Cor</th>
             <th>Idade</th>
             <th>Telefone</th>
-            <th>Localização</th>
             <th>Ações</th>
         </tr>
     </thead>
@@ -108,16 +107,6 @@ $result = $conexao->query($sql);
             <td><?= $animal['idade'] ?></td>
             <td><?= $animal['telefone_contato'] ?></td>
 
-            <td>
-                <?php if ($animal['latitude'] && $animal['longitude']): ?>
-                    <a target="_blank" 
-                       href="https://www.google.com/maps?q=<?= $animal['latitude'] ?>,<?= $animal['longitude'] ?>">
-                       Ver mapa
-                    </a>
-                <?php else: ?>
-                    <span class="text-muted">Não informado</span>
-                <?php endif; ?>
-            </td>
 
             <td>
                 <a href="adm_excluir_animal.php?id=<?= $animal['id'] ?>" 

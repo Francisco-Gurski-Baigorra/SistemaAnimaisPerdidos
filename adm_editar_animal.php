@@ -99,35 +99,69 @@ if (!empty($animal['raca_id'])) {
             <label class="form-label">Nome:</label>
             <input type="text" name="nome" class="form-control" value="<?= htmlspecialchars($animal['nome']) ?>">
 
-            <label class="form-label mt-2">Situação:</label>
-            <select name="situacao" class="form-control">
-                <option value="perdido" <?= $animal['situacao']=='perdido'?'selected':'' ?>>Perdido</option>
-                <option value="encontrado" <?= $animal['situacao']=='encontrado'?'selected':'' ?>>Encontrado</option>
+                        <label class="form-label mt-2">Situação:</label>
+            <select name="situacao" class="form-control" required>
+                <option value="perdido"    <?= $animal['situacao']=='perdido' ? 'selected' : '' ?>>Perdido</option>
+                <option value="encontrado" <?= $animal['situacao']=='encontrado' ? 'selected' : '' ?>>Encontrado</option>
             </select>
 
             <label class="form-label mt-2">Espécie:</label>
-            <input type="text" name="especie" class="form-control" value="<?= htmlspecialchars($animal['especie']) ?>">
+            <select name="especie" class="form-control" required>
+                <option value="cachorro" <?= $animal['especie']=='cachorro' ? 'selected' : '' ?>>Cachorro</option>
+                <option value="gato"     <?= $animal['especie']=='gato' ? 'selected' : '' ?>>Gato</option>
+                <option value="outros"   <?= $animal['especie']=='outros' ? 'selected' : '' ?>>Outros</option>
+            </select>
 
             <label class="form-label mt-2">Gênero:</label>
-            <select name="genero" class="form-control">
-                <option value="macho" <?= $animal['genero']=='macho'?'selected':'' ?>>Macho</option>
-                <option value="femea" <?= $animal['genero']=='femea'?'selected':'' ?>>Fêmea</option>
+            <select name="genero" class="form-control" required>
+                <option value="macho"          <?= $animal['genero']=='macho' ? 'selected' : '' ?>>Macho</option>
+                <option value="femea"          <?= $animal['genero']=='femea' ? 'selected' : '' ?>>Fêmea</option>
+                <option value="nao_informado" <?= $animal['genero']=='nao_informado' ? 'selected' : '' ?>>Não informado</option>
             </select>
 
             <label class="form-label mt-2">Raça:</label>
-            <input type="text" name="raca" class="form-control" value="<?= htmlspecialchars($raca_nome) ?>">
+        <select name="raca_id" class="form-control" required>
+    <option value="">-- Selecione a raça --</option>
+    <?php
+    // Busca todas as raças ordenadas
+    $sqlRacas = "SELECT id, racas FROM racas ORDER BY racas";
+    $resultRacas = $conexao->query($sqlRacas);
+
+    while ($row = $resultRacas->fetch_assoc()) {
+        $selected = ($row['id'] == $animal['raca_id']) ? 'selected' : '';
+        echo '<option value="' . $row['id'] . '" ' . $selected . '>' . htmlspecialchars($row['racas']) . '</option>';
+    }
+    ?>
+        </select>
 
             <label class="form-label mt-2">Porte:</label>
-            <input type="text" name="porte" class="form-control" value="<?= htmlspecialchars($animal['porte']) ?>">
+            <select name="porte" class="form-control" required>
+                <option value="pequeno" <?= $animal['porte']=='pequeno' ? 'selected' : '' ?>>Pequeno</option>
+                <option value="medio"   <?= $animal['porte']=='medio' ? 'selected' : '' ?>>Médio</option>
+                <option value="grande"  <?= $animal['porte']=='grande' ? 'selected' : '' ?>>Grande</option>
+            </select>
 
-            <label class="form-label mt-2">Cor:</label>
-            <input type="text" name="cor" class="form-control" value="<?= htmlspecialchars($animal['cor_predominante']) ?>">
+            <label class="form-label mt-2">Cor Predominante:</label>
+            <select name="cor_predominante" class="form-control">
+                <option value="preto"     <?= $animal['cor_predominante']=='preto' ? 'selected' : '' ?>>Preto</option>
+                <option value="branco"    <?= $animal['cor_predominante']=='branco' ? 'selected' : '' ?>>Branco</option>
+                <option value="marrom"    <?= $animal['cor_predominante']=='marrom' ? 'selected' : '' ?>>Marrom</option>
+                <option value="cinza"     <?= $animal['cor_predominante']=='cinza' ? 'selected' : '' ?>>Cinza</option>
+                <option value="caramelo"  <?= $animal['cor_predominante']=='caramelo' ? 'selected' : '' ?>>Caramelo</option>
+                <option value="tricolor"  <?= $animal['cor_predominante']=='tricolor' ? 'selected' : '' ?>>Tricolor</option>
+            </select>
 
             <label class="form-label mt-2">Idade:</label>
-            <input type="text" name="idade" class="form-control" value="<?= htmlspecialchars($animal['idade']) ?>">
+            <select name="idade" class="form-control" required>
+                <option value="filhote" <?= $animal['idade']=='filhote' ? 'selected' : '' ?>>Filhote</option>
+                <option value="adulto"  <?= $animal['idade']=='adulto' ? 'selected' : '' ?>>Adulto</option>
+                <option value="idoso"   <?= $animal['idade']=='idoso' ? 'selected' : '' ?>>Idoso</option>
+            </select>
 
-            <label class="form-label mt-2">Telefone:</label>
-            <input type="text" name="telefone" class="form-control" value="<?= htmlspecialchars($animal['telefone_contato']) ?>">
+            <label class="form-label mt-2">Telefone de Contato:</label>
+            <input type="text" name="telefone_contato" class="form-control" value="<?= htmlspecialchars($animal['telefone_contato']) ?>">
+
+        
         </div>
     </div>
 
