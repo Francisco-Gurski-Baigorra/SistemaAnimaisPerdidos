@@ -79,6 +79,8 @@ if (!empty($animal['raca_id'])) {
 
 <h2 class="mb-4">✏️ Editar Animal</h2>
 
+<a href="gerenciar_animais.php" class="btn btn-secondary mb-3">⬅ Voltar</a>
+
 <form action="adm_salvar_edicao_animal.php" method="POST" enctype="multipart/form-data">
 
     <input type="hidden" name="id" value="<?= $animal['id'] ?>">
