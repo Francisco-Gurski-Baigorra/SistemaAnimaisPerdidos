@@ -19,29 +19,84 @@ while ($row = $res->fetch_assoc()) {
 <head>
 <meta charset="UTF-8">
 <title>Cadastro de Animal no Mapa</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap + Ícones -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
 <style>
   html, body {
     height: 100%;
     margin: 0;
-    background-color: #e9f7ef;
-    font-family: 'Segoe UI', sans-serif;
+    background-color: #ffffffff;
     display: flex;
     flex-direction: column;
   }
 
-  h2 { text-align: center; margin-top: 10px; color: #2e7d32; font-weight: 700; }
+  /* ======================= NAVBAR PADRÃO ======================= */
+  .navbar {
+      background-color: #179e46ff;
+      padding: 1rem;
+  }
+
+  .navbar-brand {
+      font-weight: bold;
+      font-size: 1.7rem;
+      color: #2b2b2b !important;
+  }
+
+  .navbar-brand i {
+      font-size: 1.8rem;
+      color: #2b2b2b;
+  }
+
+  /* ======================= AREA PRINCIPAL ======================= */
+  .content {
+    padding: 18px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  h2 { text-align: center; margin-top: 8px; color: #252121ff; font-weight: 700; }
   p { text-align: center; color: #4b4b4b; margin-bottom: 10px; }
 
-  #map {
-    flex: 1;
-    width: 96%;
-    margin: 0 auto 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  /* ======================= MARCAÇÃO DO MAPA ======================= */
+ .map-wrapper {
+    width: 100%;             /* agora ocupa toda a largura */
+    max-width: 100%;         /* remove limite */
+    margin: 0;
+    padding: 0;
+    border-radius: 0;        /* opcional: deixa o mapa encostar nas bordas */
+    background: none;        /* elimina a caixa branca */
+    border: none;
+    box-shadow: none;
+}
+
+
+  .map-header {
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
   }
+
+  .map-title {
+    font-weight: 700;
+    color: #155724;
+  }
+
+  #map {
+    height: 78vh;  /* mapa quase tela cheia */
+    width: 100%;
+    border-radius: 0;
+}
+
 
   .leaflet-popup-content-wrapper {
     border-radius: 12px;
@@ -50,8 +105,9 @@ while ($row = $res->fetch_assoc()) {
   }
 
   .popup-form {
-    max-height: 400px;
+    max-height: 420px;
     overflow-y: auto;
+    width: 320px;
   }
 
   .popup-form label {
@@ -71,15 +127,6 @@ while ($row = $res->fetch_assoc()) {
     font-size: 14px;
   }
 
-  .popup-form select[name="raca_id"] {
-    max-height: 120px;
-    overflow-y: auto;
-    display: block;
-    position: relative;
-    z-index: 10000;
-    background-color: white;
-  }
-
   .popup-form button {
     background: #4CAF50;
     color: white;
@@ -91,59 +138,118 @@ while ($row = $res->fetch_assoc()) {
     transition: background 0.3s;
   }
 
-  .popup-form button:hover { background: #388e3c; }
-
-  .back-btn {
-    display: block;
-    width: fit-content;
-    margin: 10px auto 0;
-    text-decoration: none;
-    color: #2e7d32;
-    border: 1px solid #2e7d32;
-    border-radius: 8px;
-    padding: 5px 10px;
-    transition: all 0.3s;
+  .popup-form .btn-close-popup {
+    background: #e0e0e0;
+    color: #333;
+    margin-top: 6px;
   }
 
-  .back-btn:hover {
-    background: #2e7d32;
-    color: white;
+  .popup-form button:hover { background: #388e3c; }
+
+  /* responsividade */
+  @media (max-width: 576px) {
+    #map { height: 55vh; }
+    .popup-form { width: 260px; }
   }
 </style>
 </head>
 <body>
 
-<a href="index.php" class="back-btn">Voltar</a>
-<h2>Cadastro de Animal Perdido ou Encontrado</h2>
-<p>Clique no mapa para marcar o local e cadastrar o animal.</p>
+<!-- NAVBAR PADRÃO -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="index.php">
+            <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> RASTREIA BICHO
+        </a>
 
-<div id="map"></div>
+        <div class="ms-auto">
+            <?php if (isset($_SESSION['usuario_id'])): ?>
+                <a href="registrar_animal.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-plus-circle"></i> Registrar Animal
+                </a>
 
+                <a href="perfil.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-person-circle"></i> Perfil
+                </a>
+
+                <a href="perfil_animais.php" class="btn btn-outline-dark me-2">
+                    <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Animais Registrados
+                </a>
+
+                <a href="logout.php" class="btn btn-outline-danger me-2">
+                    <i class="bi bi-box-arrow-right"></i> Sair
+                </a>
+
+            <?php else: ?>
+                <a href="login.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </a>
+
+                <a href="cadastro.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-person-plus"></i> Registrar Conta
+                </a>
+            <?php endif; ?>
+        </div>
+    </div>
+</nav>
+
+<!-- CONTEÚDO -->
+<div class="content">
+  <h2>Registre o animal encontrado ou perdido</h2>
+  <p>Clique no mapa para marcar o local e cadastrar o animal.</p>
+
+  <div class="map-wrapper">
+    <div class="map-header">
+
+    </div>
+
+    <div id="map"></div>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-const map = L.map('map').setView([-29.78126, -57.10689], 13);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
+<script>
 const racas = <?php echo json_encode($racas, JSON_UNESCAPED_UNICODE); ?>;
 const usuario_id = <?php echo $_SESSION['usuario_id']; ?>;
 
-map.on('click', function(e) {
-    const lat = e.latlng.lat.toFixed(6);
-    const lng = e.latlng.lng.toFixed(6);
+// inicializa o mapa
+const map = L.map('map').setView([-29.78126, -57.10689], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
-    let racasOptions = '<option value="">-- Selecione a raça --</option>';
-    racas.forEach(r => {
-        racasOptions += `<option value="${r.id}">${r.racas}</option>`;
-    });
+// variável que controla se já existe um popup/form aberto
+let popupOpen = false;
+let currentPopup = null;
 
-    const formHtml = `
-    <form id="formAnimal" class="popup-form">
+// quando qualquer popup do mapa for fechado, atualiza o estado
+map.on('popupclose', function() {
+  popupOpen = false;
+  currentPopup = null;
+});
+
+// monta opções de raças (função reutilizável)
+function montarOpcoesRacas() {
+  let opt = '<option value="">-- Selecione a raça --</option>';
+  racas.forEach(r => {
+    opt += `<option value="${r.id}">${r.racas}</option>`;
+  });
+  return opt;
+}
+
+// função que cria e abre o popup-form no ponto clicado
+function abrirPopupForm(lat, lng) {
+  const racasOptions = montarOpcoesRacas();
+
+  const formHtml = `
+    <div class="popup-form">
+      <form id="formAnimal" enctype="multipart/form-data">
         <input type="hidden" name="latitude" value="${lat}">
         <input type="hidden" name="longitude" value="${lng}">
         <input type="hidden" name="usuario_id" value="${usuario_id}">
 
         <label>Nome do animal: <span style="color:red;">*</span></label>
-        <input name="nome" type="text" placeholder="Ex: Rex, Mia...">
+        <input name="nome" type="text">
 
         <label>Situação: <span style="color:red;">*</span></label>
         <select name="situacao">
@@ -175,7 +281,7 @@ map.on('click', function(e) {
         <input name="data_ocorrido" type="date" value="<?php echo date('Y-m-d'); ?>">
 
         <label>Seu telefone (com DDD): <span style="color:red;">*</span></label>
-        <input name="telefone_contato" id="tel" type="text" placeholder="(55) 99999-9999" maxlength="15">
+        <input name="telefone_contato" id="tel" type="text" maxlength="15" placeholder="(55) 99999-9999">
 
         <label>Foto do animal: <span style="color:red;">*</span></label>
         <input name="foto" type="file" accept="image/*">
@@ -210,79 +316,118 @@ map.on('click', function(e) {
         <label>Descrição (opcional):</label>
         <textarea name="descricao" rows="3" placeholder="Detalhes que ajudem na identificação..."></textarea>
 
-        <button type="button" onclick="salvarAnimal()">Salvar e Publicar</button>
-    </form>`;
+        <button type="button" id="btnSalvar">Registrar</button>
+        <button type="button" id="btnFechar" class="btn-close-popup">Fechar</button>
+      </form>
+    </div>
+  `;
 
-    L.popup({ maxWidth: 340, closeOnClick: false, autoClose: false })
-        .setLatLng(e.latlng)
-        .setContent(formHtml)
-        .openOn(map);
+  const popup = L.popup({
+    maxWidth: 360,
+    closeOnClick: false,
+    autoClose: false,
+    className: 'custom-popup'
+  })
+    .setLatLng([lat, lng])
+    .setContent(formHtml)
+    .openOn(map);
 
-    // Máscara do telefone
-    setTimeout(() => {
-        const telInput = document.getElementById('tel');
-        if (telInput) {
-            telInput.addEventListener('input', function(e) {
-                let v = e.target.value.replace(/\D/g, '');
-                if (v.length > 11) v = v.substr(0, 11);
-                v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
-                v = v.replace(/(\d{5})(\d)/, '$1-$2');
-                e.target.value = v;
-            });
-        }
-    }, 100);
-});
+  popupOpen = true;
+  currentPopup = popup;
 
-function salvarAnimal() {
+  // espera o DOM do popup existir para ligar eventos
+  setTimeout(() => {
     const form = document.getElementById('formAnimal');
+    const btnSalvar = document.getElementById('btnSalvar');
+    const btnFechar = document.getElementById('btnFechar');
 
-    const obrigatorios = {
-        nome: "Nome do animal",
-        situacao: "Situação",
-        especie: "Espécie",
-        genero: "Gênero",
-        raca_id: "Raça",
-        data_ocorrido: "Data que foi visto",
-        telefone_contato: "Telefone de contato"
-    };
+    // máscara de telefone
+    const telInput = document.getElementById('tel');
+    if (telInput) {
+      telInput.addEventListener('input', function(e) {
+        let v = e.target.value.replace(/\D/g, '');
+        if (v.length > 11) v = v.substr(0, 11);
+        v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
+        v = v.replace(/(\d{5})(\d)/, '$1-$2');
+        e.target.value = v;
+      });
+    }
 
-    for (let campo in obrigatorios) {
-        if (!form[campo].value || form[campo].value.trim() === '') {
+    // fechar popup pelo botão "Fechar"
+    if (btnFechar) {
+      btnFechar.addEventListener('click', () => {
+        map.closePopup(popup);
+        // popupclose event trata popupOpen = false
+      });
+    }
+
+    // salvar (mesma lógica do seu salvarAnimal)
+    if (btnSalvar) {
+      btnSalvar.addEventListener('click', () => {
+        // validações
+        const obrigatorios = {
+          nome: "Nome do animal",
+          situacao: "Situação",
+          especie: "Espécie",
+          genero: "Gênero",
+          raca_id: "Raça",
+          data_ocorrido: "Data que foi visto",
+          telefone_contato: "Telefone de contato"
+        };
+
+        for (let campo in obrigatorios) {
+          if (!form[campo] || !form[campo].value || form[campo].value.trim() === '') {
             alert(`Preencha o campo obrigatório: ${obrigatorios[campo]}`);
-            form[campo].focus();
+            if (form[campo]) form[campo].focus();
             return;
+          }
         }
-    }
 
-    // Validação do telefone
-    const tel = form.telefone_contato.value.replace(/\D/g, '');
-    if (tel.length !== 11) {
-        alert("Telefone deve ter 11 dígitos (ex: 55999999999)");
-        form.telefone_contato.focus();
-        return;
-    }
+        const tel = form.telefone_contato.value.replace(/\D/g, '');
+        if (tel.length !== 11) {
+          alert("Telefone deve ter 11 dígitos (ex: 55999999999)");
+          form.telefone_contato.focus();
+          return;
+        }
 
-    // Validação da foto
-    if (!form.foto.files || form.foto.files.length === 0) {
-        alert("Selecione uma foto do animal");
-        return;
-    }
+        if (!form.foto.files || form.foto.files.length === 0) {
+          alert("Selecione uma foto do animal");
+          return;
+        }
 
-    const formData = new FormData(form);
+        // envio por fetch
+        const formData = new FormData(form);
 
-    fetch('salvar_local.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(r => r.text())
-    .then(msg => {
-        alert(msg.trim());
-        if (msg.includes('sucesso') || msg.includes('cadastrado')) {
+        fetch('salvar_local.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(r => r.text())
+        .then(msg => {
+          alert(msg.trim());
+          if (msg.toLowerCase().includes('sucesso') || msg.toLowerCase().includes('cadastrado')) {
+            map.closePopup(popup); // fecha o popup atual e atualiza estado
             location.reload();
-        }
-    })
-    .catch(() => alert('Erro de conexão'));
+          }
+        })
+        .catch(() => alert('Erro de conexão'));
+      });
+    }
+
+  }, 100); // pequeno delay para garantir que o popup DOM foi injetado
 }
+
+// evento de clique no mapa: abre popup somente se NÃO houver outro aberto
+map.on('click', function(e) {
+  if (popupOpen) {
+    // já existe um formulário aberto: não fazer nada
+    // opcional: mostrar uma mensagem sutil
+    // alert('Feche o formulário aberto para criar outro.');
+    return;
+  }
+  abrirPopupForm(e.latlng.lat.toFixed(6), e.latlng.lng.toFixed(6));
+});
 </script>
+
 </body>
 </html>

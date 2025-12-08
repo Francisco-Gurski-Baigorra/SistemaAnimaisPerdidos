@@ -6,6 +6,10 @@ session_start();
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <!-- Pacote de emojis de anomal -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> 
+    
+
     <meta charset="UTF-8">
     <title>Rastreia Bicho 🐾</title>
 
@@ -99,21 +103,42 @@ session_start();
 <body>
 
 <!-- ✅ Barra superior -->
+
 <nav class="navbar navbar-expand-lg">
     <div class="container">
         <a class="navbar-brand" href="#">
-            RASTREIA BICHO <i class="bi bi-paw-fill"></i>
+            <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> RASTREIA BICHO 
+
         </a>
 
         <div class="ms-auto">
             <?php if (isset($_SESSION['usuario_id'])): ?>
-                <a href="registrar_animal.php" class="btn btn-success me-2">Registrar Animal</a>
-                <a href="perfil_animais.php" class="btn btn-outline-dark me-2"><i class="bi bi-person-circle"></i> Perfil Animais</a>
-                <a href="logout.php" class="btn btn-outline-danger">Sair</a>
+                <a href="registrar_animal.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-plus-circle"></i> Registrar Animal
+                </a>
+
+                <a href="perfil.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-person-circle"></i> Perfil
+                </a>
+
+                <!-- 🐾 Ícone atualizado para Animais Registrados -->
+                <a href="perfil_animais.php" class="btn btn-outline-dark me-2">
+                   <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Animais Registrados
+                </a>
+
+                <!-- 🔄 Botão Sair mais harmonioso -->
+                <a href="logout.php" class="btn btn-outline-danger me-2">
+                    <i class="bi bi-box-arrow-right"></i> Sair
+                </a>
+
             <?php else: ?>
-                <a href="login.php" class="btn btn-outline-dark me-2"><i class="bi bi-box-arrow-in-right"></i> Login</a>
-                <a href="cadastro.php" class="btn btn-outline-success me-2"><i class="bi bi-person-plus"></i> Registrar Conta</a>
-                <button class="btn btn-success" onclick="alert('Você precisa fazer login para registrar um animal!')">Registrar Animal</button>
+                <a href="login.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </a>
+
+                <a href="cadastro.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-person-plus"></i> Registrar Conta
+                </a>
             <?php endif; ?>
         </div>
     </div>
@@ -139,7 +164,7 @@ session_start();
 
     <div>
       <a href="buscar_animais_encontrados.php" class="btn btn-success btn-lg px-4">
-        <i class="bi bi-person-search"></i> Buscar Animal Encontrado
+        <i class="bi bi-search"></i> Buscar Animal Encontrado
       </a>
       <p class="mt-2 text-muted small">Veja os animais que foram <strong>encontrados</strong> e aguardam seus tutores.</p>
     </div>

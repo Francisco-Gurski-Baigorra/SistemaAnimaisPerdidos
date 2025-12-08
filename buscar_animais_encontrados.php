@@ -5,85 +5,159 @@ include('conecta.php');
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+
+<!-- Pacote de emojis de anomal -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> 
+
+<!-- icone de perfil -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
   <meta charset="UTF-8">
   <title>Mapa - Animais Encontrados</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
-    body, html { height:100%; margin:0; background-color:#81d181; display:flex; flex-direction:column; }
-    .filter-container { background:white; padding:10px 15px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:8px; }
-    #map { flex:1; width:100%; border-radius:10px; box-shadow:0 0 8px rgba(0,0,0,0.1); }
-    .popup-img { width:150px; height:150px; object-fit:cover; border-radius:8px; margin-bottom:5px; }
-    .info-popup { font-size:14px; line-height:1.4; max-width:260px; }
+    /* Remove margem e espaço */
+body, html {
+    height: 100%;
+    margin: 0;
+    background-color: #fdfdfdff;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Filtros colados ao mapa */
+.filter-container {
+    background: #81bd7fff;
+    padding: 12px 20px;
+    
+    border-radius: 12px;       /* deixa visual moderno */
+    margin: 8px auto;          /* aproxima do mapa */
+    width: 96%;
+    max-width: 1200px;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12); /* borda suave */
+    border: 1px solid rgba(0,0,0,0.05);
+
+    position: relative;
+    z-index: 999; /* garante que fique sempre acima do mapa */
+}
+
+/* Mapa colado nos filtros */
+#map {
+    flex: 1;
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+}
+
   </style>
 </head>
 <body>
-  <div class="container-fluid py-3">
-    <div class="text-center mb-2">
-      <h2 class="fw-bold">🐾 Mapa de Animais Encontrados</h2>
-      <p class="text-muted mb-2">Use os filtros abaixo para refinar sua busca:</p>
+  <!-- ✅ Barra superior -->
+
+<nav class="navbar navbar-expand-lg" style="background-color: #179e46ff; padding: 1rem;">
+  
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3 text-dark" href="index.php">
+            <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> RASTREIA BICHO
+        </a>
+
+        <div class="ms-auto">
+            <?php if (isset($_SESSION['usuario_id'])): ?>
+
+                <a href="registrar_animal.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-plus-circle"></i> Registrar Animal
+                </a>
+
+                <a href="perfil.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-person-circle"></i> Perfil
+                </a>
+
+                <a href="perfil_animais.php" class="btn btn-outline-dark me-2">
+                    <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Animais Registrados
+                </a>
+
+                <a href="logout.php" class="btn btn-outline-danger me-2">
+                    <i class="bi bi-box-arrow-right"></i> Sair
+                </a>
+
+            <?php else: ?>
+
+                <a href="login.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </a>
+
+                <a href="cadastro.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-person-plus"></i> Registrar Conta
+                </a>
+
+            <?php endif; ?>
+        </div>
     </div>
+</nav>
+<div class="filter-container mb-3">
+  <div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
+    
 
-    <div class="filter-container mb-3">
-      <div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
-        <a href="index.php" class="btn btn-outline-success btn-sm">⬅️ Voltar</a>
+    <select id="filtroEspecie" class="form-select form-select-sm w-auto">
+      <option value="">Espécie</option>
+      <option value="cachorro">Cachorro</option>
+      <option value="gato">Gato</option>
+      <option value="outros">Outro</option>
+    </select>
 
-        <select id="filtroEspecie" class="form-select form-select-sm w-auto">
-          <option value="">Espécie</option>
-          <option value="cachorro">Cachorro</option>
-          <option value="gato">Gato</option>
-          <option value="outros">Outro</option>
-        </select>
+    <select id="filtroRaca" class="form-select form-select-sm w-auto">
+      <option value="">Raça</option>
+      <option value="vira-lata">Vira-lata</option>
+      <option value="poodle">Poodle</option>
+      <option value="pitbull">Pitbull</option>
+      <option value="labrador">Labrador</option>
+      <option value="siamês">Siamês</option>
+      <option value="persa">Persa</option>
+      <option value="outros">Outros</option>
+    </select>
 
-        <select id="filtroRaca" class="form-select form-select-sm w-auto">
-          <option value="">Raça</option>
-          <option value="vira-lata">Vira-lata</option>
-          <option value="poodle">Poodle</option>
-          <option value="pitbull">Pitbull</option>
-          <option value="labrador">Labrador</option>
-          <option value="siamês">Siamês</option>
-          <option value="persa">Persa</option>
-          <option value="outros">Outros</option>
-        </select>
+    <select id="filtroGenero" class="form-select form-select-sm w-auto">
+      <option value="">Gênero</option>
+      <option value="macho">Macho</option>
+      <option value="femea">Fêmea</option>
+      <option value="nao_informado">Não informado</option>
+    </select>
 
-        <select id="filtroGenero" class="form-select form-select-sm w-auto">
-          <option value="">Gênero</option>
-          <option value="macho">Macho</option>
-          <option value="femea">Fêmea</option>
-          <option value="nao_informado">Não informado</option>
-        </select>
+    <select id="filtroPorte" class="form-select form-select-sm w-auto">
+      <option value="">Porte</option>
+      <option value="pequeno">Pequeno</option>
+      <option value="medio">Médio</option>
+      <option value="grande">Grande</option>
+    </select>
 
-        <select id="filtroPorte" class="form-select form-select-sm w-auto">
-          <option value="">Porte</option>
-          <option value="pequeno">Pequeno</option>
-          <option value="medio">Médio</option>
-          <option value="grande">Grande</option>
-        </select>
+    <select id="filtroCor" class="form-select form-select-sm w-auto">
+      <option value="">Cor</option>
+      <option value="preto">Preto</option>
+      <option value="branco">Branco</option>
+      <option value="marrom">Marrom</option>
+      <option value="cinza">Cinza</option>
+      <option value="caramelo">Caramelo</option>
+      <option value="preto e branco">Preto e Branco</option>
+      <option value="outros">Outros</option>
+    </select>
 
-        <select id="filtroCor" class="form-select form-select-sm w-auto">
-          <option value="">Cor</option>
-          <option value="preto">Preto</option>
-          <option value="branco">Branco</option>
-          <option value="marrom">Marrom</option>
-          <option value="cinza">Cinza</option>
-          <option value="caramelo">Caramelo</option>
-          <option value="preto e branco">Preto e Branco</option>
-          <option value="outros">Outros</option>
-        </select>
+    <select id="filtroIdade" class="form-select form-select-sm w-auto">
+      <option value="">Idade</option>
+      <option value="Filhote">Filhote</option>
+      <option value="Adulto">Adulto</option>
+      <option value="Idoso">Idoso</option>
+    </select>
 
-        <select id="filtroIdade" class="form-select form-select-sm w-auto">
-          <option value="">Idade</option>
-          <option value="Filhote">Filhote</option>
-          <option value="Adulto">Adulto</option>
-          <option value="Idoso">Idoso</option>
-        </select>
-
-        <button id="btnFiltrar" class="btn btn-success btn-sm">🔍 Filtrar</button>
-      </div>
-    </div>
+    <button id="btnFiltrar" class="btn btn-success btn-sm">🔍 Filtrar</button>
   </div>
+</div>
 
-  <div id="map"></div>
+<!-- AGORA O MAPA VEM DIRETO AQUI, SEM DIV EXTRA QUEMBRANDO -->
+<div id="map"></div>
+
 
   <!-- Modal para mostrar contato / aviso -->
   <div class="modal fade" id="contatoModal" tabindex="-1" aria-hidden="true">

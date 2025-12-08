@@ -45,10 +45,12 @@ $resultAnimais = $stmt2->get_result();
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+   <!-- icone de anomal -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> 
 <meta charset="UTF-8">
 <title>Meus Animais - Rastreia Bicho 🐾</title>
 
-<!-- ✅ Bootstrap e Ícones -->
+<!-- icone de perfil -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
@@ -99,24 +101,48 @@ body {
 </style>
 </head>
 <body>
+<!-- ✅ Barra superior -->
 
-<!-- 🔝 Navbar -->
-<nav class="navbar navbar-expand-lg mb-4">
-  <div class="container">
-    <a class="navbar-brand" href="index.php">
-      RASTREIA BICHO <i class="bi bi-paw-fill"></i>
-    </a>
+<nav class="navbar navbar-expand-lg" style="background-color: #179e46ff; padding: 1rem;">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3 text-dark" href="index.php">
+            <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> RASTREIA BICHO
+        </a>
 
-    <div class="ms-auto">
-      <a href="perfil.php" class="btn btn-outline-dark me-2">
-        <i class="bi bi-person-circle"></i> Perfil
-      </a>
-      <a href="logout.php" class="btn btn-outline-danger">
-        <i class="bi bi-box-arrow-right"></i> Sair
-      </a>
+        <div class="ms-auto">
+            <?php if (isset($_SESSION['usuario_id'])): ?>
+
+                <a href="registrar_animal.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-plus-circle"></i> Registrar Animal
+                </a>
+
+                <a href="perfil.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-person-circle"></i> Perfil
+                </a>
+
+                <a href="perfil_animais.php" class="btn btn-outline-dark me-2">
+                    <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Animais Registrados
+                </a>
+
+                <a href="logout.php" class="btn btn-outline-danger me-2">
+                    <i class="bi bi-box-arrow-right"></i> Sair
+                </a>
+
+            <?php else: ?>
+
+                <a href="login.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </a>
+
+                <a href="cadastro.php" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-person-plus"></i> Registrar Conta
+                </a>
+
+            <?php endif; ?>
+        </div>
     </div>
-  </div>
 </nav>
+
 
 <!-- 🐾 Conteúdo principal -->
 <div class="container mb-5">
