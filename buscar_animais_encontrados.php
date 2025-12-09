@@ -18,30 +18,51 @@ include('conecta.php');
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
+
+/* --- IMPEDIR QUE A IMAGEM DO POPUP EXPLODA --- */
+.popup-img {
+    max-width: 250px;    /* largura máxima */
+    max-height: 250px;   /* altura máxima */
+    width: 100%;         /* ocupa só o espaço possível */
+    height: auto;
+    border-radius: 10px;
+    display: block;
+    margin: 10px auto;
+    object-fit: contain; /* mantém proporção sem estourar */
+}
+
+
+
     /* Remove margem e espaço */
 body, html {
     height: 100%;
     margin: 0;
-    background-color: #fdfdfdff;
+    background-color: #ffffffff;
     display: flex;
     flex-direction: column;
 }
+ /* Barra superior */
+    .navbar {
+        background-color: #179e46ff;
+        padding: 1rem;
 
+        border-bottom: 3px solid #2e3531ff; /* borda mais escura */
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* somhra só pra enfeite */
+    }
 /* Filtros colados ao mapa */
 .filter-container {
-    background: #81bd7fff;
+    background: #ffffffff;
     padding: 12px 20px;
     
-    border-radius: 12px;       /* deixa visual moderno */
+    
     margin: 8px auto;          /* aproxima do mapa */
     width: 96%;
     max-width: 1200px;
 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.12); /* borda suave */
-    border: 1px solid rgba(0,0,0,0.05);
 
     position: relative;
     z-index: 999; /* garante que fique sempre acima do mapa */
+    
 }
 
 /* Mapa colado nos filtros */
@@ -49,8 +70,13 @@ body, html {
     flex: 1;
     width: 100%;
     margin: 0;
-    border-radius: 0;
+    border-radius: 10px;             /* opcional */
+    border: 3px solid #2e3531ff;     /* borda elegante */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* leve sombra */
 }
+
+
+
 
   </style>
 </head>
@@ -102,7 +128,7 @@ body, html {
     
 
     <select id="filtroEspecie" class="form-select form-select-sm w-auto">
-      <option value="">Espécie</option>
+      <option value="">Espécie</option> 
       <option value="cachorro">Cachorro</option>
       <option value="gato">Gato</option>
       <option value="outros">Outro</option>

@@ -82,6 +82,15 @@ body {
   background-color: #179e46ff;
 }
 
+ /* Barra superior */
+    .navbar {
+        background-color: #179e46ff;
+        padding: 1rem;
+
+        border-bottom: 3px solid #2e3531ff; /* borda mais escura */
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* somhra só pra enfeite */
+    }
+
 .card {
   border-radius: 15px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.18);
@@ -99,6 +108,7 @@ body {
 
 </head>
 <body>
+  
 <nav class="navbar navbar-expand-lg" style="background-color: #179e46ff; padding: 1rem;">
     <div class="container">
         <a class="navbar-brand fw-bold fs-3 text-dark" href="index.php">
@@ -144,7 +154,7 @@ body {
     <div class="col-md-6">
 
       <div class="card p-4">
-        <h3 class="text-center mb-3 fw-bold">Meu Perfil</h3>
+        <h3 class="text-center mb-2 fw-bold">Meu Perfil</h3>
 
         <?php if (isset($_GET["msg"])): ?>
           <div class="alert alert-info text-center">

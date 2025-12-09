@@ -65,7 +65,15 @@ body {
 .navbar {
   background-color: #179e46ff;
 }
+ /* Barra superior */
+    .navbar {
+        background-color: #179e46ff;
+        padding: 1rem;
 
+        border-bottom: 3px solid #2e3531ff; /* borda mais escura */
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* somhra só pra enfeite */
+    }
+    
 .navbar-brand {
   font-weight: bold;
   color: #2b2b2b !important;

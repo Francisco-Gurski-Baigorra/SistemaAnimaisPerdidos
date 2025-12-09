@@ -21,84 +21,86 @@ session_start();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
-        body {
-            background-color: #f8f9fa;
-        }
+    body {
+        background-color: #f8f9fa;
+    }
 
-        /* Barra superior */
-        .navbar {
-            background-color: #179e46ff;
-            padding: 1rem;
-        }
+    /* Barra superior */
+    .navbar {
+        background-color: #179e46ff;
+        padding: 1rem;
 
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.7rem;
-            color: #2b2b2b !important;
-        }
+        border-bottom: 3px solid #2e3531ff; /* borda mais escura */
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* somhra só pra enfeite */
+    }
 
-        .navbar-brand i {
-            font-size: 1.8rem;
-            color: #2b2b2b;
-        }
+    .navbar-brand {
+        font-weight: bold;
+        font-size: 1.7rem;
+        color: #2b2b2b !important;
+    }
 
-        /* Área principal */
-        .hero {
-            background-color: #fefefe;
-            padding: 60px 15px;
-            text-align: center;
-        }
+    .navbar-brand i {
+        font-size: 1.8rem;
+        color: #2b2b2b;
+    }
 
-        .hero h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #212529;
-        }
+    /* Área principal */
+    .hero {
+        background-color: #fefefe;
+        padding: 60px 15px;
+        text-align: center;
+    }
 
-        .hero p {
-            max-width: 600px;
-            margin: 0 auto 30px;
-            font-size: 1.1rem;
-            color: #555;
-        }
+    .hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #212529;
+    }
 
-        /* Botões principais */
-        .btn-custom {
-            background-color: #1e9f4b;
-            color: #fff;
-            font-size: 1.1rem;
-            border-radius: 10px;
-            padding: 15px 25px;
-            margin: 10px;
-            transition: 0.3s;
-        }
+    .hero p {
+        max-width: 600px;
+        margin: 0 auto 30px;
+        font-size: 1.1rem;
+        color: #555;
+    }
 
-        .btn-custom:hover {
-            background-color: #198f43;
-            transform: scale(1.03);
-        }
+    .btn-custom {
+        background-color: #1e9f4b;
+        color: #fff;
+        font-size: 1.1rem;
+        border-radius: 10px;
+        padding: 15px 25px;
+        margin: 10px;
+        transition: 0.3s;
+    }
 
-        .btn-explanation {
-            color: #444;
-            font-size: 0.9rem;
-            margin-top: 5px;
-        }
+    .btn-custom:hover {
+        background-color: #198f43;
+        transform: scale(1.03);
+    }
 
-        /* Imagem dos animais */
-        .animals-img {
-            max-width: 100%;
-            height: auto;
-            margin-top: 40px;
-        }
+    .btn-explanation {
+        color: #444;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
 
-        footer {
-            background-color: #b6e388;
-            color: #333;
-            text-align: center;
-            padding: 10px;
-            font-size: 0.9rem;
-        }
-    </style>
+    .animals-img {
+        max-width: 100%;
+        height: auto;
+        margin-top: 40px;
+    }
+
+    footer {
+        background-color: #b6e388;
+        color: #333;
+        text-align: center;
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+</style>
+
 </head>
 <body>
 

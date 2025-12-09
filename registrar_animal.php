@@ -44,6 +44,15 @@ while ($row = $res->fetch_assoc()) {
       padding: 1rem;
   }
 
+   /* Barra superior */
+    .navbar {
+        background-color: #179e46ff;
+        padding: 1rem;
+
+        border-bottom: 3px solid #2e3531ff; /* borda mais escura */
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* somhra só pra enfeite */
+    }
+
   .navbar-brand {
       font-weight: bold;
       font-size: 1.7rem;
@@ -92,10 +101,12 @@ while ($row = $res->fetch_assoc()) {
   }
 
   #map {
-    height: 78vh;  /* mapa quase tela cheia */
+    height: 78vh;
     width: 100%;
-    border-radius: 0;
+    border-radius: 12px;     /* opcional */
+    border: 3px solid #1e201fff;  /* COR + ESPESSURA */
 }
+
 
 
   .leaflet-popup-content-wrapper {
