@@ -91,6 +91,11 @@ body {
         box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* somhra só pra enfeite */
     }
 
+.navbar + * {
+    margin-top: 30px; /* ajuste como quiser */
+}
+
+
 .card {
   border-radius: 15px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.18);

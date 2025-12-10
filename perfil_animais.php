@@ -79,6 +79,11 @@ body {
   color: #2b2b2b !important;
 }
 
+.navbar + * {
+    margin-top: 30px; /* ajuste como quiser */
+}
+
+
 .card {
   border-radius: 15px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
@@ -156,7 +161,7 @@ body {
 <div class="container mb-5">
   <div class="text-center mb-4">
     <h2 class="fw-bold text-dark">Olá, <?= htmlspecialchars($usuario['nome']) ?>!</h2>
-    <p class="text-muted">Aqui estão os animais que você cadastrou:</p>
+    <p class="text-muted">Aqui estão os animais que você registrou:</p>
   </div>
 
   <?php if ($resultAnimais->num_rows > 0): ?>

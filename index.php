@@ -47,10 +47,11 @@ session_start();
 
     /* Área principal */
     .hero {
-        background-color: #fefefe;
-        padding: 60px 15px;
-        text-align: center;
-    }
+    background-color: #fefefe;
+    padding: -5px 5px; /* diminui o espaço acima */
+    text-align: center;
+}
+
 
     .hero h1 {
         font-size: 2.5rem;
@@ -159,14 +160,14 @@ session_start();
   <div class="d-flex justify-content-center gap-4 mt-3">
     <div>
       <a href="buscar_animais_perdidos.php" class="btn btn-success btn-lg px-4">
-        <i class="bi bi-search"></i> Buscar Animal Perdido
+        <i class="bi bi-search"></i> Animal de Estimação Desaparecido
       </a>
-      <p class="mt-2 text-muted small">Veja os animais que foram <strong>perdidos</strong> e cadastrados no sistema.</p>
+      <p class="mt-2 text-muted small">Veja os animais que foram <strong>perdidos</strong> e procuram seus tutores.</p>
     </div>
 
     <div>
       <a href="buscar_animais_encontrados.php" class="btn btn-success btn-lg px-4">
-        <i class="bi bi-search"></i> Buscar Animal Encontrado
+        <i class="bi bi-search"></i> Animal de Estimação Encontrado
       </a>
       <p class="mt-2 text-muted small">Veja os animais que foram <strong>encontrados</strong> e aguardam seus tutores.</p>
     </div>
