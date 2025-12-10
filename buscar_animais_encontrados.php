@@ -93,29 +93,29 @@ body, html {
         <div class="ms-auto">
             <?php if (isset($_SESSION['usuario_id'])): ?>
 
-                <a href="registrar_animal.php" class="btn btn-outline-dark me-2">
+                <a href="registrar_animal.php" class="btn btn-dark me-2">
                     <i class="bi bi-plus-circle"></i> Registrar Animal
                 </a>
 
-                <a href="perfil.php" class="btn btn-outline-dark me-2">
+                <a href="perfil.php" class="btn btn-dark me-2">
                     <i class="bi bi-person-circle"></i> Perfil
                 </a>
 
-                <a href="perfil_animais.php" class="btn btn-outline-dark me-2">
+                <a href="perfil_animais.php" class="btn btn-dark me-2">
                     <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Animais Registrados
                 </a>
 
-                <a href="logout.php" class="btn btn-outline-danger me-2">
+                <a href="logout.php" class="btn btn-danger me-2">
                     <i class="bi bi-box-arrow-right"></i> Sair
                 </a>
 
             <?php else: ?>
 
-                <a href="login.php" class="btn btn-outline-dark me-2">
+                <a href="login.php" class="btn btn-dark me-2">
                     <i class="bi bi-box-arrow-in-right"></i> Login
                 </a>
 
-                <a href="cadastro.php" class="btn btn-outline-dark me-2">
+                <a href="cadastro.php" class="btn btn-dark me-2">
                     <i class="bi bi-person-plus"></i> Registrar Conta
                 </a>
 
