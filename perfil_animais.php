@@ -242,7 +242,7 @@ $resultAnimais = $stmt2->get_result();
                     <div id="confirmar<?= $animal['id'] ?>" class="mt-2 d-none">
                         <p class="text-danger fw-bold">Deseja excluir?</p>
 
-                        <a href="excluir_animal.php?id=<?= $animal['id'] ?>" class="btn btn-danger btn-sm">Sim</a>
+                       <a href="excluir_animal.php?id=<?= $animal['id'] ?>&resgate=1" class="btn btn-success btn-sm">Sim</a>
                         <button class="btn btn-secondary btn-sm" onclick="cancelarConfirmacaoExclusao(<?= $animal['id'] ?>)">Cancelar</button>
                     </div>
 

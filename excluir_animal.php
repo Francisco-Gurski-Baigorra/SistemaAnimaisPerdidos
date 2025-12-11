@@ -2,35 +2,58 @@
 session_start();
 include('conecta.php');
 
+// garante que não haja saída antes de headers
+// verifica usuário logado
 if (!isset($_SESSION['usuario_id'])) {
-    echo "<script>alert('Você precisa estar logado para excluir.'); window.location='login.php';</script>";
+    $_SESSION['mensagem'] = 'Você precisa estar logado para excluir.';
+    header('Location: login.php');
     exit;
 }
 
-$id = $_GET['id'] ?? 0;
-$usuario_id = $_SESSION['usuario_id'];
+// parâmetros
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+$usuario_id = (int) $_SESSION['usuario_id'];
+$resgate = (isset($_GET['resgate']) && $_GET['resgate'] === '1') ? true : false;
 
-// Busca o nome da foto para excluir
+// busca foto (para remover do disco)
 $sql = "SELECT foto FROM animais WHERE id = ? AND usuario_id = ?";
 $stmt = $conexao->prepare($sql);
+if (!$stmt) {
+    $_SESSION['mensagem'] = 'Erro interno (prepare).';
+    header('Location: perfil_animais.php');
+    exit;
+}
 $stmt->bind_param("ii", $id, $usuario_id);
 $stmt->execute();
 $resultado = $stmt->get_result();
 
-if ($resultado->num_rows > 0) {
+if ($resultado && $resultado->num_rows > 0) {
     $animal = $resultado->fetch_assoc();
-    if (!empty($animal['foto']) && file_exists("uploads/" . $animal['foto'])) {
-        unlink("uploads/" . $animal['foto']);
+
+    if (!empty($animal['foto'])) {
+        $caminho = __DIR__ . '/uploads/' . $animal['foto'];
+        if (file_exists($caminho)) {
+            @unlink($caminho);
+        }
     }
 
-    // Exclui o registro
-    $sql = "DELETE FROM animais WHERE id = ? AND usuario_id = ?";
-    $stmt = $conexao->prepare($sql);
-    $stmt->bind_param("ii", $id, $usuario_id);
-    $stmt->execute();
+    // exclui registro
+    $sqlDel = "DELETE FROM animais WHERE id = ? AND usuario_id = ?";
+    $stmtDel = $conexao->prepare($sqlDel);
+    if ($stmtDel) {
+        $stmtDel->bind_param("ii", $id, $usuario_id);
+        $stmtDel->execute();
+    }
 
-    echo "<script>alert('Animal excluído com sucesso!'); window.location='perfil_animais.php';</script>";
+    // só seta mensagem se NÃO for resgate
+    if (!$resgate) {
+        $_SESSION['mensagem'] = 'Animal excluído com sucesso!';
+    }
+
+    header('Location: perfil_animais.php');
+    exit;
 } else {
-    echo "<script>alert('Animal não encontrado.'); window.location='perfil_animais.php';</script>";
+    $_SESSION['mensagem'] = 'Animal não encontrado.';
+    header('Location: perfil_animais.php');
+    exit;
 }
-?>
