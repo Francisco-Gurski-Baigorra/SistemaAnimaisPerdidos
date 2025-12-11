@@ -139,6 +139,16 @@ body {
 ======================================= -->
 <div class="card card-login p-4">
   <div class="text-center mb-3">
+    <?php if (isset($_GET['erro'])): ?>
+    <div class="alert alert-danger py-2 text-center">
+        <?php if ($_GET['erro'] == 1): ?>
+            ❌ <strong>Email não encontrado.</strong>
+        <?php elseif ($_GET['erro'] == 2): ?>
+            ❌ <strong>Senha incorreta.</strong>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
+
     <h3 class="fw-bold text-dark">Rastreia Bicho 🐾</h3>
     <p class="text-muted">Entre na sua conta</p>
   </div>
@@ -146,8 +156,10 @@ body {
   <form action="verifica_login.php" method="POST">
     <div class="mb-3">
       <label class="form-label"><strong> Email: </strong> </label>
-      <input type="email" class="form-control" name="email" placeholder="Digite seu email" required>
-    </div>
+      <input type="email" class="form-control" name="email" 
+       value="<?= isset($_GET['email']) ? htmlspecialchars($_GET['email']) : '' ?>" 
+       placeholder="Digite seu email" required>
+
 
     <div class="mb-3">
       <label class="form-label"><strong> Senha: </strong></label>

@@ -102,7 +102,7 @@ body, html {
                 </a>
 
                 <a href="perfil_animais.php" class="btn btn-dark me-2">
-                    <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Animais Registrados
+                    <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Meus Animais
                 </a>
 
                 <a href="logout.php" class="btn btn-danger me-2">

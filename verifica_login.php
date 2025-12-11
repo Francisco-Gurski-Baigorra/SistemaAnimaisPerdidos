@@ -1,6 +1,5 @@
 <?php
 include('conecta.php');
-
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -13,31 +12,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $resultado = $stmt->get_result();
 
-    if ($resultado->num_rows > 0) {
-        $usuario = $resultado->fetch_assoc();
-
-        if (password_verify($senha, $usuario['senha'])) {
-            $_SESSION['usuario_id'] = $usuario['id'];
-            $_SESSION['usuario_nome'] = $usuario['nome'];
-            $_SESSION['tipo_usuario'] = $usuario['tipo_usuario'];
-
-            // Se for administrador → vai direto pro painel admin
-    if ($usuario['tipo_usuario'] === 'administrador') {
-    header("Location: admin.php"); // ajuste o nome se necessário
+    // Se email não existir
+   // Se email não existir → mantém o email no input
+if ($resultado->num_rows === 0) {
+    header("Location: login.php?erro=1&email=" . urlencode($email));
     exit;
 }
 
-// Se for usuário normal → vai para a tela inicial
-header("Location: index.php");
-exit;
+// Se a senha estiver errada → NÃO mantém o email
+if (!password_verify($senha, $usuario['senha'])) {
+    header("Location: login.php?erro=2");
+    exit;
+}
 
-        } else {
-            echo "<script>alert('Senha incorreta!'); window.history.back();</script>";
-        }
-    } else {
-        echo "<script>alert('Usuário não encontrado!'); window.history.back();</script>";
+
+    $usuario = $resultado->fetch_assoc();
+
+    // Se a senha estiver errada
+    if (!password_verify($senha, $usuario['senha'])) {
+        header("Location: login.php?erro=2");
+        exit;
     }
 
-    $stmt->close();
+    // Login correto → criar sessão
+    $_SESSION['usuario_id'] = $usuario['id'];
+    $_SESSION['usuario_nome'] = $usuario['nome'];
+    $_SESSION['tipo_usuario'] = $usuario['tipo_usuario'];
+
+    // Se for administrador, vai para painel admin
+    if ($usuario['tipo_usuario'] === 'administrador') {
+        header("Location: admin.php");
+        exit;
+    }
+
+    // Usuário normal → tela inicial
+    header("Location: index.php");
+    exit;
 }
-?>
