@@ -50,19 +50,21 @@ while ($row = $res->fetch_assoc()) {
         padding: 1rem;
 
         border-bottom: 3px solid #2e3531ff; /* borda mais escura */
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* somhra só pra enfeite */
+        box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15); /* somhra só pra enfeite */
     }
 
-  .navbar-brand {
-      font-weight: bold;
-      font-size: 1.7rem;
-      color: #2b2b2b !important;
-  }
 
-  .navbar-brand i {
-      font-size: 1.8rem;
-      color: #2b2b2b;
-  }
+    .navbar-brand {
+        font-weight: bold;
+        font-size: 1.7rem;
+        color: #2b2b2b !important;
+    }
+
+    .navbar-brand i {
+        font-size: 1.8rem;
+        color: #2b2b2b;
+    }
+
 
   /* ======================= AREA PRINCIPAL ======================= */
   .content {

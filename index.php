@@ -22,7 +22,7 @@ session_start();
 
     <style>
     body {
-        background-color: #f8f9fa;
+        background-color: #ffffffff;
     }
 
     /* Barra superior */
@@ -31,8 +31,9 @@ session_start();
         padding: 1rem;
 
         border-bottom: 3px solid #2e3531ff; /* borda mais escura */
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* somhra só pra enfeite */
+        box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15); /* somhra só pra enfeite */
     }
+
 
     .navbar-brand {
         font-weight: bold;
@@ -44,6 +45,7 @@ session_start();
         font-size: 1.8rem;
         color: #2b2b2b;
     }
+
 
     /* Área principal */
     .hero {

@@ -17,109 +17,109 @@ $stmt->bind_param("i", $id_usuario);
 $stmt->execute();
 $usuario = $stmt->get_result()->fetch_assoc();
 
-// ✅ Buscar os animais cadastrados pelo usuário (agora incluindo latitude e longitude)
-$sqlAnimais = "
-SELECT 
-    id,
-    nome,
-    situacao,
-    especie,
-    genero,
-    cor_predominante,
-    idade,
-    descricao,
-    data_ocorrido,
-    foto,
-    latitude,
-    longitude
-FROM animais
-WHERE usuario_id = ?
-";
-
+// Buscar animais
+$sqlAnimais = "SELECT id, nome, situacao, especie, genero, cor_predominante, idade, descricao, data_ocorrido, foto, latitude, longitude 
+               FROM animais WHERE usuario_id = ?";
 $stmt2 = $conexao->prepare($sqlAnimais);
 $stmt2->bind_param("i", $id_usuario);
 $stmt2->execute();
 $resultAnimais = $stmt2->get_result();
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-   <!-- icone de anomal -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> 
 <meta charset="UTF-8">
-<title>Meus Animais - Rastreia Bicho 🐾</title>
+<title>Animais Registrados - Rastreia Bicho 🐾</title>
 
-<!-- icone de perfil -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
+
+/* ===============================
+   FUNDO PADRÃO
+================================*/
 body {
-  background-color: #b6e388;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    background-color: #f2f2f2;
+    min-height: 100vh;
+    padding-top: 120px;
+    display: flex;
+    flex-direction: column;
 }
 
+/* ===============================
+   NAVBAR
+================================*/
 .navbar {
-  background-color: #179e46ff;
+    background-color: #179e46ff;
+    padding: 1rem;
+    border-bottom: 3px solid #2e3531ff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
- /* Barra superior */
-    .navbar {
-        background-color: #179e46ff;
-        padding: 1rem;
 
-        border-bottom: 3px solid #2e3531ff; /* borda mais escura */
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* somhra só pra enfeite */
-    }
-    
 .navbar-brand {
-  font-weight: bold;
-  color: #2b2b2b !important;
+    font-weight: bold;
+    font-size: 1.7rem;
+    color: #2b2b2b !important;
 }
 
-.navbar + * {
-    margin-top: 30px; /* ajuste como quiser */
-}
-
-
+/* ===============================
+   CARDS DOS ANIMAIS (com hover suave)
+================================*/
 .card {
-  border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    border: 1px solid #e6e6e6;          /* borda mais leve por padrão */
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    will-change: transform;
+    overflow: hidden;                   /* garante que a imagem não "vaze" ao fazer transform */
+    cursor: default;
 }
 
+.card:hover {
+    transform: translateY(-6px);        /* leve "lift" */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12); /* sombra mais pronunciada */
+    border-color: #d0d0d0;              /* borda um pouco mais escura ao hover */
+}
+
+/* imagem do card (mantém comportamento atual) */
 .card img {
-  height: 200px;
-  object-fit: cover;
-  border-radius: 15px 15px 0 0;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px 10px 0 0;
+    display: block;
 }
 
+/* botões (mantém estilo) */
 .btn-success {
-  background-color: #179e46ff;
-  border: none;
+    background-color: #179e46ff;
+    border: none;
 }
-
 .btn-success:hover {
-  background-color: #12843b;
+    background-color: #12843b;
 }
 
-/* Estilo do mini mapa */
+/* Mapa */
 [id^="map"] {
-  height: 200px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  overflow: hidden;
+    height: 200px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
 }
+
+
 </style>
 </head>
 <body>
-<!-- ✅ Barra superior -->
 
-<nav class="navbar navbar-expand-lg" style="background-color: #179e46ff; padding: 1rem;">
+<!-- ===============================
+     NAVBAR
+================================-->
+<nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
-        <a class="navbar-brand fw-bold fs-3 text-dark" href="index.php">
-            <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> RASTREIA BICHO
+        <a class="navbar-brand" href="index.php">
+            <i class="fa-solid fa-paw me-2"></i> RASTREIA BICHO
         </a>
 
         <div class="ms-auto">
@@ -134,21 +134,11 @@ body {
                 </a>
 
                 <a href="perfil_animais.php" class="btn btn-dark me-2">
-                    <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Animais Registrados
+                    <i class="fa-solid fa-paw"></i> Animais Registrados
                 </a>
 
                 <a href="logout.php" class="btn btn-danger me-2">
                     <i class="bi bi-box-arrow-right"></i> Sair
-                </a>
-
-            <?php else: ?>
-
-                <a href="login.php" class="btn btn-dark me-2">
-                    <i class="bi bi-box-arrow-in-right"></i> Login
-                </a>
-
-                <a href="cadastro.php" class="btn btn-dark me-2">
-                    <i class="bi bi-person-plus"></i> Registrar Conta
                 </a>
 
             <?php endif; ?>
@@ -156,183 +146,135 @@ body {
     </div>
 </nav>
 
-
-<!-- 🐾 Conteúdo principal -->
+<!-- ===============================
+     CONTEÚDO CENTRAL
+================================-->
 <div class="container mb-5">
-  <div class="text-center mb-4">
-    <h2 class="fw-bold text-dark">Olá, <?= htmlspecialchars($usuario['nome']) ?>!</h2>
-    <p class="text-muted">Aqui estão os animais que você registrou:</p>
-  </div>
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-dark">Olá, <?= htmlspecialchars($usuario['nome']) ?>!</h2>
+        <p class="text-muted">Aqui estão os animais que você registrou:</p>
+    </div>
 
-  <?php if ($resultAnimais->num_rows > 0): ?>
+    <?php if ($resultAnimais->num_rows > 0): ?>
     <div class="row justify-content-center g-4">
-      <?php while ($animal = $resultAnimais->fetch_assoc()): ?>
+
+        <?php while ($animal = $resultAnimais->fetch_assoc()): ?>
         <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex justify-content-center">
-          <div class="card shadow-sm" style="width: 18rem;">
-            <?php if (!empty($animal['foto'])): ?>
-              <img src="uploads/<?= htmlspecialchars($animal['foto']) ?>" class="card-img-top" alt="Foto do animal">
-            <?php else: ?>
-              <div class="bg-light text-center py-5 text-muted">Sem foto</div>
-            <?php endif; ?>
+            <div class="card" style="width: 18rem;">
 
-            <div class="card-body text-center">
-              <h5 class="card-title"><?= htmlspecialchars($animal['nome']) ?></h5>
-              <p class="card-text mb-3"><?= htmlspecialchars($animal['situacao']) ?></p>
-              
-              <button class="btn btn-success w-100 mb-2" data-bs-toggle="modal" data-bs-target="#detalhesModal<?= $animal['id'] ?>">
-                <i class="bi bi-info-circle"></i> Ver Detalhes
-              </button>
-              <a href="editar_animal.php?id=<?= $animal['id'] ?>" class="btn btn-outline-primary w-100 mb-2">
-                <i class="bi bi-pencil"></i> Editar
-              </a>
-              <!-- Botão que mostra a confirmação -->
-<button class="btn btn-outline-danger w-100" 
-        onclick="mostrarConfirmacaoExclusao(<?= $animal['id'] ?>)">
-  <i class="bi bi-trash"></i> Excluir
-</button>
+                <?php if (!empty($animal['foto'])): ?>
+                    <img src="uploads/<?= htmlspecialchars($animal['foto']) ?>" class="card-img-top">
+                <?php else: ?>
+                    <div class="bg-light text-center py-5 text-muted">Sem foto</div>
+                <?php endif; ?>
 
-<!-- Área de confirmação (escondida por padrão) -->
-<div id="confirmar<?= $animal['id'] ?>" class="mt-2 d-none text-center">
-  <p class="text-danger fw-bold mb-2">
-    Deseja mesmo excluir este animal?
-  </p>
+                <div class="card-body text-center">
+                    <h5 class="card-title"><?= htmlspecialchars($animal['nome']) ?></h5>
+                    <p class="text-muted mb-2"><?= htmlspecialchars($animal['situacao']) ?></p>
 
-  <a href="excluir_animal.php?id=<?= $animal['id'] ?>" 
-     class="btn btn-danger w-45">
-      Excluir
-  </a>
+                    <button class="btn btn-success w-100 mb-2" data-bs-toggle="modal" data-bs-target="#modal<?= $animal['id'] ?>">
+                        <i class="bi bi-info-circle"></i> Ver Detalhes
+                    </button>
 
-  <button class="btn btn-secondary w-45 ms-1"
-          onclick="cancelarConfirmacaoExclusao(<?= $animal['id'] ?>)">
-          Cancelar
-  </button>
-</div>
+                    <a href="editar_animal.php?id=<?= $animal['id'] ?>" class="btn btn-outline-primary w-100 mb-2">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
 
+                    <button class="btn btn-outline-danger w-100" onclick="mostrarConfirmacaoExclusao(<?= $animal['id'] ?>)">
+                        <i class="bi bi-trash"></i> Excluir
+                    </button>
+
+                    <div id="confirmar<?= $animal['id'] ?>" class="mt-2 d-none">
+                        <p class="text-danger fw-bold">Deseja excluir?</p>
+
+                        <a href="excluir_animal.php?id=<?= $animal['id'] ?>" class="btn btn-danger btn-sm">Sim</a>
+                        <button class="btn btn-secondary btn-sm" onclick="cancelarConfirmacaoExclusao(<?= $animal['id'] ?>)">Cancelar</button>
+                    </div>
+
+                </div>
             </div>
-          </div>
         </div>
 
-        <!-- Modal de Detalhes -->
-        <div class="modal fade" id="detalhesModal<?= $animal['id'] ?>" tabindex="-1" aria-labelledby="detalhesLabel<?= $animal['id'] ?>" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="detalhesLabel<?= $animal['id'] ?>">Detalhes do Animal</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
-              </div>
-              <div class="modal-body">
-  <div class="text-center mb-3">
-    <?php if (!empty($animal['foto'])): ?>
-      <img src="uploads/<?= htmlspecialchars($animal['foto']) ?>" class="img-fluid rounded mb-3" style="max-height: 200px; object-fit: cover;">
+        <!-- MODAL -->
+        <div class="modal fade" id="modal<?= $animal['id'] ?>">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">Detalhes do Animal</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <?php if (!empty($animal['foto'])): ?>
+                            <img src="uploads/<?= $animal['foto'] ?>" class="img-fluid rounded mb-3">
+                        <?php endif; ?>
+
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item"><strong>Nome:</strong> <?= $animal['nome'] ?></li>
+                            <li class="list-group-item"><strong>Situação:</strong> <?= $animal['situacao'] ?></li>
+                            <li class="list-group-item"><strong>Espécie:</strong> <?= $animal['especie'] ?></li>
+                            <li class="list-group-item"><strong>Gênero:</strong> <?= $animal['genero'] ?></li>
+                            <li class="list-group-item"><strong>Cor:</strong> <?= $animal['cor_predominante'] ?></li>
+                            <li class="list-group-item"><strong>Idade:</strong> <?= $animal['idade'] ?></li>
+                            <li class="list-group-item"><strong>Descrição:</strong><br><?= nl2br($animal['descricao']) ?></li>
+                        </ul>
+
+                        <?php if ($animal['latitude'] && $animal['longitude']): ?>
+                            <div id="map<?= $animal['id'] ?>" data-lat="<?= $animal['latitude'] ?>" data-lng="<?= $animal['longitude'] ?>"></div>
+                        <?php endif; ?>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <?php endwhile; ?>
+
+    </div>
+
     <?php else: ?>
-      <div class="text-muted fst-italic mb-3">Sem foto disponível</div>
+    <div class="alert alert-warning text-center">
+        Nenhum animal registrado.
+    </div>
     <?php endif; ?>
-  </div>
 
-  <ul class="list-group text-start mb-3">
-    <li class="list-group-item"><strong>Nome:</strong> <?= htmlspecialchars($animal['nome'] ?? 'Não informado') ?></li>
-    <li class="list-group-item"><strong>Situação:</strong> <?= htmlspecialchars($animal['situacao'] ?? 'Não informado') ?></li>
-    <li class="list-group-item"><strong>Espécie:</strong> <?= htmlspecialchars($animal['especie'] ?? 'Não informado') ?></li>
-    <li class="list-group-item"><strong>Gênero:</strong> <?= htmlspecialchars($animal['genero'] ?? 'Não informado') ?></li>
-    <li class="list-group-item"><strong>Cor predominante:</strong> <?= htmlspecialchars($animal['cor_predominante'] ?? 'Não informado') ?></li>
-    <li class="list-group-item"><strong>Idade:</strong> <?= htmlspecialchars($animal['idade'] ?? 'Não informado') ?></li>
-   <li class="list-group-item">
-  <strong>Data do ocorrido:</strong>
-  <?php 
-    if (!empty($animal['data_ocorrido']) && $animal['data_ocorrido'] !== '0000-00-00') {
-       echo date('d/m/Y', strtotime($animal['data_ocorrido']));
-
-    } else {
-        echo 'Não informado';
-    }
-  ?>
-</li>
-    <li class="list-group-item"><strong>Descrição:</strong><br><?= nl2br(htmlspecialchars($animal['descricao'] ?? 'Sem descrição')) ?></li>
-  </ul>
-
-  <!-- 🗺️ Mini Mapa -->
-  <?php if (!empty($animal['latitude']) && !empty($animal['longitude'])): ?>
-    <div class="mt-3">
-      <h6 class="fw-bold mb-2"><i class="bi bi-geo-alt"></i> Local onde foi visto:</h6>
-      <div id="map<?= $animal['id'] ?>" 
-           data-lat="<?= htmlspecialchars($animal['latitude']) ?>" 
-           data-lng="<?= htmlspecialchars($animal['longitude']) ?>">
-      </div>
-    </div>
-  <?php else: ?>
-    <div class="alert alert-secondary text-center">Localização não informada.</div>
-  <?php endif; ?>
 </div>
 
-              <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      <?php endwhile; ?>
-    </div>
-  <?php else: ?>
-    <div class="alert alert-warning text-center mt-4">
-      <i class="bi bi-info-circle"></i> Você ainda não cadastrou nenhum animal.
-    </div>
-  <?php endif; ?>
-</div>
-
-<!-- 🔙 Rodapé -->
+<!-- RODAPÉ -->
 <footer class="text-center mt-auto py-3 bg-light">
-  <p class="mb-0 text-muted">&copy; <?= date('Y') ?> Rastreia Bicho 🐾 | Todos os direitos reservados</p>
+    <p class="text-muted mb-0">&copy; <?= date('Y') ?> Rastreia Bicho 🐾</p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- 🌍 Leaflet (Mapas) -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<script>
-document.addEventListener('shown.bs.modal', function (event) {
-  const modal = event.target;
-  const mapDiv = modal.querySelector('div[id^="map"]');
-
-  if (mapDiv && !mapDiv.dataset.mapLoaded) {
-    const lat = parseFloat(mapDiv.getAttribute('data-lat'));
-    const lng = parseFloat(mapDiv.getAttribute('data-lng'));
-
-    if (!isNaN(lat) && !isNaN(lng)) {
-      const map = L.map(mapDiv, { zoomControl: false }).setView([lat, lng], 15);
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: '© OpenStreetMap'
-      }).addTo(map);
-
-      L.marker([lat, lng]).addTo(map);
-
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 200);
-
-      mapDiv.dataset.mapLoaded = "true";
-    } else {
-      mapDiv.innerHTML = '<div class="text-muted text-center p-3">Localização inválida.</div>';
-    }
-  }
-});
-</script>
 
 <script>
 function mostrarConfirmacaoExclusao(id) {
     document.getElementById("confirmar" + id).classList.remove("d-none");
 }
-
 function cancelarConfirmacaoExclusao(id) {
     document.getElementById("confirmar" + id).classList.add("d-none");
 }
+
+document.addEventListener('shown.bs.modal', function (e) {
+    const mapDiv = e.target.querySelector('[id^="map"]');
+    if (mapDiv && !mapDiv.dataset.loaded) {
+        const lat = mapDiv.dataset.lat;
+        const lng = mapDiv.dataset.lng;
+        const map = L.map(mapDiv).setView([lat, lng], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        L.marker([lat, lng]).addTo(map);
+        mapDiv.dataset.loaded = true;
+    }
+});
 </script>
-
-
 
 </body>
 </html>
