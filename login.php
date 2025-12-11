@@ -155,19 +155,20 @@ body {
 
   <form action="verifica_login.php" method="POST">
     <div class="mb-3">
-      <label class="form-label"><strong> Email: </strong> </label>
-      <input type="email" class="form-control" name="email" 
-       value="<?= isset($_GET['email']) ? htmlspecialchars($_GET['email']) : '' ?>" 
-       placeholder="Digite seu email" required>
-
+        <label class="form-label"><strong> Email: </strong></label>
+        <input type="email" class="form-control" name="email"
+            value="<?= isset($_GET['email']) ? htmlspecialchars($_GET['email']) : '' ?>"
+            placeholder="Digite seu email" required>
+    </div>
 
     <div class="mb-3">
-      <label class="form-label"><strong> Senha: </strong></label>
-      <input type="password" class="form-control" name="senha" placeholder="Digite sua senha" required>
+        <label class="form-label"><strong> Senha: </strong></label>
+        <input type="password" class="form-control" name="senha" placeholder="Digite sua senha" required>
     </div>
 
     <button type="submit" class="btn btn-success w-100">Entrar</button>
-  </form>
+</form>
+
 
   <div class="text-center mt-3">
     <p class="mb-1">Ainda não possui uma conta? 

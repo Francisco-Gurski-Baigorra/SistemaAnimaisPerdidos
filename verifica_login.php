@@ -19,20 +19,35 @@ if ($resultado->num_rows === 0) {
     exit;
 }
 
-// Se a senha estiver errada → NÃO mantém o email
-if (!password_verify($senha, $usuario['senha'])) {
-    header("Location: login.php?erro=2");
+if ($resultado->num_rows > 0) {
+    $usuario = $resultado->fetch_assoc();
+
+    if (password_verify($senha, $usuario['senha'])) {
+
+        $_SESSION['usuario_id'] = $usuario['id'];
+        $_SESSION['usuario_nome'] = $usuario['nome'];
+        $_SESSION['tipo_usuario'] = $usuario['tipo_usuario'];
+
+        if ($usuario['tipo_usuario'] === 'administrador') {
+            header("Location: admin.php");
+            exit;
+        }
+
+        header("Location: index.php");
+        exit;
+
+    } else {
+        // SENHA ERRADA → mantém o email
+        header("Location: login.php?erro=2&email=" . urlencode($email));
+        exit;
+    }
+
+} else {
+    // EMAIL NÃO EXISTE → limpa o email
+    header("Location: login.php?erro=1");
     exit;
 }
 
-
-    $usuario = $resultado->fetch_assoc();
-
-    // Se a senha estiver errada
-    if (!password_verify($senha, $usuario['senha'])) {
-        header("Location: login.php?erro=2");
-        exit;
-    }
 
     // Login correto → criar sessão
     $_SESSION['usuario_id'] = $usuario['id'];
