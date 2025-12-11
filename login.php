@@ -9,29 +9,58 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
+ body {
+    background-color: #ffffffff;
+    min-height: 100vh;
+    margin: 0;
+    padding-top: 24px;
+    font-family: Arial, sans-serif;
+    padding-top: 0;
+}
 
-/* =======================================
-   NAVBAR
-======================================= */
-  /* Barra superior */
-    .navbar {
-        background-color: #179e46ff;
-        padding: 1rem;
+/* ======= Navbar igual ao index.php ======= */
+.navbar {
+    background-color: #179e46ff;
+    padding: 1rem;
+    border-bottom: 3px solid #2e3531ff;
+    box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
+    width: 100%; /* garante largura total */
+}
 
-        border-bottom: 3px solid #2e3531ff; /* borda mais escura */
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* somhra só pra enfeite */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.7rem;
+    color: #2b2b2b !important;
+}
+
+.navbar-brand i {
+    font-size: 1.8rem;
+    color: #2b2b2b;
+}
+
+.navbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar .btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.navbar .btn:hover {
+    transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+    .card-perfil {
+        padding: 18px;
+        margin: 0 12px;
     }
-
-    .navbar-brand {
-        font-weight: bold;
-        font-size: 1.7rem;
-        color: #2b2b2b !important;
-    }
-
-    .navbar-brand i {
-        font-size: 1.8rem;
-        color: #2b2b2b;
-    }
+}
 
 /* =======================================
    COR E CENTRALIZAÇÃO DO LOGIN

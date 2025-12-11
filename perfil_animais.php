@@ -37,31 +37,63 @@ $resultAnimais = $stmt2->get_result();
 
 <style>
 
-/* ===============================
-   FUNDO PADRÃO
-================================*/
-body {
-    background-color: #f2f2f2;
+ body {
+    background-color: #ffffffff;
     min-height: 100vh;
-    padding-top: 120px;
+    margin: 0;
+    padding-top: 24px;
+    font-family: Arial, sans-serif;
+    padding-top: 0;
+    
     display: flex;
     flex-direction: column;
 }
 
-/* ===============================
-   NAVBAR
-================================*/
+
+
+
+/* ======= Navbar igual ao index.php ======= */
 .navbar {
     background-color: #179e46ff;
     padding: 1rem;
     border-bottom: 3px solid #2e3531ff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
+    width: 100%; /* garante largura total */
 }
 
 .navbar-brand {
     font-weight: bold;
     font-size: 1.7rem;
     color: #2b2b2b !important;
+}
+
+.navbar-brand i {
+    font-size: 1.8rem;
+    color: #2b2b2b;
+}
+
+.navbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar .btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.navbar .btn:hover {
+    transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+    .card-perfil {
+        padding: 18px;
+        margin: 0 12px;
+    }
 }
 
 /* ===============================
@@ -108,6 +140,11 @@ body {
     border: 1px solid #ccc;
 }
 
+.botoes-confirmar-resgate {
+    margin-bottom: 25px; /* 🔥 Ajuste aqui a distância */
+}
+
+
 
 </style>
 </head>
@@ -134,7 +171,7 @@ body {
                 </a>
 
                 <a href="perfil_animais.php" class="btn btn-dark me-2">
-                    <i class="fa-solid fa-paw"></i> Animais Registrados
+                    <i class="fa-solid fa-paw"></i> Meus Animais
                 </a>
 
                 <a href="logout.php" class="btn btn-danger me-2">
@@ -180,6 +217,24 @@ body {
                         <i class="bi bi-pencil"></i> Editar
                     </a>
 
+
+                    <button class="btn btn-outline-success w-100 mb-2 botao-resgatado" 
+        onclick="mostrarConfirmacaoResgate(<?= $animal['id'] ?>)">
+    <i class="bi bi-check2-circle"></i> Animal Resgatado
+</button>
+
+
+<div id="confirmarResgate<?= $animal['id'] ?>" class="mt-2 d-none">
+    <p class="text-success fw-bold">Confirmar Resgate?</p>
+
+    <!-- Div para criar distância dos botões -->
+    <div class="mb-3">
+        <a href="excluir_animal.php?id=<?= $animal['id'] ?>" class="btn btn-success btn-sm">Sim</a>
+        <button class="btn btn-secondary btn-sm" onclick="cancelarConfirmacaoResgate(<?= $animal['id'] ?>)">Cancelar</button>
+    </div>
+</div>
+
+                    
                     <button class="btn btn-outline-danger w-100" onclick="mostrarConfirmacaoExclusao(<?= $animal['id'] ?>)">
                         <i class="bi bi-trash"></i> Excluir
                     </button>
@@ -274,6 +329,15 @@ document.addEventListener('shown.bs.modal', function (e) {
         mapDiv.dataset.loaded = true;
     }
 });
+</script>
+<script>
+function mostrarConfirmacaoResgate(id) {
+    document.getElementById("confirmarResgate" + id).classList.remove("d-none");
+}
+
+function cancelarConfirmacaoResgate(id) {
+    document.getElementById("confirmarResgate" + id).classList.add("d-none");
+}
 </script>
 
 </body>

@@ -86,39 +86,55 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 /* Fundo e centralização */
 /* --- Garanta empilhamento vertical e centralização --- */
+/* ======= corpo (para navbar NÃO fixa, como index.php) ======= */
+/* ======= Estilo base ======= */
 body {
     background-color: #f2f2f2;
     min-height: 100vh;
-    padding-top: 120px; /* mesmo espaçamento usado nas outras telas */
-    display: flex;
-    flex-direction: column;    /* <-- importante: empilha card + footer verticalmente */
-    align-items: center;       /* centraliza horizontalmente */
-    justify-content: flex-start;
     margin: 0;
+    padding-top: 24px;
+    font-family: Arial, sans-serif;
+    padding-top: 0;
 }
 
-
-/* NAVBAR */
+/* ======= Navbar igual ao index.php ======= */
 .navbar {
     background-color: #179e46ff;
     padding: 1rem;
     border-bottom: 3px solid #2e3531ff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
+    box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
+    width: 100%; /* garante largura total */
 }
 
-/* Marca */
-.navbar .navbar-brand {
+.navbar-brand {
     font-weight: bold;
-    font-size: 1.4rem;
+    font-size: 1.7rem;
     color: #2b2b2b !important;
 }
 
-/* Card central */
+.navbar-brand i {
+    font-size: 1.8rem;
+    color: #2b2b2b;
+}
+
+.navbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar .btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.navbar .btn:hover {
+    transform: translateY(-2px);
+}
+
+/* ======= Card do perfil ======= */
 .card-perfil {
     width: 100%;
     max-width: 520px;
@@ -126,10 +142,11 @@ body {
     border: 1px solid #dcdcdc;
     border-radius: 10px;
     padding: 22px;
+    margin: 0 auto; /* centraliza */
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Inputs padronizados */
+/* Inputs */
 .form-control {
     border-radius: 5px;
     border: 1px solid #ccc;
@@ -146,32 +163,35 @@ body {
     background-color: #12843b;
 }
 
-/* Botão excluir */
 .btn-outline-danger {
     border-radius: 6px;
 }
 
-/* Footer simples */
+/* Footer */
 footer {
     margin-top: 30px;
     width: 100%;
     max-width: 520px;
 }
 
-/* Responsividade */
+/* Responsivo */
 @media (max-width: 480px) {
-    body { padding-top: 120px; }
-    .card-perfil { padding: 18px; margin: 0 12px; }
+    .card-perfil {
+        padding: 18px;
+        margin: 0 12px;
+    }
 }
+
 </style>
 </head>
 <body>
 
 <!-- NAVBAR (igual ao login/cadastro) -->
+<!-- NAVBAR idêntica ao index.php -->
 <nav class="navbar navbar-expand-lg">
     <div class="container">
-        <a class="navbar-brand fw-bold text-dark" href="index.php">
-            <i class="bi bi-paw-fill me-2"></i> RASTREIA BICHO
+        <a class="navbar-brand" href="index.php">
+            <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> RASTREIA BICHO
         </a>
 
         <div class="ms-auto">
@@ -185,7 +205,7 @@ footer {
                 </a>
 
                 <a href="perfil_animais.php" class="btn btn-dark me-2">
-                    <i class="bi bi-paw"></i> Animais Registrados
+                   <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Meus Animais
                 </a>
 
                 <a href="logout.php" class="btn btn-danger me-2">
@@ -203,6 +223,7 @@ footer {
         </div>
     </div>
 </nav>
+
 
 <!-- CONTAINER DO PERFIL (card central) -->
 <div class="card-perfil">

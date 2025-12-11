@@ -22,30 +22,57 @@ session_start();
 
     <style>
     body {
-        background-color: #ffffffff;
+    background-color: #ffffffff;
+    min-height: 100vh;
+    margin: 0;
+    padding-top: 24px;
+    font-family: Arial, sans-serif;
+    padding-top: 0;
+}
+
+/* ======= Navbar igual ao index.php ======= */
+.navbar {
+    background-color: #179e46ff;
+    padding: 1rem;
+    border-bottom: 3px solid #2e3531ff;
+    box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
+    width: 100%; /* garante largura total */
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.7rem;
+    color: #2b2b2b !important;
+}
+
+.navbar-brand i {
+    font-size: 1.8rem;
+    color: #2b2b2b;
+}
+
+.navbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar .btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.navbar .btn:hover {
+    transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+    .card-perfil {
+        padding: 18px;
+        margin: 0 12px;
     }
-
-    /* Barra superior */
-    .navbar {
-        background-color: #179e46ff;
-        padding: 1rem;
-
-        border-bottom: 3px solid #2e3531ff; /* borda mais escura */
-        box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15); /* somhra só pra enfeite */
-    }
-
-
-    .navbar-brand {
-        font-weight: bold;
-        font-size: 1.7rem;
-        color: #2b2b2b !important;
-    }
-
-    .navbar-brand i {
-        font-size: 1.8rem;
-        color: #2b2b2b;
-    }
-
+}
 
     /* Área principal */
     .hero {
@@ -128,7 +155,7 @@ session_start();
 
                 <!-- 🐾 Ícone atualizado para Animais Registrados -->
                 <a href="perfil_animais.php" class="btn btn-dark me-2">
-                   <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Animais Registrados
+                   <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Meus Animais
                 </a>
 
                 <!-- 🔄 Botão Sair mais harmonioso -->

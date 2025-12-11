@@ -30,40 +30,58 @@ while ($row = $res->fetch_assoc()) {
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
 <style>
-  html, body {
-    height: 100%;
-    margin: 0;
+   body {
     background-color: #ffffffff;
+    min-height: 100vh;
+    margin: 0;
+    padding-top: 24px;
+    font-family: Arial, sans-serif;
+    padding-top: 0;
+}
+
+/* ======= Navbar igual ao index.php ======= */
+.navbar {
+    background-color: #179e46ff;
+    padding: 1rem;
+    border-bottom: 3px solid #2e3531ff;
+    box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
+    width: 100%; /* garante largura total */
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.7rem;
+    color: #2b2b2b !important;
+}
+
+.navbar-brand i {
+    font-size: 1.8rem;
+    color: #2b2b2b;
+}
+
+.navbar .container {
     display: flex;
-    flex-direction: column;
-  }
+    align-items: center;
+    justify-content: space-between;
+}
 
-  /* ======================= NAVBAR PADRÃO ======================= */
-  .navbar {
-      background-color: #179e46ff;
-      padding: 1rem;
-  }
+.navbar .btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: 0.2s;
+}
 
-   /* Barra superior */
-    .navbar {
-        background-color: #179e46ff;
-        padding: 1rem;
+.navbar .btn:hover {
+    transform: translateY(-2px);
+}
 
-        border-bottom: 3px solid #2e3531ff; /* borda mais escura */
-        box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15); /* somhra só pra enfeite */
+@media (max-width: 480px) {
+    .card-perfil {
+        padding: 18px;
+        margin: 0 12px;
     }
-
-
-    .navbar-brand {
-        font-weight: bold;
-        font-size: 1.7rem;
-        color: #2b2b2b !important;
-    }
-
-    .navbar-brand i {
-        font-size: 1.8rem;
-        color: #2b2b2b;
-    }
+}
 
 
   /* ======================= AREA PRINCIPAL ======================= */
@@ -186,7 +204,7 @@ while ($row = $res->fetch_assoc()) {
                 </a>
 
                 <a href="perfil_animais.php" class="btn btn-dark me-2">
-                    <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Animais Registrados
+                    <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Meus Animais
                 </a>
 
                 <a href="logout.php" class="btn btn-danger me-2">
@@ -261,8 +279,10 @@ function abrirPopupForm(lat, lng) {
         <input type="hidden" name="longitude" value="${lng}">
         <input type="hidden" name="usuario_id" value="${usuario_id}">
 
+
         <label>Nome do animal: <span style="color:red;">*</span></label>
-        <input name="nome" type="text">
+        <input name="nome" type="text"rows="3" placeholder="Digite o nome do seu animal"></textarea>
+        
 
         <label>Situação: <span style="color:red;">*</span></label>
         <select name="situacao">
