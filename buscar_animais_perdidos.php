@@ -76,6 +76,29 @@ body, html {
     line-height: 1.4;
     max-width: 260px;
 }
+
+.leaflet-popup-content-wrapper {
+    border: 2px solid #2e3531ff;   /* borda */
+    border-radius: 12px;           /* arredondamento */
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* sombra */
+}
+
+.leaflet-popup-tip {
+    background-color: #ffffff;
+    border: 2px solid #2e3531ff; /* mesma cor da borda */
+}
+
+.info-popup {
+    padding: 5px 2px; 
+}
+
+.popup-img {
+    border-radius: 10px;
+    border: 2px solid #2e3531ff; /* borda na foto também */
+}
+
+
 </style>
 
 </head>
@@ -218,54 +241,91 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 
 
 let marcadores = [];
 
-// CARREGA ANIMAIS PERDIDOS
+// ===============================
+//  FUNÇÃO PADRÃO PARA MOSTRAR N/A
+// ===============================
+function info(valor) {
+    return valor && valor.trim() !== "" ? escapeHtml(valor) : "N/A";
+}
+
+// ===============================
+//  CARREGAR ANIMAIS PERDIDOS
+// ===============================
 async function carregarAnimais() {
     try {
         const res = await fetch('carregar_perdidos.php');
         const animais = await res.json();
 
+        // Remove marcadores existentes
         marcadores.forEach(m => map.removeLayer(m));
         marcadores = [];
 
         const especie = filtro('filtroEspecie');
-        const raca = filtro('filtroRaca');
-        const genero = filtro('filtroGenero');
-        const porte = filtro('filtroPorte');
-        const cor = filtro('filtroCor');
-        const idade = filtro('filtroIdade');
+        const raca    = filtro('filtroRaca');
+        const genero  = filtro('filtroGenero');
+        const porte   = filtro('filtroPorte');
+        const cor     = filtro('filtroCor');
+        const idade   = filtro('filtroIdade');
 
-        animais.filter(a => {
+        const filtrados = animais.filter(a => {
             return (!especie || a.especie?.toLowerCase() === especie) &&
-                   (!raca || a.raca_nome?.toLowerCase().includes(raca)) &&
+                   (!raca || (a.raca_nome || "").toLowerCase().includes(raca)) &&
                    (!genero || a.genero?.toLowerCase() === genero) &&
                    (!porte || a.porte?.toLowerCase() === porte) &&
-                   (!cor || a.cor_predominante?.toLowerCase().includes(cor)) &&
+                   (!cor || (a.cor_predominante || "").toLowerCase().includes(cor)) &&
                    (!idade || a.idade?.toLowerCase() === idade);
-        }).forEach(a => {
+        });
+
+        // ===============================
+        //  SE NÃO TIVER RESULTADOS → ALERTA
+        // ===============================
+        if (filtrados.length === 0) {
+            const alertBox = document.createElement("div");
+            alertBox.className = "alert alert-warning text-center mt-2 w-75 mx-auto";
+            alertBox.innerHTML = "<b>Nenhum animal encontrado com esses filtros.</b>";
+            document.body.prepend(alertBox);
+
+            setTimeout(() => alertBox.remove(), 4000);
+            return;
+        }
+
+        // ===============================
+        //  ADICIONAR MARCADORES
+        // ===============================
+        filtrados.forEach(a => {
             if (!a.latitude || !a.longitude) return;
 
-            const icone = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/616/616408.png', iconSize: [36,36] });
+            const icone = L.icon({
+                iconUrl: 'https://cdn-icons-png.flaticon.com/512/616/616408.png',
+                iconSize: [36,36]
+            });
 
             const popupHtml = `
                 <div class="info-popup">
-                  <b>${escapeHtml(a.nome) || 'Sem nome'}</b><br>
-                  <b>Espécie:</b> ${escapeHtml(a.especie)}<br>
-                  <b>Raça:</b> ${escapeHtml(a.raca_nome)}<br>
-                  <b>Cor:</b> ${escapeHtml(a.cor_predominante)}<br>
-                  <b>Gênero:</b> ${escapeHtml(a.genero)}<br>
-                  <b>Idade:</b> ${escapeHtml(a.idade)}<br>
-                  <b>Porte:</b> ${escapeHtml(a.porte)}<br>
-                  <b>Data:</b> ${formatDate(a.data_ocorrido)}<br>
-                  <b>Descrição:</b> ${escapeHtml(a.descricao)}<br><br>
-                  ${a.foto ? `<img src="uploads/${encodeURI(a.foto)}" class="popup-img" alt="foto">` : ''}
+                  <b>${info(a.nome)}</b><br>
+                  <b>Espécie:</b> ${info(a.especie)}<br>
+                  <b>Raça:</b> ${info(a.raca_nome)}<br>
+                  <b>Cor:</b> ${info(a.cor_predominante)}<br>
+                  <b>Gênero:</b> ${info(a.genero)}<br>
+                  <b>Idade:</b> ${info(a.idade)}<br>
+                  <b>Porte:</b> ${info(a.porte)}<br>
+                  <b>Data:</b> ${a.data_ocorrido ? formatDate(a.data_ocorrido) : "N/A"}<br>
+                  <b>Descrição:</b> ${info(a.descricao)}<br><br>
+
+                  ${a.foto ? `<img src="uploads/${encodeURI(a.foto)}" class="popup-img" alt="foto">` : '<span class="text-muted">Sem foto</span>'}
+
                   <div class="d-grid mt-2">
                     <button class="btn btn-sm btn-outline-primary" onclick="verContato(${a.usuario_id})">
                       Ver contato do responsável
                     </button>
                   </div>
-                </div>`;
+                </div>
+            `;
 
-            const marker = L.marker([a.latitude, a.longitude], { icon: icone }).addTo(map).bindPopup(popupHtml);
+            const marker = L.marker([a.latitude, a.longitude], { icon: icone })
+                            .addTo(map)
+                            .bindPopup(popupHtml);
+
             marcadores.push(marker);
         });
 
@@ -275,6 +335,7 @@ async function carregarAnimais() {
     }
 }
 
+// Função filtro
 function filtro(id) {
     return document.getElementById(id).value.toLowerCase();
 }
@@ -283,8 +344,9 @@ document.getElementById('btnFiltrar').addEventListener('click', carregarAnimais)
 carregarAnimais();
 
 
-
-// 📌 VER CONTATO — IGUAL AO DE ENCONTRADOS
+// ===============================
+//    VER CONTATO DO DONO
+// ===============================
 async function verContato(usuarioId) {
     if (!isLogged) {
         showContatoModal(`
@@ -304,14 +366,15 @@ async function verContato(usuarioId) {
             const data = await res.json();
 
             showContatoModal(`
-                <p><strong>Nome:</strong> ${escapeHtml(data.nome)}</p>
-                <p><strong>Telefone:</strong> ${escapeHtml(data.telefone)}</p>
-                <p><strong>Email:</strong> ${escapeHtml(data.email)}</p>
+                <p><strong>Nome:</strong> ${info(data.nome)}</p>
+                <p><strong>Telefone:</strong> ${info(data.telefone)}</p>
+                <p><strong>Email:</strong> ${info(data.email)}</p>
                 <div class="text-muted small">Respeite a privacidade ao contatar o responsável.</div>
             `);
         } else {
             showContatoModal('<p>Erro ao buscar dados.</p>');
         }
+
     } catch {
         showContatoModal('<p>Erro ao buscar contato.</p>');
     }
@@ -323,8 +386,9 @@ function showContatoModal(html) {
 }
 
 
-
-// Utilitários
+// ===============================
+//   UTILITÁRIOS
+// ===============================
 function escapeHtml(str) {
   if (!str) return '';
   return String(str)
@@ -336,11 +400,10 @@ function escapeHtml(str) {
 }
 
 function formatDate(dateString) {
-  if (!dateString) return 'Não informado';
+  if (!dateString) return 'N/A';
   const p = dateString.split('-');
   return `${p[2]}-${p[1]}-${p[0]}`;
 }
-
 </script>
 
 </body>

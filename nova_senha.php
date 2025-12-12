@@ -1,8 +1,12 @@
 <?php
 include('conecta.php');
 
-$email = $_GET['email'];
-$token = $_GET['token'];
+$email = $_GET['email'] ?? null;
+$token = $_GET['token'] ?? null;
+
+if (!$email || !$token) {
+    die("Link inválido. Parâmetros ausentes.");
+}
 
 // Verifica se o token é válido
 $sql = "SELECT * FROM recuperar_senha WHERE email=? AND token=? AND usado=0";

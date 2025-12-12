@@ -17,13 +17,26 @@ $stmt->bind_param("i", $id_usuario);
 $stmt->execute();
 $usuario = $stmt->get_result()->fetch_assoc();
 
-// Buscar animais
-$sqlAnimais = "SELECT id, nome, situacao, especie, genero, cor_predominante, idade, descricao, data_ocorrido, foto, latitude, longitude 
-               FROM animais WHERE usuario_id = ?";
+// Buscar animais com JOIN nas raças
+$sqlAnimais = "
+    SELECT 
+        a.id, a.nome, a.situacao, a.especie, a.genero, a.cor_predominante, 
+        a.idade, a.descricao, a.data_ocorrido, a.foto,
+        a.latitude, a.longitude, a.porte, 
+        r.racas AS nome_raca
+    FROM animais a
+    LEFT JOIN racas r ON a.raca_id = r.id
+    WHERE a.usuario_id = ?
+";
 $stmt2 = $conexao->prepare($sqlAnimais);
 $stmt2->bind_param("i", $id_usuario);
 $stmt2->execute();
 $resultAnimais = $stmt2->get_result();
+
+// Função para preencher N/A automaticamente
+function mostrar($valor) {
+    return (!empty($valor) ? htmlspecialchars($valor) : "N/A");
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -38,27 +51,22 @@ $resultAnimais = $stmt2->get_result();
 <style>
 
  body {
-    background-color: #ffffffff;
+    background-color: #ffffff;
     min-height: 100vh;
     margin: 0;
-    padding-top: 24px;
-    font-family: Arial, sans-serif;
     padding-top: 0;
-    
+    font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
 }
 
-
-
-
-/* ======= Navbar igual ao index.php ======= */
+/* ======= Navbar ======= */
 .navbar {
-    background-color: #179e46ff;
+    background-color: #179e46;
     padding: 1rem;
-    border-bottom: 3px solid #2e3531ff;
+    border-bottom: 3px solid #2e3531;
     box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
-    width: 100%; /* garante largura total */
+    width: 100%;
 }
 
 .navbar-brand {
@@ -67,92 +75,40 @@ $resultAnimais = $stmt2->get_result();
     color: #2b2b2b !important;
 }
 
-.navbar-brand i {
-    font-size: 1.8rem;
-    color: #2b2b2b;
-}
-
-.navbar .container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.navbar .btn {
-    padding: 7px 14px;
-    border-radius: 8px;
-    font-weight: 500;
-    transition: 0.2s;
-}
-
-.navbar .btn:hover {
-    transform: translateY(-2px);
-}
-
-@media (max-width: 480px) {
-    .card-perfil {
-        padding: 18px;
-        margin: 0 12px;
-    }
-}
-
 /* ===============================
-   CARDS DOS ANIMAIS (com hover suave)
+   CARDS DOS ANIMAIS
 ================================*/
 .card {
-    border-radius: 10px;
-    border: 1px solid #e6e6e6;          /* borda mais leve por padrão */
+    border-radius: 12px;
+    border: 2px solid #2e3531;
     background: #ffffff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
-    will-change: transform;
-    overflow: hidden;                   /* garante que a imagem não "vaze" ao fazer transform */
-    cursor: default;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    transition: .2s;
 }
 
 .card:hover {
-    transform: translateY(-6px);        /* leve "lift" */
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12); /* sombra mais pronunciada */
-    border-color: #d0d0d0;              /* borda um pouco mais escura ao hover */
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.16);
 }
 
-/* imagem do card (mantém comportamento atual) */
+/* Imagem */
 .card img {
     height: 200px;
     object-fit: cover;
-    border-radius: 10px 10px 0 0;
-    display: block;
+    border-radius: 12px 12px 0 0;
 }
 
-/* botões (mantém estilo) */
-.btn-success {
-    background-color: #179e46ff;
-    border: none;
-}
-.btn-success:hover {
-    background-color: #12843b;
-}
-
-/* Mapa */
 [id^="map"] {
     height: 200px;
     border-radius: 10px;
     border: 1px solid #ccc;
 }
 
-.botoes-confirmar-resgate {
-    margin-bottom: 25px; /* 🔥 Ajuste aqui a distância */
-}
-
-
-
 </style>
 </head>
 <body>
 
-<!-- ===============================
-     NAVBAR
-================================-->
+<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
         <a class="navbar-brand" href="index.php">
@@ -160,33 +116,26 @@ $resultAnimais = $stmt2->get_result();
         </a>
 
         <div class="ms-auto">
-            <?php if (isset($_SESSION['usuario_id'])): ?>
+            <a href="registrar_animal.php" class="btn btn-dark me-2">
+                <i class="bi bi-plus-circle"></i> Registrar Animal
+            </a>
 
-                <a href="registrar_animal.php" class="btn btn-dark me-2">
-                    <i class="bi bi-plus-circle"></i> Registrar Animal
-                </a>
+            <a href="perfil.php" class="btn btn-dark me-2">
+                <i class="bi bi-person-circle"></i> Perfil
+            </a>
 
-                <a href="perfil.php" class="btn btn-dark me-2">
-                    <i class="bi bi-person-circle"></i> Perfil
-                </a>
+            <a href="perfil_animais.php" class="btn btn-dark me-2">
+                <i class="fa-solid fa-paw"></i> Meus Animais
+            </a>
 
-                <a href="perfil_animais.php" class="btn btn-dark me-2">
-                    <i class="fa-solid fa-paw"></i> Meus Animais
-                </a>
-
-                <a href="logout.php" class="btn btn-danger me-2">
-                    <i class="bi bi-box-arrow-right"></i> Sair
-                </a>
-
-            <?php endif; ?>
+            <a href="logout.php" class="btn btn-danger me-2">
+                <i class="bi bi-box-arrow-right"></i> Sair
+            </a>
         </div>
     </div>
 </nav>
 
-<!-- ===============================
-     CONTEÚDO CENTRAL
-================================-->
-<div class="container mb-5">
+<div class="container mb-5" style="padding-top: 90px;">
     <div class="text-center mb-4">
         <h2 class="fw-bold text-dark">Olá, <?= htmlspecialchars($usuario['nome']) ?>!</h2>
         <p class="text-muted">Aqui estão os animais que você registrou:</p>
@@ -197,17 +146,18 @@ $resultAnimais = $stmt2->get_result();
 
         <?php while ($animal = $resultAnimais->fetch_assoc()): ?>
         <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex justify-content-center">
+
             <div class="card" style="width: 18rem;">
 
                 <?php if (!empty($animal['foto'])): ?>
-                    <img src="uploads/<?= htmlspecialchars($animal['foto']) ?>" class="card-img-top">
+                    <img src="uploads/<?= $animal['foto'] ?>" class="card-img-top">
                 <?php else: ?>
                     <div class="bg-light text-center py-5 text-muted">Sem foto</div>
                 <?php endif; ?>
 
                 <div class="card-body text-center">
-                    <h5 class="card-title"><?= htmlspecialchars($animal['nome']) ?></h5>
-                    <p class="text-muted mb-2"><?= htmlspecialchars($animal['situacao']) ?></p>
+                    <h5 class="card-title"><?= mostrar($animal['nome']) ?></h5>
+                    <p class="text-muted mb-2"><?= mostrar($animal['situacao']) ?></p>
 
                     <button class="btn btn-success w-100 mb-2" data-bs-toggle="modal" data-bs-target="#modal<?= $animal['id'] ?>">
                         <i class="bi bi-info-circle"></i> Ver Detalhes
@@ -217,32 +167,23 @@ $resultAnimais = $stmt2->get_result();
                         <i class="bi bi-pencil"></i> Editar
                     </a>
 
+                    <button class="btn btn-outline-success w-100 mb-2" onclick="mostrarConfirmacaoResgate(<?= $animal['id'] ?>)">
+                        <i class="bi bi-check2-circle"></i> Animal Resgatado
+                    </button>
 
-                    <button class="btn btn-outline-success w-100 mb-2 botao-resgatado" 
-        onclick="mostrarConfirmacaoResgate(<?= $animal['id'] ?>)">
-    <i class="bi bi-check2-circle"></i> Animal Resgatado
-</button>
+                    <div id="confirmarResgate<?= $animal['id'] ?>" class="d-none">
+                        <p class="text-success fw-bold mt-2">Confirmar Resgate?</p>
+                        <a href="excluir_animal.php?id=<?= $animal['id'] ?>&resgate=1" class="btn btn-success btn-sm">Sim</a>
+                        <button class="btn btn-secondary btn-sm" onclick="cancelarConfirmacaoResgate(<?= $animal['id'] ?>)">Cancelar</button>
+                    </div>
 
-
-<div id="confirmarResgate<?= $animal['id'] ?>" class="mt-2 d-none">
-    <p class="text-success fw-bold">Confirmar Resgate?</p>
-
-    <!-- Div para criar distância dos botões -->
-    <div class="mb-3">
-        <a href="excluir_animal.php?id=<?= $animal['id'] ?>" class="btn btn-success btn-sm">Sim</a>
-        <button class="btn btn-secondary btn-sm" onclick="cancelarConfirmacaoResgate(<?= $animal['id'] ?>)">Cancelar</button>
-    </div>
-</div>
-
-                    
-                    <button class="btn btn-outline-danger w-100" onclick="mostrarConfirmacaoExclusao(<?= $animal['id'] ?>)">
+                    <button class="btn btn-outline-danger w-100 mt-2" onclick="mostrarConfirmacaoExclusao(<?= $animal['id'] ?>)">
                         <i class="bi bi-trash"></i> Excluir
                     </button>
 
-                    <div id="confirmar<?= $animal['id'] ?>" class="mt-2 d-none">
-                        <p class="text-danger fw-bold">Deseja excluir?</p>
-
-                       <a href="excluir_animal.php?id=<?= $animal['id'] ?>&resgate=1" class="btn btn-success btn-sm">Sim</a>
+                    <div id="confirmar<?= $animal['id'] ?>" class="d-none">
+                        <p class="text-danger fw-bold mt-2">Deseja excluir?</p>
+                        <a href="excluir_animal.php?id=<?= $animal['id'] ?>" class="btn btn-success btn-sm">Sim</a>
                         <button class="btn btn-secondary btn-sm" onclick="cancelarConfirmacaoExclusao(<?= $animal['id'] ?>)">Cancelar</button>
                     </div>
 
@@ -250,9 +191,9 @@ $resultAnimais = $stmt2->get_result();
             </div>
         </div>
 
-        <!-- MODAL -->
+        <!-- MODAL DETALHES -->
         <div class="modal fade" id="modal<?= $animal['id'] ?>">
-            <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
 
                     <div class="modal-header bg-success text-white">
@@ -267,19 +208,21 @@ $resultAnimais = $stmt2->get_result();
                         <?php endif; ?>
 
                         <ul class="list-group mb-3">
-                            <li class="list-group-item"><strong>Nome:</strong> <?= $animal['nome'] ?></li>
-                            <li class="list-group-item"><strong>Situação:</strong> <?= $animal['situacao'] ?></li>
-                            <li class="list-group-item"><strong>Espécie:</strong> <?= $animal['especie'] ?></li>
-                            <li class="list-group-item"><strong>Gênero:</strong> <?= $animal['genero'] ?></li>
-                            <li class="list-group-item"><strong>Cor:</strong> <?= $animal['cor_predominante'] ?></li>
-                            <li class="list-group-item"><strong>Idade:</strong> <?= $animal['idade'] ?></li>
-                            <li class="list-group-item"><strong>Descrição:</strong><br><?= nl2br($animal['descricao']) ?></li>
+                            <li class="list-group-item"><strong>Nome:</strong> <?= mostrar($animal['nome']) ?></li>
+                            <li class="list-group-item"><strong>Situação:</strong> <?= mostrar($animal['situacao']) ?></li>
+                            <li class="list-group-item"><strong>Espécie:</strong> <?= mostrar($animal['especie']) ?></li>
+                            <li class="list-group-item"><strong>Gênero:</strong> <?= mostrar($animal['genero']) ?></li>
+                            <li class="list-group-item"><strong>Raça:</strong> <?= mostrar($animal['nome_raca']) ?></li>
+                            <li class="list-group-item"><strong>Porte:</strong> <?= mostrar($animal['porte']) ?></li>
+                            <li class="list-group-item"><strong>Cor:</strong> <?= mostrar($animal['cor_predominante']) ?></li>
+                            <li class="list-group-item"><strong>Idade:</strong> <?= mostrar($animal['idade']) ?></li>
+                            <li class="list-group-item"><strong>Descrição:</strong><br><?= mostrar($animal['descricao']) ?></li>
+                            <li class="list-group-item"><strong>Data do ocorrido:</strong> <?= mostrar($animal['data_ocorrido']) ?></li>
                         </ul>
 
                         <?php if ($animal['latitude'] && $animal['longitude']): ?>
                             <div id="map<?= $animal['id'] ?>" data-lat="<?= $animal['latitude'] ?>" data-lng="<?= $animal['longitude'] ?>"></div>
                         <?php endif; ?>
-
                     </div>
 
                     <div class="modal-footer">
@@ -301,7 +244,6 @@ $resultAnimais = $stmt2->get_result();
 
 </div>
 
-<!-- RODAPÉ -->
 <footer class="text-center mt-auto py-3 bg-light">
     <p class="text-muted mb-0">&copy; <?= date('Y') ?> Rastreia Bicho 🐾</p>
 </footer>
@@ -318,6 +260,13 @@ function cancelarConfirmacaoExclusao(id) {
     document.getElementById("confirmar" + id).classList.add("d-none");
 }
 
+function mostrarConfirmacaoResgate(id) {
+    document.getElementById("confirmarResgate" + id).classList.remove("d-none");
+}
+function cancelarConfirmacaoResgate(id) {
+    document.getElementById("confirmarResgate" + id).classList.add("d-none");
+}
+
 document.addEventListener('shown.bs.modal', function (e) {
     const mapDiv = e.target.querySelector('[id^="map"]');
     if (mapDiv && !mapDiv.dataset.loaded) {
@@ -329,15 +278,6 @@ document.addEventListener('shown.bs.modal', function (e) {
         mapDiv.dataset.loaded = true;
     }
 });
-</script>
-<script>
-function mostrarConfirmacaoResgate(id) {
-    document.getElementById("confirmarResgate" + id).classList.remove("d-none");
-}
-
-function cancelarConfirmacaoResgate(id) {
-    document.getElementById("confirmarResgate" + id).classList.add("d-none");
-}
 </script>
 
 </body>

@@ -61,8 +61,9 @@ try {
     $mail->setFrom('francisco.2023318347@aluno.iffar.edu.br', 'Sistema de Animais Perdidos');
     $mail->addAddress($email);
 
-    $link = "http://localhost/sistemaanimaisperdidos/sistemaanimaisperdidos/nova_senha.php?email=" 
-            . urlencode($email) . "&token=" . urlencode($token);
+   $link = "http://localhost/SistemaAnimaisPerdidos/nova_senha.php?email="
+        . urlencode($email) . "&token=" . urlencode($token);
+
 
     $mail->isHTML(true);
     $mail->Subject = 'Recuperação de Senha';

@@ -174,7 +174,7 @@ body {
     <p class="mb-1">Ainda não possui uma conta? 
       <a href="cadastro.php" class="text-success">Fazer Cadastro</a>
     </p>
-    <p><a href="recuperar_senha.php" class="text-muted">Esqueceu a senha?</a></p>
+    <p><a href="nova_senha.php" class="text-muted">Esqueceu a senha?</a></p>
   </div>
 </div>
 

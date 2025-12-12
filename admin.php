@@ -23,77 +23,82 @@ if ($_SESSION['tipo_usuario'] !== 'administrador') {
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <style>
-        body {
-            background-color: #9fccebff;
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+<style>
 
-        .card-admin {
-            width: 100%;
-            max-width: 500px;
-            padding: 25px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 0 12px rgba(0,0,0,0.15);
-            text-align: center;
-        }
+body {
+    background-color:  #f2f2f2;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+}
 
-        .btn-opcao {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            font-size: 18px;
-            font-weight: bold;
-        }
+/* ===== CARD CENTRAL ===== */
+.card-admin {
+    width: 100%;
+    max-width: 460px;
+    background: #fff;
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    padding: 30px;
+    text-align: center;
+}
 
-        .btn-usuarios {
-            background-color: #0069d9;
-            color: white;
-        }
+.card-admin h2 {
+    font-weight: bold;
+    color: #222;
+}
 
-        .btn-usuarios:hover {
-            background-color: #0052a3;
-        }
+.btn-opcao {
+    width: 100%;
+    padding: 14px;
+    font-size: 18px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    transition: 0.2s;
+}
 
-        .btn-animais {
-            background-color: #28a745;
-            color: white;
-        }
+.btn-opcao:hover {
+    transform: translateY(-2px);
+}
 
-        .btn-animais:hover {
-            background-color: #218838;
-        }
+.logout {
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #d92323;
+}
 
-        .logout {
-            margin-top: 15px;
-            display: block;
-            font-weight: bold;
-            color: #333;
-        }
+.logout:hover {
+    text-decoration: underline;
+}
 
-        .logout:hover {
-            text-decoration: underline;
-        }
-    </style>
+</style>
+
 </head>
-
 <body>
 
-    <div class="card-admin">
-        <h2 class="mb-3">Painel do Administrador</h2>
-        <p class="text-muted">Gerencie usuários e animais do sistema.</p>
+<div class="card-admin">
+    <h2 class="mb-3">Painel do Administrador</h2>
+    <p class="text-muted mb-4">Gerencie usuários e animais do sistema.</p>
 
-        <a href="gerenciar_usuarios.php" class="btn btn-opcao btn-usuarios">👥 Gerenciar Usuários</a>
-        <a href="gerenciar_animais.php" class="btn btn-opcao btn-animais">🐾 Gerenciar Animais</a>
+    <a href="gerenciar_usuarios.php" class="btn btn-opcao btn-primary">
+        👥 Gerenciar Usuários
+    </a>
 
-        <a href="logout.php" class="logout">Sair</a>
-    </div>
+    <a href="gerenciar_animais.php" class="btn btn-opcao btn-success">
+        🐾 Gerenciar Animais
+    </a>
+
+    <a href="logout.php" class="logout">Sair</a>
+</div>
 
 </body>
 </html>
