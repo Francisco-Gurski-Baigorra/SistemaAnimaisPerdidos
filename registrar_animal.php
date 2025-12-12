@@ -186,6 +186,8 @@ while ($row = $res->fetch_assoc()) {
 </head>
 <body>
 
+
+
 <!-- NAVBAR PADRÃO -->
 <nav class="navbar navbar-expand-lg">
     <div class="container">
@@ -460,7 +462,10 @@ map.on('click', function(e) {
   }
   abrirPopupForm(e.latlng.lat.toFixed(6), e.latlng.lng.toFixed(6));
 });
+
+
 </script>
+
 
 </body>
 </html>

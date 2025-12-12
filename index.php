@@ -209,6 +209,24 @@ session_start();
 </div>
 
 </section>
+<footer class="footer-rastreia">
+    © 2025 Rastreia Bicho 🐾
+</footer>
+
+<style>
+    /* Rodapé */
+.footer-rastreia {
+    background-color: #179e46ff; /* verde claro já existente no site */
+    color: #333;
+    text-align: center;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    width: 100%;
+    border-top: 2px solid #2e3531ff;
+    margin-top: 40px;
+}
+</style>
 
 </body>
 </html>
