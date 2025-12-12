@@ -114,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <style>
 body {
-    background-color: #b6e388;
+    background-color: #ffffffff;
     min-height: 100vh;
 }
 .card {

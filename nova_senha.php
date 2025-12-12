@@ -43,7 +43,7 @@ if ($agora > $data_criacao) {
 
     <style>
         body {
-            background-color: #9fccebff;
+            background-color: #ffffffff;
             height: 100vh;
             margin: 0;
             display: flex;

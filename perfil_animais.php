@@ -183,7 +183,7 @@ function mostrar($valor) {
 
                     <div id="confirmar<?= $animal['id'] ?>" class="d-none">
                         <p class="text-danger fw-bold mt-2">Deseja excluir?</p>
-                        <a href="excluir_animal.php?id=<?= $animal['id'] ?>" class="btn btn-success btn-sm">Sim</a>
+                        <a href="excluir_animal.php?id=<?= $animal['id'] ?>" class="btn btn-danger btn-sm">Sim</a>
                         <button class="btn btn-secondary btn-sm" onclick="cancelarConfirmacaoExclusao(<?= $animal['id'] ?>)">Cancelar</button>
                     </div>
 
