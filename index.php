@@ -122,13 +122,7 @@ session_start();
         margin-top: 40px;
     }
 
-    footer {
-        background-color: #b6e388;
-        color: #333;
-        text-align: center;
-        padding: 10px;
-        font-size: 0.9rem;
-    }
+
 </style>
 
 </head>
@@ -208,15 +202,16 @@ session_start();
   </div>
 </div>
 
+
 </section>
+
 <footer class="footer-rastreia">
-    © 2025 Rastreia Bicho 🐾
+    © 2025 Rastreia Bicho
 </footer>
 
 <style>
-    /* Rodapé */
 .footer-rastreia {
-    background-color: #179e46ff; /* verde claro já existente no site */
+    background-color: #179e46ff;
     color: #333;
     text-align: center;
     padding: 12px;
@@ -224,9 +219,16 @@ session_start();
     font-weight: 600;
     width: 100%;
     border-top: 2px solid #2e3531ff;
-    margin-top: 40px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+body {
+    padding-bottom: 60px;
 }
 </style>
 
 </body>
 </html>
+

@@ -178,5 +178,31 @@ body {
   </div>
 </div>
 
+
+<footer class="footer-rastreia">
+    © 2025 Rastreia Bicho
+</footer>
+
+<style>
+.footer-rastreia {
+    background-color: #179e46ff;
+    color: #333;
+    text-align: center;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    width: 100%;
+    border-top: 2px solid #2e3531ff;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+body {
+    padding-bottom: 60px;
+}
+</style>
+
+
 </body>
 </html>

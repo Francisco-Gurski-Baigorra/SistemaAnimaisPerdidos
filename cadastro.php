@@ -18,6 +18,13 @@
     padding-top: 0;
 }
 
+.form-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 80px; /* espaço para não grudar no footer */
+}
+
+
 /* ======= Navbar igual ao index.php ======= */
 .navbar {
     background-color: #179e46ff;
@@ -70,10 +77,8 @@ body {
     background-color: #f2f2f2; 
     min-height: 100vh;
     padding-top: 160px; /* espaço da navbar */
-    display: flex;
-    justify-content: center; /* centraliza horizontalmente */
-    align-items: flex-start; /* impede esticar vertical */
 }
+
 
 
 /* Card de cadastro mais largo */
@@ -136,6 +141,7 @@ body {
 </nav>
 
 <!-- FORMULÁRIO -->
+ <div class="form-wrapper">
 <div class="card card-cadastro p-4">
   <div class="text-center mb-3">
     <h3 class="fw-bold text-dark">Rastreia Bicho 🐾</h3>
@@ -202,6 +208,8 @@ body {
     <p>Já tem uma conta? <a href="login.php" class="text-success">Fazer login</a></p>
   </div>
 </div>
+</div>
+
 
 <!-- SCRIPT DA MÁSCARA DO TELEFONE -->
 <script>
@@ -219,6 +227,26 @@ document.getElementById("telefone").addEventListener("input", function (e) {
     }
 });
 </script>
+
+<footer class="footer-rastreia">
+    © 2025 Rastreia Bicho
+</footer>
+
+<style>
+.footer-rastreia {
+    background-color: #179e46ff;
+    color: #333;
+    text-align: center;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    width: 100%;
+    border-top: 2px solid #2e3531ff;
+}
+
+</style>
+
+
 
 </body>
 </html>
