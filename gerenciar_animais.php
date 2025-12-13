@@ -2,13 +2,17 @@
 include('conecta.php');
 session_start();
 
-// 🔐 Apenas administradores
+/* =========================
+   🔐 Apenas administradores
+========================= */
 if (!isset($_SESSION['tipo_usuario']) || $_SESSION['tipo_usuario'] !== 'administrador') {
     echo "<script>alert('❌ Você não tem permissão para acessar esta área!'); window.location='index.php';</script>";
     exit;
 }
 
-// 🔍 Busca todos os animais com JOIN
+/* =========================
+   🔍 Busca todos os animais
+========================= */
 $sql = "SELECT 
             a.id,
             a.usuario_id,
@@ -21,17 +25,43 @@ $sql = "SELECT
             a.cor_predominante,
             a.idade,
             a.nome,
-            a.descricao,
-            a.latitude,
-            a.longitude,
-            a.telefone_contato,
-            a.data_ocorrido,
-            a.data_cadastro
+            a.telefone_contato
         FROM animais a
         LEFT JOIN racas r ON a.raca_id = r.id
-        ORDER BY a.id DESC";
+        ORDER BY a.situacao, a.id DESC";
 
 $result = $conexao->query($sql);
+
+/* =========================
+   📦 Agrupa por situação
+========================= */
+$animaisPorSituacao = [
+    'perdido'    => [],
+    'encontrado' => [],
+    'resgatado'  => []
+];
+
+while ($row = $result->fetch_assoc()) {
+    $animaisPorSituacao[$row['situacao']][] = $row;
+}
+
+/* =========================
+   📞 Formata telefone
+========================= */
+function formatarTelefone($telefone) {
+    $telefone = preg_replace('/\D/', '', $telefone);
+
+    if (strlen($telefone) === 11) {
+        return sprintf(
+            '(%s) %s-%s',
+            substr($telefone, 0, 2),
+            substr($telefone, 2, 5),
+            substr($telefone, 7)
+        );
+    }
+
+    return 'N/A';
+}
 ?>
 
 <!DOCTYPE html>
@@ -41,6 +71,8 @@ $result = $conexao->query($sql);
 <title>Gerenciar Animais</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 
 <style>
 body {
@@ -71,9 +103,16 @@ body {
     background-color: #179e46ff;
     color: white;
 }
+.titulo-situacao {
+    background: #e9f5ee;
+    border-left: 6px solid #179e46ff;
+    padding: 10px 15px;
+    font-weight: bold;
+    margin-top: 30px;
+}
 </style>
-
 </head>
+
 <body>
 
 <div class="container mt-4">
@@ -84,7 +123,22 @@ body {
             <a href="admin.php" class="btn btn-voltar">⬅ Voltar</a>
         </div>
 
-        <table class="table table-bordered table-striped text-center">
+        <?php
+        $labels = [
+            'perdido'    => 'Animais Perdidos',
+            'encontrado' => 'Animais Encontrados',
+            'resgatado'  => 'Animais Resgatados'
+        ];
+
+        foreach ($animaisPorSituacao as $situacao => $lista):
+            if (empty($lista)) continue;
+        ?>
+
+        <div class="titulo-situacao">
+            <?= $labels[$situacao] ?>
+        </div>
+
+        <table class="table table-bordered table-striped text-center mt-2">
             <thead>
                 <tr>
                     <th>ID Animal</th>
@@ -104,46 +158,48 @@ body {
             </thead>
 
             <tbody>
-<?php while ($animal = $result->fetch_assoc()): ?>
-<tr>
-    <td><?= $animal['id'] ?></td>
-    <td><?= $animal['usuario_id'] ?></td>
+            <?php foreach ($lista as $animal): ?>
+                <tr>
+                    <td><?= $animal['id'] ?></td>
+                    <td><?= $animal['usuario_id'] ?></td>
 
-    <td>
-        <?php if (!empty($animal['foto'])): ?>
-            <img src="uploads/<?= htmlspecialchars($animal['foto']) ?>" alt="Foto">
-        <?php else: ?>
-            <span class="text-muted">N/A</span>
-        <?php endif; ?>
-    </td>
+                    <td>
+                        <?php if (!empty($animal['foto'])): ?>
+                            <img src="uploads/<?= htmlspecialchars($animal['foto']) ?>">
+                        <?php else: ?>
+                            <span class="text-muted">N/A</span>
+                        <?php endif; ?>
+                    </td>
 
-    <td><?= !empty($animal['nome']) ? htmlspecialchars($animal['nome']) : 'N/A' ?></td>
-    <td><?= !empty($animal['situacao']) ? ucfirst($animal['situacao']) : 'N/A' ?></td>
-    <td><?= !empty($animal['especie']) ? ucfirst($animal['especie']) : 'N/A' ?></td>
-    <td><?= !empty($animal['genero']) ? ucfirst($animal['genero']) : 'N/A' ?></td>
-    <td><?= !empty($animal['raca_nome']) ? $animal['raca_nome'] : 'N/A' ?></td>
-    <td><?= !empty($animal['porte']) ? ucfirst($animal['porte']) : 'N/A' ?></td>
-    <td><?= !empty($animal['cor_predominante']) ? ucfirst($animal['cor_predominante']) : 'N/A' ?></td>
-    <td><?= !empty($animal['idade']) ? $animal['idade'] : 'N/A' ?></td>
-    <td><?= !empty($animal['telefone_contato']) ? $animal['telefone_contato'] : 'N/A' ?></td>
+                    <td><?= $animal['nome'] ?: 'N/A' ?></td>
+                    <td><?= ucfirst($animal['situacao']) ?></td>
+                    <td><?= ucfirst($animal['especie']) ?></td>
+                    <td><?= ucfirst($animal['genero']) ?></td>
+                    <td><?= $animal['raca_nome'] ?: 'N/A' ?></td>
+                    <td><?= ucfirst($animal['porte']) ?></td>
+                    <td><?= ucfirst($animal['cor_predominante']) ?></td>
+                    <td><?= $animal['idade'] ?: 'N/A' ?></td>
+                    <td><?= formatarTelefone($animal['telefone_contato']) ?></td>
 
-    <td>
-        <a href="adm_excluir_animal.php?id=<?= $animal['id'] ?>" 
-           class="btn btn-excluir btn-sm"
-           onclick="return confirm('Tem certeza que deseja excluir este animal?')">
-           🗑 Excluir
-        </a>
-
-        <a href="adm_editar_animal.php?id=<?= $animal['id'] ?>" class="btn btn-editar btn-sm">
-            ✏ Editar
-        </a>
-    </td>
-
-</tr>
-<?php endwhile; ?>
-</tbody>
-
+                    <td>
+                        <a href="adm_editar_animal.php?id=<?= $animal['id'] ?>"
+                           class="btn btn-editar btn-sm">
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </a>
+                    
+                        <a href="adm_excluir_animal.php?id=<?= $animal['id'] ?>"
+                           class="btn btn-excluir btn-sm"
+                           onclick="return confirm('Tem certeza que deseja excluir este animal?')">
+                           <i class="bi bi-trash"></i> Excluir
+                        </a>
+  
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
         </table>
+
+        <?php endforeach; ?>
 
     </div>
 </div>

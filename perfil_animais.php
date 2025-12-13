@@ -11,7 +11,8 @@ if (!isset($_SESSION['usuario_id'])) {
 $id_usuario = $_SESSION['usuario_id'];
 
 // Buscar informações do usuário
-$sqlUsuario = "SELECT nome, email FROM usuarios WHERE id = ?";
+$sqlUsuario = "SELECT nome, email FROM usuarios WHERE id = ?"; 
+
 $stmt = $conexao->prepare($sqlUsuario);
 $stmt->bind_param("i", $id_usuario);
 $stmt->execute();
@@ -27,6 +28,7 @@ $sqlAnimais = "
     FROM animais a
     LEFT JOIN racas r ON a.raca_id = r.id
     WHERE a.usuario_id = ?
+    AND a.situacao != 'resgatado'
 ";
 $stmt2 = $conexao->prepare($sqlAnimais);
 $stmt2->bind_param("i", $id_usuario);
@@ -173,7 +175,7 @@ function mostrar($valor) {
 
                     <div id="confirmarResgate<?= $animal['id'] ?>" class="d-none">
                         <p class="text-success fw-bold mt-2">Confirmar Resgate?</p>
-                        <a href="excluir_animal.php?id=<?= $animal['id'] ?>&resgate=1" class="btn btn-success btn-sm">Sim</a>
+                        <a href="resgatar_animal.php?id=<?= $animal['id'] ?>&resgate=1" class="btn btn-success btn-sm">Sim</a>
                         <button class="btn btn-secondary btn-sm" onclick="cancelarConfirmacaoResgate(<?= $animal['id'] ?>)">Cancelar</button>
                     </div>
 

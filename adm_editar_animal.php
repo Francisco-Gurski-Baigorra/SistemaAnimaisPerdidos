@@ -105,6 +105,7 @@ if (!empty($animal['raca_id'])) {
             <select name="situacao" class="form-control" required>
                 <option value="perdido"    <?= $animal['situacao']=='perdido' ? 'selected' : '' ?>>Perdido</option>
                 <option value="encontrado" <?= $animal['situacao']=='encontrado' ? 'selected' : '' ?>>Encontrado</option>
+                <option value="encontrado" <?= $animal['situacao']=='resgatado' ? 'selected' : '' ?>>Resgatado</option>
             </select>
 
             <label class="form-label mt-2">Espécie:</label>
@@ -161,7 +162,17 @@ if (!empty($animal['raca_id'])) {
             </select>
 
             <label class="form-label mt-2">Telefone de Contato:</label>
-            <input type="text" name="telefone_contato" class="form-control" value="<?= htmlspecialchars($animal['telefone_contato']) ?>">
+<input
+    type="text"
+    name="telefone_contato"
+    id="telefone_contato"
+    class="form-control"
+    maxlength="15"
+    placeholder="(99) 99999-9999"
+    value="<?= htmlspecialchars($animal['telefone_contato']) ?>"
+    required
+>
+
 
         
         </div>
@@ -207,6 +218,31 @@ marker.on("dragend", function(e) {
     document.getElementById("longitude").value = pos.lng;
 });
 </script>
+
+<script>
+document.getElementById('telefone_contato').addEventListener('input', function (e) {
+    let valor = e.target.value.replace(/\D/g, '');
+
+    // Limita a 11 dígitos
+    if (valor.length > 11) {
+        valor = valor.slice(0, 11);
+    }
+
+    // Aplica máscara
+    if (valor.length <= 2) {
+        valor = '(' + valor;
+    } 
+    else if (valor.length <= 7) {
+        valor = '(' + valor.slice(0, 2) + ') ' + valor.slice(2);
+    } 
+    else {
+        valor = '(' + valor.slice(0, 2) + ') ' + valor.slice(2, 7) + '-' + valor.slice(7);
+    }
+
+    e.target.value = valor;
+});
+</script>
+
 
 </body>
 </html>

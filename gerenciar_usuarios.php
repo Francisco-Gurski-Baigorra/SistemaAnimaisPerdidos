@@ -81,7 +81,10 @@ body {
                     <td><?= $usuario["telefone"] ?></td>
                     <td><?= $usuario["endereco"] ?></td>
                     <td><?= date("d/m/Y", strtotime($usuario["data_nascimento"])) ?></td>
-                    <td><?= ucfirst($usuario["tipo_usuario"]) ?></td>
+                    <td>
+                    <?= $usuario["tipo_usuario"] === "administrador" ? "⚙️ Administrador" : "👤 Usuário" ?>
+                    </td>
+
                     <td><?= $usuario["ativo"] == "sim" ? "🟢 Sim" : "🔴 Não" ?></td>
 
                     <td>
