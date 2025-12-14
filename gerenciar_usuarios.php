@@ -58,11 +58,11 @@ body {
     color: white;
 }
 .btn-editar {
-    background-color: #ffc107;
+    background-color: #f3f053ff;
     color: black;
 }
 .btn-excluir {
-    background-color: #dc3545;
+    background-color: #df4e5cff;
     color: white;
 }
 .btn-voltar {
@@ -97,7 +97,7 @@ body {
 
 
 <div class="container mt-4 mb-5"> <div class="card p-4 shadow">
-        <h2 class="text-center mb-4">👥 Gerenciar Usuários</h2>
+        <h2 class="text-center mb-4"><i class="bi bi-people-fill"></i> Gerenciar Usuários</h2>
 
         <div class="text-end mb-3">
             <a href="admin.php" class="btn btn-voltar"><i class="bi bi-arrow-left"></i> Voltar</a>
@@ -127,7 +127,7 @@ body {
                     <td><?= $usuario["endereco"] ?></td>
                     <td><?= date("d/m/Y", strtotime($usuario["data_nascimento"])) ?></td>
                     <td>
-                    <?= $usuario["tipo_usuario"] === "administrador" ? "⚙️ Administrador" : "👤 Usuário" ?>
+                    <?= $usuario["tipo_usuario"] === "administrador" ? "<i class='bi bi-gear'></i> </i> Administrador" : "<i class='bi bi-person-fill'></i> Usuário" ?>
                     </td>
 
                     <td><?= $usuario["ativo"] == "sim" ? "🟢 Sim" : "🔴 Não" ?></td>

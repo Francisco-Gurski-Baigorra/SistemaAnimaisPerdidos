@@ -133,11 +133,11 @@ body {
 
 /* ======= Botões ======= */
 .btn-editar {
-    background-color: #0aaddfff;
+    background-color: #f3f053ff;
     color: black;
 }
 .btn-excluir {
-    background-color: #dc3545;
+    background-color: #df4e5cff;
     color: white;
 }
 .btn-voltar {

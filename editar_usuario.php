@@ -102,7 +102,7 @@ body {
 <div class="container mt-4 mb-5">
     <div class="card p-4 shadow col-md-6 offset-md-3">
 
-        <h3 class="text-center mb-3">✏️ Editar Usuário</h3>
+        <h3 class="text-center mb-3"><i class="bi bi-pencil"></i> Editar Usuário</h3>
 
         <form action="salvar_edicao_usuario.php" method="POST" id="formEditarUsuario">
 
