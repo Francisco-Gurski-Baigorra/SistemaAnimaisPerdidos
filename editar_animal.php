@@ -285,7 +285,7 @@ body {
         name="descricao"
         rows="3"
         maxlength="150"
-        placeholder="Máx. 100 caracteres"><?= htmlspecialchars($animal['descricao'] ?? '') ?></textarea>
+        placeholder="Máx. 150 caracteres"><?= htmlspecialchars($animal['descricao'] ?? '') ?></textarea>
 </div>
 
 

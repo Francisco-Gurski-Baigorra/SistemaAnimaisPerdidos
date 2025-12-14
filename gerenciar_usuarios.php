@@ -100,7 +100,7 @@ body {
         <h2 class="text-center mb-4"><i class="bi bi-people-fill"></i> Gerenciar Usuários</h2>
 
         <div class="text-end mb-3">
-            <a href="admin.php" class="btn btn-voltar"><i class="bi bi-arrow-left"></i> Voltar</a>
+            <a href="admin.php" class="btn btn-voltar"><i class="bi bi-arrow-left-circle"></i> Voltar</a>
         </div>
 
         <table class="table table-bordered table-striped text-center">

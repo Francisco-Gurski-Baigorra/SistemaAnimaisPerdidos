@@ -288,10 +288,25 @@ function abrirPopupForm(lat, lng) {
         <input type="hidden" name="longitude" value="${lng}">
         <input type="hidden" name="usuario_id" value="${usuario_id}">
 
+      
+        <label class="form-label">
+    Nome do animal <span class="text-muted">(ou breve descrição)</span>
+    <span style="color:red;">*</span>
+</label>
 
-        <label>Nome do animal: <span style="color:red;">*</span></label>
-        <input name="nome" type="text"rows="3" placeholder="Digite o nome do seu animal"></textarea>
+<input
+    type="text"
+    name="nome"
+    class="form-control"
+    required
+    minlength="3"
+    maxlength="50"
+    placeholder="Ex: Cusco / Cão preto com coleira verde"
+>
+
         
+
+
 
         <label>Situação: <span style="color:red;">*</span></label>
         <select name="situacao">
