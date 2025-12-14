@@ -111,11 +111,35 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <title>Editar Animal</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
 
 <style>
 body {
-    background-color: #ffffffff;
-    min-height: 100vh;
+    background-color: #ffffff;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+
+
+/* ======= Navbar ======= */
+.navbar {
+    background-color: #179e46;
+    padding: 1rem;
+    border-bottom: 3px solid #2e3531;
+    box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
+}
+
+
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.7rem;
+    color: #2b2b2b !important;
 }
 .card {
     border-radius: 20px;
@@ -130,7 +154,42 @@ body {
 </head>
 
 <body>
-<div class="container mt-4">
+
+
+<nav class="navbar navbar-expand-lg"> 
+    <div class="container">
+        <a class="navbar-brand" href="index.php">
+            <i class="fa-solid fa-paw me-2"></i> RASTREIA BICHO
+        </a>
+
+        <div class="ms-auto">
+            <a href="registrar_animal.php" class="btn btn-dark me-2">
+                <i class="bi bi-plus-circle"></i> Registrar Animal
+            </a>
+
+            <a href="perfil.php" class="btn btn-dark me-2">
+                <i class="bi bi-person-circle"></i> Perfil
+            </a>
+
+            <a href="perfil_animais.php" class="btn btn-dark me-2">
+                <i class="fa-solid fa-paw"></i> Meus Animais
+            </a>
+
+            <?php if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'administrador'): ?>
+    <a href="admin.php" class="btn btn-primary me-2">
+        <i class="bi bi-gear-fill"></i> Administrador
+    </a>
+<?php endif; ?>
+
+<a href="logout.php" class="btn btn-danger me-2">
+    <i class="bi bi-box-arrow-right"></i> Sair
+</a>
+        </div>
+    </div>
+</nav>
+
+
+<div class="container mt-4 mb-5">
     <div class="card p-4">
         <h3 class="text-center mb-3 text-success fw-bold">Editar Animal</h3>
 
@@ -168,7 +227,6 @@ body {
                     </select>
                 </div>
 
-                <!-- RAÇAS (select vindo do banco) -->
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Raça</label>
                     <select class="form-select" name="raca_id">
@@ -221,11 +279,16 @@ body {
                 </div>
 
                 <div class="col-12">
-                    <label class="form-label fw-bold">Descrição</label>
-                    <textarea class="form-control" name="descricao" rows="3"><?= htmlspecialchars($animal['descricao'] ?? '') ?></textarea>
-                </div>
+    <label class="form-label fw-bold">Descrição</label>
+    <textarea
+        class="form-control"
+        name="descricao"
+        rows="3"
+        maxlength="150"
+        placeholder="Máx. 100 caracteres"><?= htmlspecialchars($animal['descricao'] ?? '') ?></textarea>
+</div>
 
-                <!-- MAPA -->
+
                 <div class="col-12">
                     <label class="form-label fw-bold">Localização do animal</label>
                     <div id="map"></div>
@@ -273,6 +336,27 @@ marker.on("dragend", function(e) {
     document.getElementById("longitude").value = pos.lng;
 });
 </script>
+
+
+
+<footer class="footer-rastreia">
+    © 2025 Rastreia Bicho
+</footer>
+
+<style>
+.footer-rastreia {
+    background-color: #179e46ff;
+    color: #333;
+    text-align: center;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    width: 100%;
+    border-top: 2px solid #2e3531ff;
+}
+
+
+</style>
 
 </body>
 </html>

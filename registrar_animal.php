@@ -209,9 +209,16 @@ while ($row = $res->fetch_assoc()) {
                     <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Meus Animais
                 </a>
 
-                <a href="logout.php" class="btn btn-danger me-2">
-                    <i class="bi bi-box-arrow-right"></i> Sair
-                </a>
+                <?php if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'administrador'): ?>
+    <a href="admin.php" class="btn btn-primary me-2">
+        <i class="bi bi-gear-fill"></i> Administrador
+    </a>
+<?php endif; ?>
+
+<!-- 🔄 Botão Sair -->
+<a href="logout.php" class="btn btn-danger me-2">
+    <i class="bi bi-box-arrow-right"></i> Sair
+</a>
 
             <?php else: ?>
                 <a href="login.php" class="btn btn-dark me-2">
@@ -349,7 +356,13 @@ function abrirPopupForm(lat, lng) {
         </select>
 
         <label>Descrição (opcional):</label>
-        <textarea name="descricao" rows="3" placeholder="Detalhes que ajudem na identificação..."></textarea>
+        <textarea
+      name="descricao"
+      rows="3"
+      maxlength="150"
+      placeholder="Detalhes que ajudem na identificação">
+      </textarea>
+
 
         <button type="button" id="btnSalvar">Registrar</button>
         <button type="button" id="btnFechar" class="btn-close-popup">Fechar</button>

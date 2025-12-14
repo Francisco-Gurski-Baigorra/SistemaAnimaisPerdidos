@@ -56,11 +56,11 @@ function mostrar($valor) {
     background-color: #ffffff;
     min-height: 100vh;
     margin: 0;
-    padding-top: 0;
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
 }
+
 
 /* ======= Navbar ======= */
 .navbar {
@@ -106,6 +106,23 @@ function mostrar($valor) {
     border: 1px solid #ccc;
 }
 
+.descricao-box {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #333;
+
+    max-height: 120px;      /* controla o tamanho */
+    overflow-y: auto;       /* scroll só se precisar */
+
+    white-space: normal;    /* mantém padrão visual */
+    word-break: break-word; /* evita estouro */
+}
+
+
+
 </style>
 </head>
 <body>
@@ -130,14 +147,22 @@ function mostrar($valor) {
                 <i class="fa-solid fa-paw"></i> Meus Animais
             </a>
 
-            <a href="logout.php" class="btn btn-danger me-2">
-                <i class="bi bi-box-arrow-right"></i> Sair
-            </a>
+            <?php if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'administrador'): ?>
+    <a href="admin.php" class="btn btn-primary me-2">
+        <i class="bi bi-gear-fill"></i> Administrador
+    </a>
+<?php endif; ?>
+
+<!-- 🔄 Botão Sair -->
+<a href="logout.php" class="btn btn-danger me-2">
+    <i class="bi bi-box-arrow-right"></i> Sair
+</a>
         </div>
     </div>
 </nav>
 
-<div class="container mb-5" style="padding-top: 90px;">
+<main class="container mb-5 flex-grow-1" style="padding-top: 90px;">
+
     <div class="text-center mb-4">
         <h2 class="fw-bold text-dark">Olá, <?= htmlspecialchars($usuario['nome']) ?>!</h2>
         <p class="text-muted">Aqui estão os animais que você registrou:</p>
@@ -218,7 +243,14 @@ function mostrar($valor) {
                             <li class="list-group-item"><strong>Porte:</strong> <?= mostrar($animal['porte']) ?></li>
                             <li class="list-group-item"><strong>Cor:</strong> <?= mostrar($animal['cor_predominante']) ?></li>
                             <li class="list-group-item"><strong>Idade:</strong> <?= mostrar($animal['idade']) ?></li>
-                            <li class="list-group-item"><strong>Descrição:</strong><br><?= mostrar($animal['descricao']) ?></li>
+                            <li class="list-group-item">
+                            <strong>Descrição:</strong>
+                            <div class="descricao-box mt-2">
+                            <?= mostrar($animal['descricao']) ?>
+                            </div>
+                            </li>
+
+
                             <li class="list-group-item"><strong>Data do ocorrido:</strong> <?= mostrar($animal['data_ocorrido']) ?></li>
                         </ul>
 
@@ -244,7 +276,8 @@ function mostrar($valor) {
     </div>
     <?php endif; ?>
 
-</div>
+</main>
+
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -295,6 +328,7 @@ document.addEventListener('shown.bs.modal', function (e) {
     width: 100%;
     border-top: 2px solid #2e3531ff;
 }
+
 
 </style>
 

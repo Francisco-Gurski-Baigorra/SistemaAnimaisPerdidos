@@ -134,8 +134,9 @@ session_start();
     <div class="container">
         <a class="navbar-brand" href="#">
             <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> RASTREIA BICHO 
-
         </a>
+        
+        
 
         <div class="ms-auto">
             <?php if (isset($_SESSION['usuario_id'])): ?>
@@ -152,10 +153,17 @@ session_start();
                    <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Meus Animais
                 </a>
 
-                <!-- 🔄 Botão Sair mais harmonioso -->
-                <a href="logout.php" class="btn btn-danger me-2">
-                    <i class="bi bi-box-arrow-right"></i> Sair
-                </a>
+                <?php if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'administrador'): ?>
+    <a href="admin.php" class="btn btn-primary me-2">
+        <i class="bi bi-gear-fill"></i> Administrador
+    </a>
+<?php endif; ?>
+
+<!-- 🔄 Botão Sair -->
+<a href="logout.php" class="btn btn-danger me-2">
+    <i class="bi bi-box-arrow-right"></i> Sair
+</a>
+
 
             <?php else: ?>
                 <a href="login.php" class="btn btn-dark me-2">
