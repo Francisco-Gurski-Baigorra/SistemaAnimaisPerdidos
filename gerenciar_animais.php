@@ -131,6 +131,12 @@ body {
     color: white;
 }
 
+/* Impede quebra de dados importantes (telefone, tipo, status) */
+.no-break {
+    white-space: nowrap;
+}
+
+
 /* ======= Botões ======= */
 .btn-editar {
     background-color: #f3f053ff;
@@ -236,7 +242,7 @@ body {
                     <td><?= $animal['porte'] ? ucfirst($animal['porte']) : 'N/A' ?></td>
                     <td><?= $animal['cor_predominante'] ? ucfirst($animal['cor_predominante']) : 'N/A' ?></td>
                     <td><?= $animal['idade'] ?: 'N/A' ?></td>
-                    <td><?= formatarTelefone($animal['telefone_contato']) ?></td>
+                    <td class="no-break"><?= formatarTelefone($animal['telefone_contato']) ?></td>
 
                     <td>
                         <a href="adm_editar_animal.php?id=<?= $animal['id'] ?>" class="btn btn-editar btn-sm">

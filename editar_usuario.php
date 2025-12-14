@@ -102,7 +102,7 @@ body {
 <div class="container mt-4 mb-5">
     <div class="card p-4 shadow col-md-6 offset-md-3">
 
-        <h3 class="text-center mb-3"><i class="bi bi-pencil"></i> Editar Usuário</h3>
+        <h3 class="text-center mb-3"><i class="bi bi-pencil"></i>Editar Usuário</h3>
 
         <form action="salvar_edicao_usuario.php" method="POST" id="formEditarUsuario">
 
@@ -110,10 +110,16 @@ body {
             <input type="hidden" name="id" value="<?= $usuario['id'] ?>">
 
             <label class="form-label">Nome:</label>
-<input type="text" class="form-control" name="nome" value="<?= $usuario['nome'] ?>" required>
+<input type="text"
+       class="form-control"
+       name="nome"
+       value="<?= $usuario['nome'] ?>"
+       maxlength="30"
+       required>
+
 
 <label class="form-label mt-3">Email:</label>
-<input type="email" class="form-control" name="email" value="<?= $usuario['email'] ?>" required>
+<input type="email" class="form-control" name="email" value="<?= $usuario['email'] ?>" maxlength="30" required >
 
 <label class="form-label mt-3">Telefone:</label>
 <input
@@ -129,7 +135,13 @@ body {
 
 
 <label class="form-label mt-3">Endereço:</label>
-<input type="text" class="form-control" name="endereco" value="<?= $usuario['endereco'] ?>" required>
+<input type="text"
+       class="form-control"
+       name="endereco"
+       value="<?= $usuario['endereco'] ?>"
+       maxlength="50"
+       required>
+
 
 <label class="form-label mt-3">Data de Nascimento:</label>
 <input type="date" class="form-control" name="data_nascimento" value="<?= $usuario['data_nascimento'] ?>" required>

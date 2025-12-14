@@ -71,13 +71,17 @@ while ($r = $resRacas->fetch_assoc()) {
 
         /* ======= Footer ======= */
         .footer-rastreia {
-            background-color: #179e46;
-            color: #2b2b2b;
-            text-align: center;
-            padding: 1rem 0;
-            border-top: 3px solid #2e3531;
-            margin-top: auto;
+            background-color: #179e46ff;
+    color: #333;
+    text-align: center;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    width: 100%;
+    border-top: 2px solid #2e3531ff;
+    margin-top: auto;
         }
+
 
         #map {
             height: 300px;
@@ -152,7 +156,9 @@ while ($r = $resRacas->fetch_assoc()) {
                            class="form-control"
                            required
                            minlength="3"
-                           value="<?= htmlspecialchars($animal['nome']) ?>">
+                           value="<?= htmlspecialchars($animal['nome']) ?>"
+                           maxlength="30">
+                           
 
                     <label class="form-label mt-2">Situação</label> <span class="text-danger">*</span>
                     <select name="situacao" class="form-control" required>
@@ -228,7 +234,7 @@ while ($r = $resRacas->fetch_assoc()) {
                            value="<?= htmlspecialchars($animal['telefone_contato']) ?>">
 
                     <label class="form-label mt-2">Descrição</label>
-                    <textarea name="descricao" class="form-control" maxlength="150"><?= htmlspecialchars($animal['descricao']) ?></textarea>
+                    <textarea name="descricao" class="form-control" maxlength="150"><?= htmlspecialchars($animal['descricao'])  ?></textarea>
                 </div>
             </div>
 
@@ -249,7 +255,7 @@ while ($r = $resRacas->fetch_assoc()) {
     <!-- Footer full width, conteúdo alinhado -->
     <footer class="footer-rastreia">
         <div class="container">
-            © 2025 Rastreia Bicho
+            © 2025 Rastreia Bicho 
         </div>
     </footer>
 

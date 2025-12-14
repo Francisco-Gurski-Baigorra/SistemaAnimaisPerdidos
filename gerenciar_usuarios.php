@@ -70,6 +70,12 @@ body {
     color: white;
 }
 
+/* Impede quebra de dados importantes (telefone, tipo, status) */
+.no-break {
+    white-space: nowrap;
+}
+
+
 /* FOOTER CORRIGIDO */
 .footer-rastreia {
     background-color: #179e46ff;
@@ -82,6 +88,8 @@ body {
     border-top: 2px solid #2e3531ff;
     margin-top: auto; /* Garante que ocupe o espaço restante e vá para o final */
 }
+
+
 </style>
 
 </head>
@@ -123,7 +131,7 @@ body {
                     <td><?= $usuario["id"] ?></td>
                     <td><?= $usuario["nome"] ?></td>
                     <td><?= $usuario["email"] ?></td>
-                    <td><?= $usuario["telefone"] ?></td>
+                    <td class="no-break"><?= $usuario["telefone"] ?></td>
                     <td><?= $usuario["endereco"] ?></td>
                     <td><?= date("d/m/Y", strtotime($usuario["data_nascimento"])) ?></td>
                     <td>
