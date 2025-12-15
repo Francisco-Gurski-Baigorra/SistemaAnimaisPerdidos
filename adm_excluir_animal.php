@@ -42,7 +42,7 @@ if ($stmt->execute()) {
         unlink("uploads/" . $animal['foto']);
     }
 
-    echo "<script>alert('🐾 Animal excluído com sucesso!'); window.location='gerenciar_animais.php';</script>";
+    echo "<script>alert(' Animal excluído com sucesso!'); window.location='gerenciar_animais.php';</script>";
 } else {
     echo "<script>alert('Erro ao excluir!'); window.location='gerenciar_animais.php';</script>";
 }

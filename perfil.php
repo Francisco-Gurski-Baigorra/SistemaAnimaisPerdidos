@@ -232,9 +232,10 @@ body {
 
     <form method="POST">
         <div class="mb-3">
-            <label class="form-label">Nome completo</label>
+            <label class="form-label">Nome</label>
             <input type="text" name="nome" class="form-control" required
-                   value="<?= htmlspecialchars($usuario['nome']) ?>">
+                   value="<?= htmlspecialchars($usuario['nome']) ?>"
+                   maxlength="50">
         </div>
 
         <div class="mb-3">
@@ -261,7 +262,8 @@ body {
         <div class="mb-3">
             <label class="form-label">Endereço</label>
             <input type="text" name="endereco" class="form-control" required
-                   value="<?= htmlspecialchars($usuario['endereco']) ?>">
+                   value="<?= htmlspecialchars($usuario['endereco']) ?>"
+                   maxlength="50">
         </div>
 
         <div class="mb-3">
@@ -275,11 +277,13 @@ body {
         <h5 class="fw-bold">Alterar senha</h5>
 
         <div class="mb-3">
-            <input type="password" name="senha" class="form-control" placeholder="Nova senha">
+            <input type="password" name="senha" class="form-control" placeholder="Nova senha"
+            maxlength="50">
         </div>
 
         <div class="mb-3">
-            <input type="password" name="confirmar_senha" class="form-control" placeholder="Confirmar senha">
+            <input type="password" name="confirmar_senha" class="form-control" placeholder="Confirmar senha"
+            maxlength="50">
         </div>
 
         <button class="btn btn-success w-100">Salvar alterações</button>

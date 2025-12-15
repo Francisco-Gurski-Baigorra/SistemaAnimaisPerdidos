@@ -152,30 +152,35 @@ body {
 
     <!-- Nome -->
     <div class="mb-3">
-      <label class="form-label"><strong>Nome completo:</strong></label>
+      <label class="form-label"><strong>Nome:</strong></label>
       <input type="text" class="form-control" name="nome"
-      placeholder="Digite seu Nome" required>
+      placeholder="Digite seu Nome" required
+      maxlength="35">
+                
     </div>
 
     <!-- Email -->
     <div class="mb-3">
       <label class="form-label"><strong>Email:</strong></label>
       <input type="email" class="form-control" name="email" 
-      placeholder="Digite seu E-mail" required>
+      placeholder="Digite seu E-mail" required
+      maxlength="50">
     </div>
 
     <!-- Senha -->
     <div class="mb-3">
       <label class="form-label"><strong>Senha:</strong></label>
       <input type="password" class="form-control" name="senha" 
-      placeholder="Digite sua Senha" required>
+      placeholder="Digite sua Senha" required
+      maxlength="50">
     </div>
 
     <!-- Confirmar Senha -->
     <div class="mb-3">
       <label class="form-label"><strong>Confirmar Senha:</strong></label>
       <input type="password" class="form-control" name="confirmar_senha" 
-      placeholder="Confirme sua Senha" required>
+      placeholder="Confirme sua Senha" required
+      maxlength="50">
       
     </div>
 
@@ -192,7 +197,8 @@ body {
          <strong>Endereço (Bairro, Rua e Número):</strong>
       </label>
       <input type="text" class="form-control" name="endereco" 
-             placeholder="Ex: Centro, Rua A, Nº 123" required>
+             placeholder="Ex: Centro, Rua A, Nº 123" required
+             maxlength="50">
     </div>
 
     <!-- Data de nascimento -->

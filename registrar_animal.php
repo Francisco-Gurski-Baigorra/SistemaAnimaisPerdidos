@@ -371,12 +371,12 @@ function abrirPopupForm(lat, lng) {
         </select>
 
         <label>Descrição (opcional):</label>
-        <textarea
-      name="descricao"
-      rows="3"
-      maxlength="150"
-      placeholder="Detalhes que ajudem na identificação">
-      </textarea>
+<textarea
+    name="descricao"
+    rows="3"
+    maxlength="150"
+    placeholder="Detalhes que ajudem na identificação"></textarea>
+
 
 
         <button type="button" id="btnSalvar">Registrar</button>

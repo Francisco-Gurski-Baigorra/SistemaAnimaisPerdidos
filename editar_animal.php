@@ -206,7 +206,8 @@ body {
 
                 <div class="col-md-6">
                     <label class="form-label fw-bold">Nome</label>
-                    <input type="text" class="form-control" name="nome" value="<?= htmlspecialchars($animal['nome'] ?? '') ?>" required>
+                    <input type="text" class="form-control" name="nome" value="<?= htmlspecialchars($animal['nome'] ?? '') ?>" required
+                    maxlength="50">
                 </div>
 
                 <div class="col-md-4">
@@ -264,9 +265,18 @@ body {
                 </div>
 
                 <div class="col-md-4">
-                    <label class="form-label fw-bold">Telefone para contato</label>
-                    <input type="text" class="form-control" name="telefone_contato" value="<?= htmlspecialchars($animal['telefone_contato'] ?? '') ?>">
-                </div>
+    <label class="form-label fw-bold">Telefone para contato</label>
+    <input type="text"
+           class="form-control"
+           name="telefone_contato"
+           id="telefone_contato"
+           maxlength="15"
+           minlength="14"
+           placeholder="(99) 99999-9999"
+           required
+           value="<?= htmlspecialchars($animal['telefone_contato'] ?? '') ?>">
+</div>
+
 
                 <div class="col-md-6">
                     <label class="form-label fw-bold">Data do ocorrido</label>
@@ -357,6 +367,31 @@ marker.on("dragend", function(e) {
 
 
 </style>
+
+<script>
+document.getElementById('telefone_contato').addEventListener('input', function (e) {
+    let valor = e.target.value.replace(/\D/g, '');
+
+    // limita a 11 dígitos numéricos
+    if (valor.length > 11) {
+        valor = valor.slice(0, 11);
+    }
+
+    // aplica máscara
+    if (valor.length <= 2) {
+        valor = '(' + valor;
+    } else if (valor.length <= 7) {
+        valor = '(' + valor.slice(0, 2) + ') ' + valor.slice(2);
+    } else {
+        valor = '(' + valor.slice(0, 2) + ') ' +
+                valor.slice(2, 7) + '-' +
+                valor.slice(7);
+    }
+
+    e.target.value = valor;
+});
+</script>
+
 
 </body>
 </html>
