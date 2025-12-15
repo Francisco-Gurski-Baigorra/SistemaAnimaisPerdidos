@@ -34,6 +34,25 @@
     width: 100%; /* garante largura total */
 }
 
+/* interação no rastreia bicho */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.7rem;
+    color: #2b2b2b !important;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.navbar-brand:hover {
+    transform: translateY(-2px) scale(1.04);
+    opacity: 0.9;
+}
+
 .navbar-brand {
     font-weight: bold;
     font-size: 1.7rem;
@@ -144,7 +163,7 @@ body {
  <div class="form-wrapper">
 <div class="card card-cadastro p-4">
   <div class="text-center mb-3">
-    <h3 class="fw-bold text-dark">Rastreia Bicho 🐾</h3>
+    <h3 class="fw-bold text-dark">Rastreia Bicho <i class="fa-solid fa-paw me-2"> </i></h3>
     <p class="text-muted">Crie sua conta</p>
   </div>
 

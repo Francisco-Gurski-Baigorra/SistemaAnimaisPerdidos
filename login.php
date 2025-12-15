@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Login - Rastreia Bicho 🐾</title>
+<title>Login - Rastreia Bicho </title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -17,6 +17,25 @@
     font-family: Arial, sans-serif;
     padding-top: 0;
 }
+/* interação no rastreia bicho */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.7rem;
+    color: #2b2b2b !important;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.navbar-brand:hover {
+    transform: translateY(-2px) scale(1.04);
+    opacity: 0.9;
+}
+
 
 /* ======= Navbar igual ao index.php ======= */
 .navbar {
@@ -149,7 +168,7 @@ body {
     </div>
 <?php endif; ?>
 
-    <h3 class="fw-bold text-dark">Rastreia Bicho 🐾</h3>
+    <h3 class="fw-bold text-dark">Rastreia Bicho <i class="fa-solid fa-paw me-2"> </i> </h3>
     <p class="text-muted">Entre na sua conta</p>
   </div>
 
@@ -174,7 +193,7 @@ body {
     <p class="mb-1">Ainda não possui uma conta? 
       <a href="cadastro.php" class="text-success">Fazer Cadastro</a>
     </p>
-    <p><a href="recuperar_senha.html" class="text-muted">Esqueceu a senha?</a></p>
+    <p><a href="recuperar_senha.php" class="text-muted">Esqueceu a senha?</a></p>
   </div>
 </div>
 

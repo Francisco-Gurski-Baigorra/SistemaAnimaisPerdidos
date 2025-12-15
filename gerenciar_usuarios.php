@@ -45,6 +45,25 @@ body {
     width: 100%;
 }
 
+/* interação no rastreia bicho */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.7rem;
+    color: #2b2b2b !important;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.navbar-brand:hover {
+    transform: translateY(-2px) scale(1.04);
+    opacity: 0.9;
+}
+
 .navbar-brand {
     font-weight: bold;
     font-size: 1.7rem;
@@ -134,11 +153,11 @@ body {
                     <td class="no-break"><?= $usuario["telefone"] ?></td>
                     <td><?= $usuario["endereco"] ?></td>
                     <td><?= date("d/m/Y", strtotime($usuario["data_nascimento"])) ?></td>
-                    <td>
+                    <td class="no-break">
                     <?= $usuario["tipo_usuario"] === "administrador" ? "<i class='bi bi-gear'></i> </i> Administrador" : "<i class='bi bi-person-fill'></i> Usuário" ?>
                     </td>
 
-                    <td><?= $usuario["ativo"] == "sim" ? "🟢 Sim" : "🔴 Não" ?></td>
+                    <td class="no-break"><?= $usuario["ativo"] == "sim" ? "🟢 Sim" : "🔴 Não" ?></td>
 
                     <td>
                         <a href="editar_usuario.php?id=<?= $usuario['id'] ?>" class="btn btn-editar btn-sm">

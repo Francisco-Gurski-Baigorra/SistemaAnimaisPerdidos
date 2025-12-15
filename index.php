@@ -74,6 +74,26 @@ session_start();
     }
 }
 
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.7rem;
+    color: #2b2b2b !important;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.navbar-brand:hover {
+    transform: translateY(-2px) scale(1.04);
+    opacity: 0.9;
+}
+
+
+
     /* Área principal */
     .hero {
     background-color: #fefefe;
