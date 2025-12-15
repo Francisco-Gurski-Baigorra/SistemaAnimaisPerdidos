@@ -141,6 +141,15 @@ function mostrar($valor) {
     word-break: break-word; /* evita estouro */
 }
 
+/* ===== IMAGEM DO MODAL (PADRÃO E RESPONSIVA) ===== */
+.modal img {
+    width: 100%;
+    max-height: 350px;   /* altura ideal para visualização */
+    object-fit: contain; /* mostra a imagem inteira sem cortar */
+    background-color: #f8f9fa;
+    border-radius: 10px;
+}
+
 
 
 </style>

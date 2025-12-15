@@ -36,7 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $erros = [];
 
-    // Validações obrigatórias
     if ($nome === "") {
         $erros[] = "O nome não pode ser apagado.";
     }
@@ -53,14 +52,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $erros[] = "O telefone deve conter exatamente 11 dígitos.";
     }
 
-    // Se houver erros, volta com notificação
     if (!empty($erros)) {
         $msg = implode(" ", $erros);
         header("Location: perfil.php?msg=" . urlencode($msg));
         exit;
     }
 
-    // Atualiza dados
     $sqlUp = "UPDATE usuarios SET nome=?, telefone=?, endereco=?, data_nascimento=? WHERE id=?";
     $stmtUp = $conexao->prepare($sqlUp);
     $stmtUp->bind_param("ssssi", $nome, $telefone, $endereco, $data_nasc, $id);
@@ -68,7 +65,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $msgParts = ["Dados atualizados!"];
 
-    // Atualizar senha (opcional)
     if (!empty($_POST["senha"]) || !empty($_POST["confirmar_senha"])) {
         if (!empty($_POST["senha"]) && $_POST["senha"] === $_POST["confirmar_senha"]) {
             $senhaHash = password_hash($_POST["senha"], PASSWORD_DEFAULT);
@@ -99,7 +95,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-
 <style>
 body {
     background-color: #f2f2f2;
@@ -108,26 +103,21 @@ body {
     font-family: Arial, sans-serif;
 }
 
-/* ======= Navbar igual ao index.php ======= */
 .navbar {
     background-color: #179e46ff;
     padding: 1rem;
     border-bottom: 3px solid #2e3531ff;
     box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
-    width: 100%; /* garante largura total */
+    width: 100%;
 }
 
-
-/* interação no rastreia bicho */
 .navbar-brand {
     font-weight: bold;
     font-size: 1.7rem;
     color: #2b2b2b !important;
-
     display: inline-flex;
     align-items: center;
     gap: 6px;
-
     transition: transform 0.2s ease, opacity 0.2s ease;
     cursor: pointer;
 }
@@ -135,11 +125,6 @@ body {
 .navbar-brand:hover {
     transform: translateY(-2px) scale(1.04);
     opacity: 0.9;
-}
-.navbar-brand {
-    font-weight: bold;
-    font-size: 1.7rem;
-    color: #2b2b2b !important;
 }
 
 .navbar-brand i {
@@ -170,6 +155,7 @@ body {
         margin: 0 12px;
     }
 }
+
 .card-perfil {
     max-width: 520px;
     background: #fff;
@@ -192,13 +178,10 @@ body {
 
 <body>
 
-<!-- ✅ Barra superior -->
-
 <nav class="navbar navbar-expand-lg">
     <div class="container">
         <a class="navbar-brand" href="index.php">
-            <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> RASTREIA BICHO 
-
+            <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> RASTREIA BICHO
         </a>
 
         <div class="ms-auto">
@@ -211,22 +194,19 @@ body {
                     <i class="bi bi-person-circle"></i> Perfil
                 </a>
 
-                <!-- 🐾 Ícone atualizado para Animais Registrados -->
                 <a href="perfil_animais.php" class="btn btn-dark me-2">
-                   <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Meus Animais
+                    <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> Meus Animais
                 </a>
 
                 <?php if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'administrador'): ?>
-    <a href="admin.php" class="btn btn-primary me-2">
-        <i class="bi bi-gear-fill"></i> Administrador
-    </a>
-<?php endif; ?>
+                    <a href="admin.php" class="btn btn-primary me-2">
+                        <i class="bi bi-gear-fill"></i> Administrador
+                    </a>
+                <?php endif; ?>
 
-<!-- 🔄 Botão Sair -->
-<a href="logout.php" class="btn btn-danger me-2">
-    <i class="bi bi-box-arrow-right"></i> Sair
-</a>
-
+                <a href="logout.php" class="btn btn-danger me-2">
+                    <i class="bi bi-box-arrow-right"></i> Sair
+                </a>
             <?php else: ?>
                 <a href="login.php" class="btn btn-dark me-2">
                     <i class="bi bi-box-arrow-in-right"></i> Login
@@ -253,8 +233,7 @@ body {
         <div class="mb-3">
             <label class="form-label">Nome</label>
             <input type="text" name="nome" class="form-control" required
-                   value="<?= htmlspecialchars($usuario['nome']) ?>"
-                   maxlength="50">
+                   value="<?= htmlspecialchars($usuario['nome']) ?>" maxlength="50">
         </div>
 
         <div class="mb-3">
@@ -264,25 +243,17 @@ body {
         </div>
 
         <div class="mb-3">
-    <label class="form-label">Telefone</label>
-    <input
-        type="text"
-        name="telefone"
-        id="telefone"
-        class="form-control"
-        required
-        maxlength="15"
-        placeholder="(99) 99999-9999"
-        value="<?= htmlspecialchars($usuario['telefone']) ?>"
-    >
-</div>
-
+            <label class="form-label">Telefone</label>
+            <input type="text" name="telefone" id="telefone" class="form-control"
+                   required maxlength="15"
+                   placeholder="(99) 99999-9999"
+                   value="<?= htmlspecialchars($usuario['telefone']) ?>">
+        </div>
 
         <div class="mb-3">
             <label class="form-label">Endereço</label>
             <input type="text" name="endereco" class="form-control" required
-                   value="<?= htmlspecialchars($usuario['endereco']) ?>"
-                   maxlength="50">
+                   value="<?= htmlspecialchars($usuario['endereco']) ?>" maxlength="50">
         </div>
 
         <div class="mb-3">
@@ -296,36 +267,39 @@ body {
         <h5 class="fw-bold">Alterar senha</h5>
 
         <div class="mb-3">
-            <input type="password" name="senha" class="form-control" placeholder="Nova senha"
-            maxlength="50">
+            <input type="password" name="senha" class="form-control" placeholder="Nova senha" maxlength="50">
         </div>
 
         <div class="mb-3">
-            <input type="password" name="confirmar_senha" class="form-control" placeholder="Confirmar senha"
-            maxlength="50">
+            <input type="password" name="confirmar_senha" class="form-control" placeholder="Confirmar senha" maxlength="50">
         </div>
 
         <button class="btn btn-success w-100">Salvar alterações</button>
+
+        <!-- 🔥 BOTÃO EXCLUIR CONTA -->
+        <button type="button" class="btn btn-danger w-100 mt-2" onclick="confirmarExclusao()">
+             Excluir conta
+        </button>
     </form>
 </div>
 
 <script>
+function confirmarExclusao() {
+    if (confirm("⚠️ Tem certeza que deseja excluir sua conta?\n\nEssa ação é PERMANENTE e não poderá ser desfeita.")) {
+        window.location.href = "excluir_usuario.php";
+    }
+}
+
 document.getElementById('telefone').addEventListener('input', function (e) {
     let valor = e.target.value.replace(/\D/g, '');
 
-    // limita a 11 dígitos
-    if (valor.length > 11) {
-        valor = valor.slice(0, 11);
-    }
+    if (valor.length > 11) valor = valor.slice(0, 11);
 
-    // formatação
     if (valor.length <= 2) {
         valor = '(' + valor;
-    } 
-    else if (valor.length <= 7) {
+    } else if (valor.length <= 7) {
         valor = '(' + valor.slice(0, 2) + ') ' + valor.slice(2);
-    } 
-    else {
+    } else {
         valor = '(' + valor.slice(0, 2) + ') ' + valor.slice(2, 7) + '-' + valor.slice(7);
     }
 
@@ -333,24 +307,9 @@ document.getElementById('telefone').addEventListener('input', function (e) {
 });
 </script>
 
-
-
 <footer class="footer-rastreia">
-    © 2025 Rastreia Bicho 
+    © 2025 Rastreia Bicho
 </footer>
-<style>
-.footer-rastreia {
-    background-color: #179e46ff;
-    color: #333;
-    text-align: center;
-    padding: 12px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    width: 100%;
-    border-top: 2px solid #2e3531ff;
-}
-</style>
-
 
 </body>
 </html>

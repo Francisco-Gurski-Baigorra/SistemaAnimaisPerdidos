@@ -85,7 +85,7 @@
             text-align: center;
 
             /* 🔹 Centralização perfeita */
-            margin: auto;
+            margin: 150px auto;
         }
 
         .btn-verde {
@@ -123,7 +123,7 @@
 
 <nav class="navbar navbar-expand-lg">
     <div class="container">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="index.php">
             <i class="fa-solid fa-paw"></i><i class="bi bi-paw-fill me-2"></i> RASTREIA BICHO 
         </a>
 

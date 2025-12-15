@@ -33,6 +33,11 @@ if ($agora > $data_criacao) {
 <!DOCTYPE html>
 <html lang="pt-BR">
 
+<!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -87,7 +92,7 @@ if ($agora > $data_criacao) {
 <body>
 
     <div class="card-redefinir">
-        <h3 class="text-center mb-3">🔑 Redefinir Senha</h3>
+        <h3 class="text-center mb-3"><i class="bi bi-key-fill"></i> Redefinir Senha</h3>
         <p class="text-muted text-center">Escolha sua nova senha para continuar.</p>
 
         <form action="salvar_senha.php" method="post">
