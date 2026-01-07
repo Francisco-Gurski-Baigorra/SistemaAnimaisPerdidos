@@ -16,40 +16,39 @@ $telefone_contato = $_POST['telefone_contato'] ?? '';
 $latitude = !empty($_POST['latitude']) ? floatval($_POST['latitude']) : null;
 $longitude = !empty($_POST['longitude']) ? floatval($_POST['longitude']) : null;
 
-// Upload da foto (se houver)
+
 $novaFoto = null;
 if (!empty($_FILES['foto']['name']) && $_FILES['foto']['error'] === 0) {
     $ext = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
-    $novoNome = "animal_" . time() . "_" . rand(1000,9999) . "." . $ext;
+    $novoNome = "animal_" . time() . "_" . rand(1000,9999) . "." . $ext; // so pra garantir que nao sobreescreva arquivos
     move_uploaded_file($_FILES['foto']['tmp_name'], "uploads/" . $novoNome);
     $novaFoto = $novoNome;
 }
 
-// ==================== UPDATE COM NOVA FOTO ====================
+
 if ($novaFoto) {
     $sql = "UPDATE animais SET 
-                nome = ?, situacao = ?, especie = ?, genero = ?, raca_id = ?, porte = ?, 
-                cor_predominante = ?, idade = ?, telefone_contato = ?, latitude = ?, longitude = ?, foto = ? 
+            nome = ?, situacao = ?, especie = ?, genero = ?, raca_id = ?, porte = ?, 
+            cor_predominante = ?, idade = ?, telefone_contato = ?, latitude = ?, longitude = ?, foto = ? 
             WHERE id = ?";
 
-    $stmt = $conexao->prepare($sql);
-    $stmt->bind_param("ssssisssssssi",
-        $nome,
-        $situacao,
-        $especie,
-        $genero,
-        $raca_id,
-        $porte,
-        $cor_predominante,
-        $idade,
-        $telefone_contato,
-        $latitude,
-        $longitude,
-        $novaFoto,
-        $id
-    );
-}
-// ==================== UPDATE SEM NOVA FOTO ====================
+$stmt = $conexao->prepare($sql);
+$stmt->bind_param("ssssisssssssi",
+    $nome,
+    $situacao,
+    $especie,
+    $genero,
+    $raca_id,
+    $porte,
+    $cor_predominante,
+    $idade,
+    $telefone_contato,
+    $latitude,
+    $longitude,
+    $novaFoto,
+    $id
+);
+}//alteracao sem a nova foto pra foto antiga nao ser apagada
 else {
     $sql = "UPDATE animais SET 
                 nome = ?, situacao = ?, especie = ?, genero = ?, raca_id = ?, porte = ?, 
@@ -74,8 +73,5 @@ else {
 }
 
 $stmt->execute();
-$stmt->close();
-$conexao->close();
-
 header("Location: gerenciar_animais.php?edit=success");
 exit;
