@@ -2,129 +2,87 @@
 session_start();
 require 'conecta.php';
 
+// Verifica se o usuário está logado
 if (!isset($_SESSION['usuario_id'])) {
-    die("Erro: Você precisa estar logado.");
+    die("Erro: Você precisa estar logado para realizar esta ação.");
 }
 
 $usuario_id = $_SESSION['usuario_id'];
 
-// Campos obrigatórios
-$nome             = trim($_POST['nome'] ?? '');
-$situacao         = $_POST['situacao'] ?? '';
-$especie          = $_POST['especie'] ?? '';
-$genero           = $_POST['genero'] ?? '';
-$raca_id          = (int)($_POST['raca_id'] ?? 0);
-$data_ocorrido    = $_POST['data_ocorrido'] ?? '';
-$telefone_contato = preg_replace('/\D/', '', $_POST['telefone_contato'] ?? '');
-$latitude         = $_POST['latitude'] ?? null;
-$longitude        = $_POST['longitude'] ?? null;
+// --- COLETA DOS DADOS (Sem usar ??) ---
+if (isset($_POST['nome'])) { $nome = $_POST['nome']; } else { $nome = ''; }
+if (isset($_POST['situacao'])) { $situacao = $_POST['situacao']; } else { $situacao = ''; }
+if (isset($_POST['especie'])) { $especie = $_POST['especie']; } else { $especie = ''; }
+if (isset($_POST['genero'])) { $genero = $_POST['genero']; } else { $genero = ''; }
+if (isset($_POST['raca_id'])) { $raca_id = (int)$_POST['raca_id']; } else { $raca_id = 0; }
+if (isset($_POST['data_ocorrido'])) { $data_ocorrido = $_POST['data_ocorrido']; } else { $data_ocorrido = ''; }
+if (isset($_POST['telefone_contato'])) { $telefone_contato = preg_replace('/\D/', '', $_POST['telefone_contato']); } else { $telefone_contato = ''; }
+if (isset($_POST['latitude'])) { $latitude = $_POST['latitude']; } else { $latitude = ''; }
+if (isset($_POST['longitude'])) { $longitude = $_POST['longitude']; } else { $longitude = ''; }
 
-// Campos opcionais
-$porte            = $_POST['porte'] ?? null;
-$cor_predominante = $_POST['cor_predominante'] ?? null;
-$idade            = strtolower($_POST['idade'] ?? '');
-$descricao        = trim($_POST['descricao'] ?? '');
+// Campos Opcionais (Mantendo as iniciais maiúsculas vindas do formulário)
+if (isset($_POST['porte'])) { $porte = $_POST['porte']; } else { $porte = ''; }
+if (isset($_POST['cor_predominante'])) { $cor_predominante = $_POST['cor_predominante']; } else { $cor_predominante = ''; }
+if (isset($_POST['idade'])) { $idade = $_POST['idade']; } else { $idade = ''; }
+if (isset($_POST['descricao'])) { $descricao = $_POST['descricao']; } else { $descricao = ''; }
 
-// Validação dos campos obrigatórios
-if ($nome === '' || $situacao === '' || $especie === '' || $genero === '' || 
-    $raca_id === 0 || $data_ocorrido === '' || strlen($telefone_contato) !== 11) {
-    die("Erro: Preencha todos os campos obrigatórios corretamente.");
+// --- VALIDAÇÃO DE SEGURANÇA: ESPÉCIE VS RAÇA ---
+
+// Primeiro, buscamos qual é a raça que o usuário selecionou no banco
+$sql_busca_raca = "SELECT racas FROM racas WHERE id = '$raca_id'";
+$resultado_raca = mysqli_query($conexao, $sql_busca_raca);
+$dados_raca = mysqli_fetch_assoc($resultado_raca);
+
+if (!$dados_raca) {
+    die("Erro: Raça não encontrada.");
 }
 
-// Validação da foto
-if (!isset($_FILES['foto']) || $_FILES['foto']['error'] !== UPLOAD_ERR_OK || $_FILES['foto']['size'] === 0) {
-    die("Erro: Selecione uma foto válida do animal.");
-}
+$nome_da_raca = strtolower($dados_raca['racas']);
 
-// Upload da foto
-$ext = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
-$permitidos = ['jpg','jpeg','png','gif','webp'];
-if (!in_array($ext, $permitidos)) {
-    die("Erro: Formato de imagem não permitido (use JPG, PNG, GIF ou WEBP).");
-}
+// Listas de controle (Devem bater com os nomes na sua tabela 'racas')
+$racas_de_cachorro = ['vira-lata', 'labrador', 'bulldog', 'pastor alemão', 'pincher', 'cimarron', 'husky', 'salsicha', 'golden'];
+$racas_de_gato = ['persa', 'siamês', 'sphynx'];
 
-$foto_nome = "animal_" . time() . "_" . rand(1000,9999) . "." . $ext;
-$caminho = "uploads/" . $foto_nome;
-
-if (!move_uploaded_file($_FILES['foto']['tmp_name'], $caminho)) {
-    die("Erro ao salvar a foto no servidor.");
-}
-// ================= VALIDAÇÃO ESPÉCIE x RAÇA =================
-
-$mapaRacasPorEspecie = [
-    'cachorro' => [
-        'vira-lata','labrador','bulldog','pastor alemão','pincher',
-        'cimarron','husky','salsicha','golden'
-    ],
-    'gato' => [
-        'persa','siamês','sphynx'
-    ]
-];
-
-// Busca o nome da raça pelo ID
-$stmtRaca = $conexao->prepare("SELECT racas FROM racas WHERE id = ?");
-$stmtRaca->bind_param("i", $raca_id);
-$stmtRaca->execute();
-$resRaca = $stmtRaca->get_result();
-
-if ($resRaca->num_rows === 0) {
-    die("Erro: Raça inválida.");
-}
-
-$nomeRaca = strtolower($resRaca->fetch_assoc()['racas']);
-$stmtRaca->close();
-
-// Regra: espécie "outros" só aceita raça "outros"
-if ($especie === 'outros' && $nomeRaca !== 'outros') {
-    die('Erro: Para a espécie "outros", a raça deve ser "outros".');
-}
-
-// Regra: raça "outros" é permitida para qualquer espécie
-if ($nomeRaca !== 'outros') {
-
-    if (isset($mapaRacasPorEspecie[$especie])) {
-        if (!in_array($nomeRaca, $mapaRacasPorEspecie[$especie])) {
-            die('Erro: A raça selecionada não corresponde à espécie informada.');
-        }
+if ($especie == 'cachorro') {
+    if (!in_array($nome_da_raca, $racas_de_cachorro) && $nome_da_raca != 'outros') {
+        die("Erro: Você não pode cadastrar um cachorro com uma raça de gato ou outra espécie.");
+    }
+} 
+else if ($especie == 'gato') {
+    if (!in_array($nome_da_raca, $racas_de_gato) && $nome_da_raca != 'outros') {
+        die("Erro: Você não pode cadastrar um gato com uma raça de cachorro ou outra espécie.");
+    }
+} 
+else if ($especie == 'outros') {
+    if ($nome_da_raca != 'outros') {
+        die("Erro: Para a espécie 'Outros', selecione a raça 'Outros'.");
     }
 }
 
-
-// === INSERÇÃO NO BANCO (15 campos → 15 tipos) ===
-$sql = "INSERT INTO animais (
-    usuario_id, nome, situacao, especie, genero, raca_id, porte,
-    cor_predominante, idade, descricao, telefone_contato,
-    data_ocorrido, latitude, longitude, foto
-) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-)";
-
-$stmt = $conexao->prepare($sql);
-
-// CORREÇÃO: agora são 15 tipos corretos
-$stmt->bind_param(
-    "issssississsdss",  // ← 15 tipos certinhos!
-    $usuario_id,       // int
-    $nome,             // string
-    $situacao,         // string
-    $especie,          // string
-    $genero,           // string
-    $raca_id,          // int
-    $porte,            // string (ou null)
-    $cor_predominante, // string (ou null)
-    $idade,            // string
-    $descricao,        // string
-    $telefone_contato, // string (11 dígitos)
-    $data_ocorrido,    // string (date)
-    $latitude,         // double (ou null)
-    $longitude,        // double (ou null)
-    $foto_nome         // string
-);
-
-if ($stmt->execute()) {
-    echo "Animal cadastrado com sucesso!";
+// --- UPLOAD DA FOTO ---
+$foto_nome = "";
+if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
+    $extensao = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
+    $foto_nome = "animal_" . time() . "_" . rand(1000, 9999) . "." . $extensao;
+    move_uploaded_file($_FILES['foto']['tmp_name'], "uploads/" . $foto_nome);
 } else {
-    echo "Erro no banco de dados: " . $stmt->error;
+    die("Erro: A foto do animal é obrigatória.");
 }
-$stmt->close();
+
+// --- INSERT NO BANCO (Lógica simples de string) ---
+$sql = "INSERT INTO animais (
+            usuario_id, nome, situacao, especie, genero, raca_id, porte,
+            cor_predominante, idade, descricao, telefone_contato,
+            data_ocorrido, latitude, longitude, foto
+        ) VALUES (
+            '$usuario_id', '$nome', '$situacao', '$especie', '$genero', '$raca_id', '$porte',
+            '$cor_predominante', '$idade', '$descricao', '$telefone_contato',
+            '$data_ocorrido', '$latitude', '$longitude', '$foto_nome'
+        )";
+
+if (mysqli_query($conexao, $sql)) {
+    echo "Sucesso: Animal cadastrado com sucesso!";
+} else {
+    echo "Erro ao salvar no banco: " . mysqli_error($conexao);
+}
 ?>
