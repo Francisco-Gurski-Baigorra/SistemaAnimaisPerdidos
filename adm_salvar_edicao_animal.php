@@ -1,25 +1,20 @@
 <?php
 session_start();
-require 'conecta.php';
+include 'conecta.php';
 
-if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo_usuario'] != 'administrador') {
-    header("Location: ../login.php");
-    exit;
-}
 
-// Recebe e limpa os dados
-$id               = $_POST['id'];
-$nome             = $_POST['nome'] ?? '';
-$situacao         = $_POST['situacao'] ?? '';
-$especie          = $_POST['especie'] ?? '';
-$genero           = $_POST['genero'] ?? '';
-$raca_id          = !empty($_POST['raca_id']) ? intval($_POST['raca_id']) : null;
-$porte            = $_POST['porte'] ?? '';
+$id = $_POST['id'];
+$nome = $_POST['nome'] ?? '';
+$situacao = $_POST['situacao'] ?? '';
+$especie = $_POST['especie'] ?? '';
+$genero = $_POST['genero'] ?? '';
+$raca_id = ($_POST['raca_id']) ?? '';
+$porte = $_POST['porte'] ?? '';
 $cor_predominante = $_POST['cor_predominante'] ?? '';
-$idade            = $_POST['idade'] ?? '';
+$idade = $_POST['idade'] ?? '';
 $telefone_contato = $_POST['telefone_contato'] ?? '';
-$latitude         = !empty($_POST['latitude']) ? floatval($_POST['latitude']) : null;
-$longitude        = !empty($_POST['longitude']) ? floatval($_POST['longitude']) : null;
+$latitude = !empty($_POST['latitude']) ? floatval($_POST['latitude']) : null;
+$longitude = !empty($_POST['longitude']) ? floatval($_POST['longitude']) : null;
 
 // Upload da foto (se houver)
 $novaFoto = null;
