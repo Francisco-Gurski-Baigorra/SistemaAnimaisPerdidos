@@ -49,6 +49,46 @@ $caminho = "uploads/" . $foto_nome;
 if (!move_uploaded_file($_FILES['foto']['tmp_name'], $caminho)) {
     die("Erro ao salvar a foto no servidor.");
 }
+// ================= VALIDAÇÃO ESPÉCIE x RAÇA =================
+
+$mapaRacasPorEspecie = [
+    'cachorro' => [
+        'vira-lata','labrador','bulldog','pastor alemão','pincher',
+        'cimarron','husky','salsicha','golden'
+    ],
+    'gato' => [
+        'persa','siamês','sphynx'
+    ]
+];
+
+// Busca o nome da raça pelo ID
+$stmtRaca = $conexao->prepare("SELECT racas FROM racas WHERE id = ?");
+$stmtRaca->bind_param("i", $raca_id);
+$stmtRaca->execute();
+$resRaca = $stmtRaca->get_result();
+
+if ($resRaca->num_rows === 0) {
+    die("Erro: Raça inválida.");
+}
+
+$nomeRaca = strtolower($resRaca->fetch_assoc()['racas']);
+$stmtRaca->close();
+
+// Regra: espécie "outros" só aceita raça "outros"
+if ($especie === 'outros' && $nomeRaca !== 'outros') {
+    die('Erro: Para a espécie "outros", a raça deve ser "outros".');
+}
+
+// Regra: raça "outros" é permitida para qualquer espécie
+if ($nomeRaca !== 'outros') {
+
+    if (isset($mapaRacasPorEspecie[$especie])) {
+        if (!in_array($nomeRaca, $mapaRacasPorEspecie[$especie])) {
+            die('Erro: A raça selecionada não corresponde à espécie informada.');
+        }
+    }
+}
+
 
 // === INSERÇÃO NO BANCO (15 campos → 15 tipos) ===
 $sql = "INSERT INTO animais (

@@ -271,6 +271,15 @@ while ($row = $res->fetch_assoc()) {
 
 <script>
 const racas = <?php echo json_encode($racas, JSON_UNESCAPED_UNICODE); ?>;
+const mapaRacasPorEspecie = {
+  cachorro: [
+    'vira-lata','labrador','bulldog','pastor alemão','pincher',
+    'cimarron','husky','salsicha','golden'
+  ],
+  gato: [
+    'persa','siamês','sphynx'
+  ]
+};
 const usuario_id = <?php echo $_SESSION['usuario_id']; ?>;
 
 // inicializa o mapa
@@ -417,6 +426,16 @@ function abrirPopupForm(lat, lng) {
   popupOpen = true;
   currentPopup = popup;
 
+  function getIdRacaOutros() {
+  for (const r of racas) {
+    if (r.racas.toLowerCase() === 'outros') {
+      return r.id;
+    }
+  }
+  return '';
+}
+
+
   // espera o DOM do popup existir para ligar eventos
   setTimeout(() => {
     const form = document.getElementById('formAnimal');
@@ -496,7 +515,24 @@ function abrirPopupForm(lat, lng) {
       });
     }
 
-  }, 100); // pequeno delay para garantir que o popup DOM foi injetado
+    // ====== NOVO: mudar raça quando espécie = 'outros' ======
+    const especieSelect = form.querySelector('select[name="especie"]');
+    const racaSelect    = form.querySelector('select[name="raca_id"]');
+
+    if (especieSelect && racaSelect) {
+      especieSelect.addEventListener('change', function () {
+        if (this.value === 'outros') {
+          const idOutros = getIdRacaOutros();
+          if (idOutros !== '') {
+            racaSelect.value = idOutros;
+          }
+        }
+      });
+    }
+    // ====== FIM DO CÓDIGO NOVO ======
+
+}, 100);
+
 }
 
 // evento de clique no mapa: abre popup somente se NÃO houver outro aberto
