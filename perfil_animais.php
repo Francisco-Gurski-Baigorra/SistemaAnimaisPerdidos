@@ -159,11 +159,6 @@ function mostrar($valor) {
             <a href="perfil_animais.php" class="btn btn-dark">
                 <i class="fa-solid fa-paw"></i> Meus Animais
             </a>
-            <?php if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'administrador'): ?>
-                <a href="admin.php" class="btn btn-primary">
-                    <i class="bi bi-gear-fill"></i> Administrador
-                </a>
-            <?php endif; ?>
             <a href="logout.php" class="btn btn-danger">
                 <i class="bi bi-box-arrow-right"></i> Sair
             </a>

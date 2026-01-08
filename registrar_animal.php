@@ -58,9 +58,6 @@ while ($row = mysqli_fetch_assoc($res)) {
                 <a href="registrar_animal.php" class="btn btn-dark me-2"><i class="bi bi-plus-circle"></i> Registrar Animal</a>
                 <a href="perfil.php" class="btn btn-dark me-2"><i class="bi bi-person-circle"></i> Perfil</a>
                 <a href="perfil_animais.php" class="btn btn-dark me-2"><i class="fa-solid fa-paw"></i> Meus Animais</a>
-                <?php if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'administrador'): ?>
-                    <a href="admin.php" class="btn btn-primary me-2"><i class="bi bi-gear-fill"></i> Administrador</a>
-                <?php endif; ?>
                 <a href="logout.php" class="btn btn-danger"><i class="bi bi-box-arrow-right"></i> Sair</a>
             <?php else: ?>
                 <a href="login.php" class="btn btn-dark me-2">Login</a>
@@ -99,7 +96,7 @@ function abrirPopupForm(lat, lng) {
         <input type="hidden" name="usuario_id" value="${usuario_id}">
 
         <label>Nome do animal *</label>
-        <input type="text" name="nome" required placeholder="Ex: Rex">
+        <input type="text" name="nome" required placeholder="Ex: Nome do animal ou Caracteristica">
 
         <label>Situação *</label>
         <select name="situacao" required>
@@ -153,7 +150,7 @@ function abrirPopupForm(lat, lng) {
             <option value="Marrom">Marrom</option>
             <option value="Cinza">Cinza</option>
             <option value="Caramelo">Caramelo</option>
-            <option value="Tricolor">Tricolor</option>
+            <option value="Outros">Outros</option>
         </select>
 
         <label>Idade Aproximada</label>

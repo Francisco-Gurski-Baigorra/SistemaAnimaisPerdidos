@@ -9,7 +9,7 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $usuario_id = $_SESSION['usuario_id'];
 
-// --- COLETA DOS DADOS DIRETO DO POST (Sem ?? e sem firulas) ---
+// --- COLETA DOS DADOS DIRETO DO POST ---
 $nome = $_POST['nome'];
 $situacao = $_POST['situacao'];
 $especie = $_POST['especie'];
@@ -24,7 +24,7 @@ $cor_predominante = $_POST['cor_predominante'];
 $idade = $_POST['idade'];
 $descricao = $_POST['descricao'];
 
-// --- UPLOAD DA FOTO (Simples) ---
+// --- UPLOAD DA FOTO ---
 $foto_nome = "";
 if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
     $extensao = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
@@ -32,7 +32,7 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
     move_uploaded_file($_FILES['foto']['tmp_name'], "uploads/" . $foto_nome);
 }
 
-// --- INSERT NO BANCO (Lógica de string direta) ---
+// --- INSERT NO BANCO ---
 $sql = "INSERT INTO animais (
             usuario_id, nome, situacao, especie, genero, raca_id, porte,
             cor_predominante, idade, descricao, telefone_contato,
@@ -43,10 +43,11 @@ $sql = "INSERT INTO animais (
             '$data_ocorrido', '$latitude', '$longitude', '$foto_nome'
         )";
 
-// Executa a query
+// --- RESPOSTA PARA O FETCH ---
 if (mysqli_query($conexao, $sql)) {
-    echo "<script>alert('Cadastrado com sucesso!'); window.location='index.php';</script>";
+    // Retornamos apenas o texto. O JavaScript do registrar_animal.php vai dar o alert.
+    echo "Sucesso: Animal cadastrado!";
 } else {
-    echo "Erro: " . mysqli_error($conexao);
+    echo "Erro ao cadastrar: " . mysqli_error($conexao);
 }
 ?>
