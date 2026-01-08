@@ -13,104 +13,78 @@ session_start();
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <style>
-        /* Estilos Gerais */
-        body {
-            background-color: #ffffff;
-            min-height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            padding-bottom: 60px; /* Espaço para o footer fixo */
-        }
+   <style>
+    /* Estilos Gerais */
+    body {
+        background-color: #ffffff;
+        min-height: 100vh; /* Ocupa no mínimo a altura total da tela */
+        margin: 0;
+        font-family: Arial, sans-serif;
+        
+        /* SOLUÇÃO: Flexbox para empurrar o footer para o fim e remover espaço branco */
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 0; /* Removido o padding que causava o espaço em branco */
+    }
 
-        /* ======= Navbar ======= */
-        .navbar {
-            background-color: #179e46ff;
-            padding: 1rem;
-            border-bottom: 3px solid #2e3531ff;
-            box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
-            width: 100%;
-        }
+    /* ======= Navbar ======= */
+    .navbar {
+        background-color: #179e46ff;
+        padding: 1rem;
+        border-bottom: 3px solid #2e3531ff;
+        box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
+        width: 100%;
+    }
 
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.7rem;
-            color: #2b2b2b !important;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-            cursor: pointer;
-            text-decoration: none;
-        }
+    .navbar-brand {
+        font-weight: bold;
+        font-size: 1.7rem;
+        color: #2b2b2b !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+        cursor: pointer;
+        text-decoration: none;
+    }
 
-        .navbar-brand:hover {
-            transform: translateY(-2px) scale(1.04);
-            opacity: 0.9;
-        }
+    /* ======= Hero / Conteúdo Principal ======= */
+    .hero {
+        background-color: #fefefe;
+        padding: 20px 5px;
+        text-align: center;
+        
+        /* SOLUÇÃO: Faz o conteúdo principal crescer e ocupar o espaço restante */
+        flex: 1;
+    }
 
-        .navbar-brand i {
-            font-size: 1.8rem;
-            color: #2b2b2b;
-        }
+    .hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #212529;
+    }
 
-        .navbar .container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    /* ======= Footer ======= */
+    .footer-rastreia {
+        background-color: #179e46ff;
+        color: #333;
+        text-align: center;
+        padding: 12px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        width: 100%;
+        border-top: 2px solid #2e3531ff;
+        
+        /* Garante que ele fique no final sem sobrepor e sem deixar vácuo */
+        position: relative;
+        margin-top: auto; 
+    }
 
-        .navbar .btn {
-            padding: 7px 14px;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-
-        .navbar .btn:hover {
-            transform: translateY(-2px);
-        }
-
-        /* ======= Hero / Conteúdo Principal ======= */
-        .hero {
-            background-color: #fefefe;
-            padding: 20px 5px;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #212529;
-        }
-
-        .hero p {
-            max-width: 600px;
-            margin: 0 auto 30px;
-            font-size: 1.1rem;
-            color: #555;
-        }
-
-        /* ======= Footer ======= */
-        .footer-rastreia {
-            background-color: #179e46ff;
-            color: #333;
-            text-align: center;
-            padding: 12px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            width: 100%;
-            border-top: 2px solid #2e3531ff;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-        }
-
-        /* Responsividade */
-        @media (max-width: 480px) {
-            .navbar-brand { font-size: 1.4rem; }
-        }
-    </style>
+    /* Responsividade */
+    @media (max-width: 480px) {
+        .navbar-brand { font-size: 1.4rem; }
+    }
+</style>
 </head>
 <body>
 
