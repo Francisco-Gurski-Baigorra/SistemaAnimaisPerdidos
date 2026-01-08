@@ -1,13 +1,6 @@
 <?php
 session_start();
 
-// 1. Impede acesso caso não esteja logado
-if (!isset($_SESSION['usuario_id'])) {
-    header("Location: login.php");
-    exit;
-}
-
-// 2. Impede acesso caso não seja administrador
 if ($_SESSION['tipo_usuario'] !== 'administrador') {
     echo "<script>alert('❌ Você não tem permissão para acessar esta área!'); window.location='index.php';</script>";
     exit;
@@ -33,10 +26,9 @@ if ($_SESSION['tipo_usuario'] !== 'administrador') {
             font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
-            padding-bottom: 60px; /* Espaço para o footer fixo */
+            padding-bottom: 60px; 
         }
 
-        /* ======= Navbar ======= */
         .navbar {
             background-color: #179e46;
             padding: 1rem;
@@ -59,7 +51,6 @@ if ($_SESSION['tipo_usuario'] !== 'administrador') {
             transform: scale(1.02);
         }
 
-        /* ===== CARD CENTRAL ===== */
         .admin-wrapper {
             flex: 1;
             display: flex;
@@ -119,7 +110,6 @@ if ($_SESSION['tipo_usuario'] !== 'administrador') {
             text-decoration: underline;
         }
 
-        /* ======= Footer ======= */
         .footer-rastreia {
             background-color: #179e46ff;
             color: #333;

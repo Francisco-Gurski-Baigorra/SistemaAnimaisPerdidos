@@ -2,7 +2,6 @@
 session_start();
 include('conecta.php');
 
-// Busca as raças no banco para o filtro dinâmico
 $racas = [];
 $sql_racas = "SELECT id, racas FROM racas ORDER BY racas";
 $res_racas = mysqli_query($conexao, $sql_racas);
@@ -224,17 +223,17 @@ while ($row = mysqli_fetch_assoc($res_racas)) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-const isLogged = <?= isset($_SESSION['usuario_id']) ? 'true' : 'false' ?>;
+const isLogged = <?= isset($_SESSION['usuario_id']) ? 'true' : 'false' ?>; //verificar se esta logado para poder acessar contato
 const map = L.map('map').setView([-29.78126, -57.10689], 13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 let marcadores = [];
 
-async function carregarAnimais() {
-    const res = await fetch('carregar_encontrados.php');
+async function carregarAnimais() { //noap precisa recarregar pagina pra filtrar
+    const res = await fetch('carregar_encontrados.php'); //pega os animais econtrados do outro codigo
     const animais = await res.json();
 
-    marcadores.forEach(m => map.removeLayer(m));
+    marcadores.forEach(m => map.removeLayer(m)); // filtro dos marcadores
     marcadores = [];
 
     const fEsp = document.getElementById('filtroEspecie').value.toLowerCase();
@@ -243,7 +242,7 @@ async function carregarAnimais() {
     const fPor = document.getElementById('filtroPorte').value.toLowerCase();
     const fIda = document.getElementById('filtroIdade').value.toLowerCase();
 
-    const filtrados = animais.filter(a => {
+    const filtrados = animais.filter(a => { //aplica o filtro de cada caractersitica
         return (!fEsp || a.especie.toLowerCase() === fEsp) &&
                (!fRac || a.raca_nome.toLowerCase().includes(fRac)) &&
                (!fGen || a.genero.toLowerCase() === fGen) &&
@@ -251,7 +250,7 @@ async function carregarAnimais() {
                (!fIda || a.idade.toLowerCase() === fIda);
     });
 
-    const aviso = document.getElementById('aviso-vazio');
+    const aviso = document.getElementById('aviso-vazio'); // avisa casoa busca do filtro nao eocntre nada
     if (filtrados.length === 0) {
         aviso.style.display = 'block';
         setTimeout(() => { aviso.style.display = 'none'; }, 4000);
@@ -259,15 +258,16 @@ async function carregarAnimais() {
         aviso.style.display = 'none';
     }
 
-    filtrados.forEach(a => {
+    filtrados.forEach(a => { //icone do animal para cada um cadastrado
         const icone = L.icon({
             iconUrl: 'https://cdn-icons-png.flaticon.com/512/616/616408.png',
             iconSize: [36, 36]
         });
 
-        const dataFormatada = a.data_ocorrido ? a.data_ocorrido.split('-').reverse().join('/') : "N/A";
+        const dataFormatada = a.data_ocorrido ? a.data_ocorrido.split('-').reverse().join('/') : "N/A"; //formatar a data
 
-        const popupHtml = `
+        //janela do formulario para preencher as informações com marcador 
+        const popupHtml = ` 
             <div class="info-popup">
                 <b style="font-size:16px;">${a.nome || 'N/A'} <span class="status-badge">${a.situacao}</span></b><br>
                 <hr style="margin:5px 0; border-top:1px solid #2e3531ff;">
@@ -288,19 +288,21 @@ async function carregarAnimais() {
         `;
 
         const m = L.marker([a.latitude, a.longitude], {icon: icone}).addTo(map).bindPopup(popupHtml);
-        marcadores.push(m);
+        marcadores.push(m); //armazenando os marcadores
     });
 }
 
+//mostrar todo os animais no mapa, sem filtro
 document.getElementById('btnFiltrar').addEventListener('click', carregarAnimais);
 carregarAnimais();
 
+//prepara o modal para visualizar o contato de outro usuario
 async function verContato(id) {
     const modalBody = document.getElementById('contatoModalBody');
     const modalElement = document.getElementById('contatoModal');
     const instanciaModal = bootstrap.Modal.getOrCreateInstance(modalElement);
 
-    // 1. Se não estiver logado, mostra as opções de login
+    // se nao estiver logado nostra as opcao de login
     if (!isLogged) {
         modalBody.innerHTML = `
             <p>Você precisa estar <strong>logado</strong> para visualizar o contato.</p>
@@ -310,28 +312,25 @@ async function verContato(id) {
             </div>
         `;
         instanciaModal.show();
-        return; // Para a execução aqui
+        return; 
     }
 
-    // 2. Se estiver logado, busca os dados no contato.php
+    // mostra os dados de contato caso esteja logado
     modalBody.innerHTML = '<div class="spinner-border text-success"></div><p>Carregando...</p>';
     instanciaModal.show();
 
     try {
-        // MUDANÇA AQUI: de 'owner_info.php' para 'contato.php'
-        const res = await fetch('owner_info.php?usuario_id=' + id);
-        
-        if (!res.ok) throw new Error("Erro ao buscar dados");
+        const res = await fetch('owner_info.php?usuario_id=' + id); // esperar o servidor responder antes de avancar
+        if (!res.ok) throw new Error("Erro ao buscar dados"); // maldito erro 404
+        const data = await res.json(); // se der certro trransofrma o conteudo em um  onjetivo json
 
-        const data = await res.json();
-
-        // Verifica se o PHP retornou algum erro lógico
+            //verifica se nao retornou algum erro
         if (data.error) {
             modalBody.innerHTML = `<p class="text-danger">Acesso negado ou erro no servidor.</p>`;
             return;
         }
 
-        // 3. Preenche o modal com os dados que o PHP enviou
+        // preenche o modal com as informaçoes do php
         modalBody.innerHTML = `
             <p><strong>Nome:</strong> ${data.nome || 'Não informado'}</p>
             <p><strong>Telefone:</strong> ${data.telefone || 'Não informado'}</p>
@@ -339,6 +338,7 @@ async function verContato(id) {
             <div class="text-muted small mt-3">Respeite a privacidade ao contatar o responsável.</div>
         `;
 
+    //aviso se houver algum erro no try
     } catch (erro) {
         console.error("Erro na requisição:", erro);
         modalBody.innerHTML = `<p class="text-danger">Erro ao carregar contato. Tente novamente.</p>`;
