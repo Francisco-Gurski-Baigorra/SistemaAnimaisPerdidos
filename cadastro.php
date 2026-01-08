@@ -8,16 +8,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <style>
-        body { background-color: #f2f2f2; min-height: 100vh; margin: 0; padding-top: 160px; font-family: Arial, sans-serif; }
-        .form-wrapper { display: flex; justify-content: center; margin-bottom: 80px; }
-        .navbar { background-color: #179e46ff; padding: 1rem; border-bottom: 3px solid #2e3531ff; box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15); width: 100%; }
-        .navbar-brand { font-weight: bold; font-size: 1.7rem; color: #2b2b2b !important; display: inline-flex; align-items: center; gap: 6px; transition: transform 0.2s ease, opacity 0.2s ease; cursor: pointer; text-decoration: none; }
-        .navbar-brand:hover { transform: translateY(-2px) scale(1.04); opacity: 0.9; }
-        .navbar .btn { padding: 7px 14px; border-radius: 8px; font-weight: 500; transition: 0.2s; }
-        .navbar .btn:hover { transform: translateY(-2px); }
-        .card-cadastro { width: 100%; max-width: 600px; background: #ffffff; border: 1px solid #dcdcdc; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 25px; }
-        .footer-rastreia { background-color: #179e46ff; color: #333; text-align: center; padding: 12px; font-size: 0.95rem; font-weight: 600; width: 100%; border-top: 2px solid #2e3531ff; position: relative; bottom: 0; }
+<style>
+    body { background-color: #f2f2f2; min-height: 100vh; margin: 0; padding-top: 160px; font-family: Arial, sans-serif; }
+    .form-wrapper { display: flex; justify-content: center; margin-bottom: 80px; }
+    .navbar { background-color: #179e46ff; padding: 1rem; border-bottom: 3px solid #2e3531ff; box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15); width: 100%; }
+    .navbar-brand { font-weight: bold; font-size: 1.7rem; color: #2b2b2b !important; display: inline-flex; align-items: center; gap: 6px; transition: transform 0.2s ease, opacity 0.2s ease; cursor: pointer; text-decoration: none; }
+    .navbar-brand:hover { transform: translateY(-2px) scale(1.04); opacity: 0.9; }
+    .navbar .btn { padding: 7px 14px; border-radius: 8px; font-weight: 500; transition: 0.2s; }
+    .navbar .btn:hover { transform: translateY(-2px); }
+    .card-cadastro { width: 100%; max-width: 600px; background: #ffffff; border: 1px solid #dcdcdc; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 25px; }
+    .footer-rastreia { background-color: #179e46ff; color: #333; text-align: center; padding: 12px; font-size: 0.95rem; font-weight: 600; width: 100%; border-top: 2px solid #2e3531ff; position: relative; bottom: 0; }
     </style>
 </head>
 <body>

@@ -2,56 +2,38 @@
 session_start();
 include('conecta.php');
 
-// Verifica se está logado
 if (!isset($_SESSION['usuario_id'])) {
     echo "<script>alert('Você precisa estar logado para editar.'); window.location='login.php';</script>";
     exit;
 }
 
-// Pega o ID via GET de forma básica (sem ??)
-if (isset($_GET['id'])) {
-    $id = (int)$_GET['id'];
-} else {
-    $id = 0;
-}
-$usuario_id = (int)$_SESSION['usuario_id'];
+$id = $_GET['id'];
+$usuario_id = $_SESSION['usuario_id'];
 
-// BUSCAR O ANIMAL (SQL Direto)
 $sql_animal = "SELECT * FROM animais WHERE id = $id AND usuario_id = $usuario_id";
 $resultado_animal = mysqli_query($conexao, $sql_animal);
 
-if (mysqli_num_rows($resultado_animal) === 0) {
-    echo "<script>alert('Animal não encontrado.'); window.location='perfil_animais.php';</script>";
-    exit;
-}
 $animal = mysqli_fetch_assoc($resultado_animal);
 
-// BUSCAR TODAS AS RAÇAS
 $sql_racas = "SELECT id, racas FROM racas ORDER BY racas ASC";
 $lista_racas = mysqli_query($conexao, $sql_racas);
 
-// PROCESSAR ATUALIZAÇÃO (POST)
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    // Pegando os dados e limpando contra erros de aspas (mysqli_real_escape_string)
-    $nome             = mysqli_real_escape_string($conexao, $_POST['nome']);
-    $situacao         = mysqli_real_escape_string($conexao, $_POST['situacao']);
-    $especie          = mysqli_real_escape_string($conexao, $_POST['especie']);
-    $genero           = mysqli_real_escape_string($conexao, $_POST['genero']);
-    $raca_id          = (int)$_POST['raca_id'];
-    $cor_predominante = mysqli_real_escape_string($conexao, $_POST['cor_predominante']);
-    $idade            = mysqli_real_escape_string($conexao, $_POST['idade']);
-    $descricao        = mysqli_real_escape_string($conexao, $_POST['descricao']);
-    $telefone_contato = mysqli_real_escape_string($conexao, $_POST['telefone_contato']);
-    $data_ocorrido    = mysqli_real_escape_string($conexao, $_POST['data_ocorrido']);
-    $latitude         = $_POST['latitude'];
-    $longitude        = $_POST['longitude'];
+$nome = $_POST['nome'];
+$situacao = $_POST['situacao'];
+$especie = $_POST['especie'];
+$genero  = $_POST['genero'];
+$raca_id = $_POST['raca_id'];
+$cor_predominante = $_POST['cor_predominante'];
+$idade = $_POST['idade'];
+$descricao = $_POST['descricao'];
+$telefone_contato = $_POST['telefone_contato'];
+$data_ocorrido = $_POST['data_ocorrido'];
+$latitude = $_POST['latitude'];
+$longitude = $_POST['longitude'];
 
-    // Tratamento básico para Raça e Data (se vazio vira NULL no SQL)
-    $raca_sql = ($raca_id > 0) ? $raca_id : "NULL";
-    $data_sql = (!empty($data_ocorrido)) ? "'$data_ocorrido'" : "NULL";
 
-    // FOTO (Lógica mantida)
     if (!empty($_FILES["foto"]["name"])) {
         $foto_nome = uniqid() . "_" . basename($_FILES["foto"]["name"]);
         move_uploaded_file($_FILES["foto"]["tmp_name"], "uploads/" . $foto_nome);
@@ -59,22 +41,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $foto_nome = $animal['foto'];
     }
 
-    // UPDATE DIRETO (Sem prepared statements)
-    $sql_update = "UPDATE animais SET 
-                    nome = '$nome', 
-                    situacao = '$situacao', 
-                    especie = '$especie', 
-                    genero = '$genero', 
-                    raca_id = $raca_sql,
-                    cor_predominante = '$cor_predominante', 
-                    idade = '$idade', 
-                    descricao = '$descricao', 
-                    telefone_contato = '$telefone_contato', 
-                    data_ocorrido = $data_sql,
-                    latitude = '$latitude', 
-                    longitude = '$longitude', 
-                    foto = '$foto_nome'
-                  WHERE id = $id AND usuario_id = $usuario_id";
+$sql_update = "UPDATE animais SET 
+   nome = '$nome', 
+    situacao = '$situacao', 
+    especie = '$especie', 
+    genero = '$genero', 
+    raca_id = $raca_sql,
+    cor_predominante = '$cor_predominante', 
+    idade = '$idade', 
+    descricao = '$descricao', 
+    telefone_contato = '$telefone_contato', 
+    data_ocorrido = $data_sql,
+    latitude = '$latitude', 
+    longitude = '$longitude', 
+    foto = '$foto_nome'
+    WHERE id = $id AND usuario_id = $usuario_id";
 
     if (mysqli_query($conexao, $sql_update)) {
         echo "<script>alert('Animal atualizado com sucesso!'); window.location='perfil_animais.php';</script>";
@@ -230,27 +211,42 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-// Mapa Leaflet
-let lat = parseFloat("<?php echo $animal['latitude']; ?>") || -29.78;
-let lng = parseFloat("<?php echo $animal['longitude']; ?>") || -57.10;
+//localizacao salva
+let lat = <?= $animal['latitude']?>;
+let lng = <?= $animal['longitude']?>;
 
+// cria o mapa e centraliza no animal
 const map = L.map('map').setView([lat, lng], 14);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-let marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+// cria o marcador no animal e permite ser arrsatado
+let marcador = L.marker([lat, lng], { draggable: true }).addTo(map);
 
-marker.on("dragend", function(e) {
-    const pos = e.target.getLatLng();
-    document.getElementById("latitude").value = pos.lat;
-    document.getElementById("longitude").value = pos.lng;
+// quando arrastar o marcadro atualiza
+marcador.on("dragend", function() {
+    let posicao = marcador.getLatLng(); // guarda a nova posição
+    document.getElementById("latitude").value = posicao.lat;
+    document.getElementById("longitude").value = posicao.lng;
 });
 
-// Máscara Telefone
 document.getElementById('telefone_contato').addEventListener('input', function (e) {
-    let v = e.target.value.replace(/\D/g, '').slice(0, 11);
-    if (v.length <= 2) e.target.value = '(' + v;
-    else if (v.length <= 7) e.target.value = '(' + v.slice(0, 2) + ') ' + v.slice(2);
-    else e.target.value = '(' + v.slice(0, 2) + ') ' + v.slice(2, 7) + '-' + v.slice(7);
+    let num = e.target.value.replace(/\D/g, "");
+    let formatado = "";
+
+    // faz a divisao se tiver mt numero 99999-4444
+    if (num.length > 7) {
+        formatado = "(" + num.substring(0, 2) + ") " + num.substring(2, 7) + "-" + num.substring(7, 11);
+    } 
+    // monta no comeco (11) 999
+    else if (num.length > 2) {
+        formatado = "(" + num.substring(0, 2) + ") " + num.substring(2);
+    } 
+    // coemando coloca so o parenteses (11
+    else if (num.length > 0) {
+        formatado = "(" + num;
+    }
+
+    e.target.value = formatado;
 });
 </script>
 
