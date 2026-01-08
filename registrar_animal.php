@@ -10,8 +10,7 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $racas = [];
 $sql = "SELECT id, racas FROM racas ORDER BY racas";
-
-$res = mysqli_query($conexao, $sql); 
+$res = mysqli_query($conexao, $sql);
 while ($row = mysqli_fetch_assoc($res)) {
     $racas[] = $row;
 }
@@ -29,20 +28,37 @@ while ($row = mysqli_fetch_assoc($res)) {
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
 <style>
-    body { background-color: #ffffff; min-height: 100vh; margin: 0; font-family: Arial, sans-serif; display: flex; flex-direction: column; }
-    .navbar { background-color: #179e46ff; padding: 1rem; border-bottom: 3px solid #2e3531ff; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-    .navbar-brand { font-weight: bold; font-size: 1.7rem; color: #2b2b2b !important; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
-    .navbar .btn { padding: 7px 14px; border-radius: 8px; font-weight: 500; transition: 0.2s; }
-    .content { padding: 18px; flex: 1; display: flex; flex-direction: column; }
+    
+    body 
+    { background-color: #ffffff; min-height: 100vh; margin: 0; font-family: Arial, sans-serif; display: flex; flex-direction: column; }
+
+    .navbar 
+    { background-color: #179e46ff; padding: 1rem; border-bottom: 3px solid #2e3531ff; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+
+    .navbar-brand
+    { font-weight: bold; font-size: 1.7rem; color: #2b2b2b !important; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+
+    .navbar .btn
+    { padding: 7px 14px; border-radius: 8px; font-weight: 500; transition: 0.2s; }
+
+    .content 
+    { padding: 18px; flex: 1; display: flex; flex-direction: column; }
+
     h2 { text-align: center; margin-top: 8px; color: #252121ff; font-weight: 700; }
+
     p { text-align: center; color: #4b4b4b; margin-bottom: 10px; }
+
     #map { height: 75vh; width: 100%; border-radius: 12px; border: 3px solid #1e201fff; }
+
+    .footer-rastreia { background-color: #179e46ff; color: #333; text-align: center; padding: 12px; font-size: 0.95rem; font-weight: 600; border-top: 2px solid #2e3531ff; margin-top: 20px; }
+
     .popup-form { max-height: 420px; overflow-y: auto; width: 320px; }
     .popup-form label { font-weight: 600; margin-top: 6px; display: block; }
     .popup-form input, .popup-form select, .popup-form textarea { width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 8px; font-size: 14px; }
+    
     .popup-form button { background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 8px; width: 100%; font-weight: 600; cursor: pointer; }
+    
     .popup-form .btn-close-popup { background: #e0e0e0; color: #333; margin-top: 6px; }
-    .footer-rastreia { background-color: #179e46ff; color: #333; text-align: center; padding: 12px; font-size: 0.95rem; font-weight: 600; border-top: 2px solid #2e3531ff; margin-top: 20px; }
 </style>
 </head>
 <body>
@@ -75,7 +91,9 @@ while ($row = mysqli_fetch_assoc($res)) {
 <footer class="footer-rastreia">© 2025 Rastreia Bicho</footer>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 <script>
+// selecina os dados vidnos do php
 const todasRacas = <?php echo json_encode($racas, JSON_UNESCAPED_UNICODE); ?>;
 const usuario_id = <?php echo $_SESSION['usuario_id']; ?>;
 
@@ -94,7 +112,7 @@ function abrirPopupForm(lat, lng) {
         <input type="hidden" name="usuario_id" value="${usuario_id}">
 
         <label>Nome do animal *</label>
-        <input type="text" name="nome" required placeholder="Ex: Nome do animal ou Caracteristica">
+        <input type="text" name="nome" required placeholder="Ex: Nome ou característica">
 
         <label>Situação *</label>
         <select name="situacao" required>
@@ -123,7 +141,7 @@ function abrirPopupForm(lat, lng) {
             <option value="nao_informado">Não informado</option>
         </select>
 
-        <label>Data da ocorrência *</label>
+        <label>Data *</label>
         <input name="data_ocorrido" type="date" value="<?php echo date('Y-m-d'); ?>" required>
 
         <label>Seu telefone *</label>
@@ -167,58 +185,78 @@ function abrirPopupForm(lat, lng) {
       </form>
     </div>`;
 
-    const popup = L.popup({ maxWidth: 360, closeOnClick: false }).setLatLng([lat, lng]).setContent(formHtml).openOn(map);
+    //rtela ao clicar
+    L.popup({ maxWidth: 360, closeOnClick: false })
+     .setLatLng([lat, lng])
+     .setContent(formHtml)
+     .openOn(map);
 
-    setTimeout(() => {
+    // ativar os filtros no select da raca
+    setTimeout(function() {
         const especieSel = document.getElementById('especieSelect');
         const racaSel = document.getElementById('racaSelect');
 
+        // qunado muda especie muda raca
         especieSel.addEventListener('change', function() {
-            const esp = this.value;
+            const especieEscolhida = this.value;
             racaSel.innerHTML = '<option value="">-- Selecione a raça --</option>';
 
-            todasRacas.forEach(r => {
-                const nomeR = r.racas.toLowerCase();
-                let mostrar = false;
+            todasRacas.forEach(function(r) {
+                const nomeRaca = r.racas.toLowerCase();
+                let podeMostrar = false;
 
-                if (esp === 'cachorro' && (racasCachorro.includes(nomeR) || nomeR === 'outros')) mostrar = true;
-                if (esp === 'gato' && (racasGato.includes(nomeR) || nomeR === 'outros')) mostrar = true;
-                if (esp === 'outros' && nomeR === 'outros') mostrar = true;
+                if (especieEscolhida === 'cachorro' && (racasCachorro.includes(nomeRaca) || nomeRaca === 'outros')) podeMostrar = true;
+                if (especieEscolhida === 'gato' && (racasGato.includes(nomeRaca) || nomeRaca === 'outros')) podeMostrar = true;
+                if (especieEscolhida === 'outros' && nomeRaca === 'outros') podeMostrar = true;
 
-                if (mostrar) {
+                if (podeMostrar) {
                     racaSel.innerHTML += `<option value="${r.id}">${r.racas}</option>`;
                 }
             });
-
-            if (esp === 'outros') {
-                const rOutros = todasRacas.find(r => r.racas.toLowerCase() === 'outros');
-                if (rOutros) racaSel.value = rOutros.id;
-            }
         });
 
         document.getElementById('tel').addEventListener('input', function(e) {
-            let v = e.target.value.replace(/\D/g, '');
-            if (v.length > 11) v = v.substr(0, 11);
-            v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
-            v = v.replace(/(\d{5})(\d)/, '$1-$2');
-            e.target.value = v;
+            let v = e.target.value.replace(/\D/g, ''); 
+            if (v.length > 11) v = v.substr(0, 11);  
+            v = v.replace(/^(\d{2})(\d)/g, '($1) $2'); // parentes ddd
+            v = v.replace(/(\d{5})(\d)/, '$1-$2');    // traco no meio
         });
 
+        // botao de salvar
         document.getElementById('btnSalvar').addEventListener('click', function() {
-            const formData = new FormData(document.getElementById('formAnimal'));
-            fetch('salvar_local.php', { method: 'POST', body: formData })
-            .then(r => r.text())
-            .then(msg => {
-                alert(msg.trim());
-                if (msg.toLowerCase().includes('sucesso')) location.reload();
+            const formElemento = document.getElementById('formAnimal');
+            
+            if (!formElemento.checkValidity()) {
+                formElemento.reportValidity();
+                return;
+            }
+
+            const dadosDoForm = new FormData(formElemento);
+
+            fetch('salvar_local.php', { method: 'POST', body: dadosDoForm })
+            .then(resposta => resposta.text())
+            .then(texto => {
+                alert(texto.trim());
+                // recarregar pagina caso tenh salvo
+                if (texto.toLowerCase().includes('sucesso')) {
+                    location.reload();
+                }
             });
         });
 
-        document.getElementById('btnFechar').addEventListener('click', () => map.closePopup());
+        document.getElementById('btnFechar').addEventListener('click', function() {
+            map.closePopup();
+        });
+        
     }, 200);
 }
 
-map.on('click', e => abrirPopupForm(e.latlng.lat.toFixed(6), e.latlng.lng.toFixed(6)));
+// chma a funcao ao clicar no mapa
+map.on('click', function(e) {
+    const latitude = e.latlng.lat.toFixed(6);
+    const longitude = e.latlng.lng.toFixed(6);
+    abrirPopupForm(latitude, longitude);
+});
 </script>
 </body>
 </html>
