@@ -2,7 +2,7 @@
 session_start();
 
 if ($_SESSION['tipo_usuario'] !== 'administrador') {
-    echo "<script>alert('❌ Você não tem permissão para acessar esta área!'); window.location='index.php';</script>";
+    echo "<script>alert('Você não tem permissão para acessar esta área!'); window.location='index.php';</script>";
     exit;
 }
 ?>

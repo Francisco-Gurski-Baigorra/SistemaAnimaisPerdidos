@@ -25,5 +25,4 @@ header('Content-Type: application/json');
 
 // exibe o json com ascento
 echo json_encode($animais, JSON_UNESCAPED_UNICODE);
-mysqli_close($conexao);
 ?>

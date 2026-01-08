@@ -1,6 +1,5 @@
 <?php
 session_start();
-// Conexão procedural simples
 include('conecta.php');
 
 if (!isset($_SESSION['usuario_id'])) {
@@ -178,7 +177,8 @@ function abrirPopupForm(lat, lng) {
         </select>
 
         <label>Descrição (opcional)</label>
-        <textarea name="descricao" rows="2"></textarea>
+        <textarea name="descricao" placeholder="Digite uma breve descrição..." rows="2"></textarea>
+
 
         <button type="button" id="btnSalvar">Cadastrar Animal</button>
         <button type="button" id="btnFechar" class="btn-close-popup">Cancelar</button>
@@ -215,11 +215,17 @@ function abrirPopupForm(lat, lng) {
             });
         });
 
+        // Verificação de telefone adicionada aqui
         document.getElementById('tel').addEventListener('input', function(e) {
-            let v = e.target.value.replace(/\D/g, ''); 
-            if (v.length > 11) v = v.substr(0, 11);  
-            v = v.replace(/^(\d{2})(\d)/g, '($1) $2'); // parentes ddd
-            v = v.replace(/(\d{5})(\d)/, '$1-$2');    // traco no meio
+            let value = e.target.value.replace(/\D/g, "");
+            if (value.length > 11) value = value.slice(0, 11);
+            if (value.length > 6) {
+                e.target.value = `(${value.slice(0,2)}) ${value.slice(2,7)}-${value.slice(7)}`;
+            } else if (value.length > 2) {
+                e.target.value = `(${value.slice(0,2)}) ${value.slice(2)}`;
+            } else {
+                e.target.value = value;
+            }
         });
 
         // botao de salvar

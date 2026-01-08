@@ -33,10 +33,6 @@ if ($resultado_foto && mysqli_num_rows($resultado_foto) > 0) {
     $sql_del = "DELETE FROM animais WHERE id = $id AND usuario_id = $usuario_id";
     mysqli_query($conexao, $sql_del);
 
-    if ($foi_excluido == false) {
-        $_SESSION['mensagem'] = 'Animal excluído do sistema!';
-    }
-
     header('Location: perfil_animais.php');
     exit;
 

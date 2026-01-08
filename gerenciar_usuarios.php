@@ -3,7 +3,7 @@ session_start();
 include("conecta.php");
 
 if (!isset($_SESSION["tipo_usuario"]) || $_SESSION["tipo_usuario"] !== "administrador") {
-    echo "<script>alert('❌ Você não tem permissão para acessar esta área!'); window.location='index.php';</script>";
+    echo "<script>alert(' Você não tem permissão para acessar esta área!'); window.location='index.php';</script>";
     exit;
 }
 

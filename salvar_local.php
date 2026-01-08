@@ -2,14 +2,12 @@
 session_start();
 include('conecta.php');
 
-// Verifica se o usuário está logado
 if (!isset($_SESSION['usuario_id'])) {
     die("Erro: Você precisa estar logado.");
 }
 
 $usuario_id = $_SESSION['usuario_id'];
 
-// --- COLETA DOS DADOS DIRETO DO POST ---
 $nome = $_POST['nome'];
 $situacao = $_POST['situacao'];
 $especie = $_POST['especie'];

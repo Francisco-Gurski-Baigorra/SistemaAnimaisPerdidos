@@ -2,7 +2,6 @@
 session_start();
 include('conecta.php');
 
-// Busca as raças no banco para o filtro dinâmico
 $racas = [];
 $sql_racas = "SELECT id, racas FROM racas ORDER BY racas";
 $res_racas = mysqli_query($conexao, $sql_racas);
