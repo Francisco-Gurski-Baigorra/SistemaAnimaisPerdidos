@@ -224,81 +224,111 @@ while ($row = mysqli_fetch_assoc($res_racas)) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+// verifica se o usuario esta logado
 const isLogged = <?= isset($_SESSION['usuario_id']) ? 'true' : 'false' ?>;
+
+// config do mapa zoom e ecentro
 const map = L.map('map').setView([-29.78126, -57.10689], 13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
+// lista do marcadores
 let marcadores = [];
 
-async function carregarAnimais() {
-    // AQUI É A ÚNICA MUDANÇA NO JS: Chamamos carregar_perdidos.php
-    const res = await fetch('carregar_perdidos.php');
-    const animais = await res.json();
+// funcao para buscar os animais perdidos
+function carregarAnimais() {
+    //  buscar os animais noarquivo
+    fetch('carregar_perdidos.php')
+        .then(function(resposta) {
+            return resposta.json(); // converte numa lista json
+        })
+        .then(function(animais) {
+            // remove os marcadores que estavam la
+            for (let i = 0; i < marcadores.length; i++) {
+                map.removeLayer(marcadores[i]);
+            }
+            marcadores = []; // zera alisata
 
-    marcadores.forEach(m => map.removeLayer(m));
-    marcadores = [];
+            // utiliza os filtros que possuem
+            const fEsp = document.getElementById('filtroEspecie').value.toLowerCase();
+            const fRac = document.getElementById('filtroRaca').value.toLowerCase();
+            const fGen = document.getElementById('filtroGenero').value.toLowerCase();
+            const fPor = document.getElementById('filtroPorte').value.toLowerCase();
+            const fIda = document.getElementById('filtroIdade').value.toLowerCase();
 
-    const fEsp = document.getElementById('filtroEspecie').value.toLowerCase();
-    const fRac = document.getElementById('filtroRaca').value.toLowerCase();
-    const fGen = document.getElementById('filtroGenero').value.toLowerCase();
-    const fPor = document.getElementById('filtroPorte').value.toLowerCase();
-    const fIda = document.getElementById('filtroIdade').value.toLowerCase();
+            let encontrouAlgum = false;
 
-    const filtrados = animais.filter(a => {
-        return (!fEsp || a.especie.toLowerCase() === fEsp) &&
-               (!fRac || a.raca_nome.toLowerCase().includes(fRac)) &&
-               (!fGen || a.genero.toLowerCase() === fGen) &&
-               (!fPor || a.porte.toLowerCase() === fPor) &&
-               (!fIda || a.idade.toLowerCase() === fIda);
-    });
+            // percore a lista de animais do banco
+            animais.forEach(function(a) {
+                
+                // Lse o filtro que estiver preenchdi for diferntedo do animal, pula ele
+                if (fEsp != "" && a.especie.toLowerCase() !== fEsp) return;
+                if (fRac != "" && !a.raca_nome.toLowerCase().includes(fRac)) return;
+                if (fGen != "" && a.genero.toLowerCase() !== fGen) return;
+                if (fPor != "" && a.porte.toLowerCase() !== fPor) return;
+                if (fIda != "" && a.idade.toLowerCase() !== fIda) return;
 
-    const aviso = document.getElementById('aviso-vazio');
-    if (filtrados.length === 0) {
-        aviso.style.display = 'block';
-        setTimeout(() => { aviso.style.display = 'none'; }, 4000);
-    } else {
-        aviso.style.display = 'none';
-    }
+                encontrouAlgum = true;
 
-    filtrados.forEach(a => {
-        const icone = L.icon({
-            iconUrl: 'https://cdn-icons-png.flaticon.com/512/616/616408.png',
-            iconSize: [36, 36]
+                // icone do animal
+                const icone = L.icon({
+                    iconUrl: 'https://cdn-icons-png.flaticon.com/512/616/616408.png',
+                    iconSize: [36, 36]
+                });
+
+                // data formatada
+                let dataFormatada = "N/A";
+                if (a.data_ocorrido) {
+                    dataFormatada = a.data_ocorrido.split('-').reverse().join('/');
+                }
+
+                // formulario do html pra preencher
+                const popupHtml = `
+                    <div class="info-popup">
+                        <b style="font-size:16px;">${a.nome} <span class="status-badge">${a.situacao}</span></b><br>
+                        <hr style="margin:5px 0; border-top:1px solid #2e3531ff;">
+                        <b>Espécie:</b> ${a.especie}<br>
+                        <b>Raça:</b> ${a.raca_nome}<br>
+                        <b>Gênero:</b> ${a.genero}<br>
+                        <b>Idade:</b> ${a.idade}<br>
+                        <b>Porte:</b> ${a.porte}<br>
+                        <b>Data:</b> ${dataFormatada}<br>
+                        <b>Descrição:</b> ${a.descricao || 'N/A'}<br><br>
+                        <img src="uploads/${a.foto}" class="popup-img">
+                        <div class="d-grid mt-2">
+                            <button class="btn btn-sm btn-success" onclick="verContato(${a.usuario_id})">
+                                Ver contato do responsável
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // adocopmar po marcador e guarda ma lista
+                const m = L.marker([a.latitude, a.longitude], {icon: icone}).addTo(map).bindPopup(popupHtml);
+                marcadores.push(m);
+            });
+
+            // verifica o aviso do animal nao encotrado
+            const aviso = document.getElementById('aviso-vazio');
+            if (encontrouAlgum == false) {
+                aviso.style.display = 'block';
+            } else {
+                aviso.style.display = 'none';
+            }
         });
-
-        const dataFormatada = a.data_ocorrido ? a.data_ocorrido.split('-').reverse().join('/') : "N/A";
-
-        const popupHtml = `
-            <div class="info-popup">
-                <b style="font-size:16px;">${a.nome || 'N/A'} <span class="status-badge">${a.situacao}</span></b><br>
-                <hr style="margin:5px 0; border-top:1px solid #2e3531ff;">
-                <b>Espécie:</b> ${a.especie}<br>
-                <b>Raça:</b> ${a.raca_nome}<br>
-                <b>Gênero:</b> ${a.genero}<br>
-                <b>Idade:</b> ${a.idade}<br>
-                <b>Porte:</b> ${a.porte}<br>
-                <b>Data:</b> ${dataFormatada}<br>
-                <b>Descrição:</b> ${a.descricao || 'N/A'}<br><br>
-                <img src="uploads/${a.foto}" class="popup-img">
-                <div class="d-grid mt-2">
-                    <button class="btn btn-sm btn-success" onclick="verContato(${a.usuario_id})">
-                        Ver contato do responsável
-                    </button>
-                </div>
-            </div>
-        `;
-
-        const m = L.marker([a.latitude, a.longitude], {icon: icone}).addTo(map).bindPopup(popupHtml);
-        marcadores.push(m);
-    });
 }
 
+// ativa os fitlrso quandos clica no botao
 document.getElementById('btnFiltrar').addEventListener('click', carregarAnimais);
 carregarAnimais();
 
-async function verContato(id) {
+//  funcao q verifica se poder ver o contato
+function verContato(id) {
     const modalBody = document.getElementById('contatoModalBody');
-    if (!isLogged) {
+    const modalElement = document.getElementById('contatoModal');
+    const instanciaModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+
+    // login e cadastro
+    if (isLogged == false) {
         modalBody.innerHTML = `
             <p>Você precisa estar <strong>logado</strong> para visualizar o contato.</p>
             <div class="d-flex justify-content-center gap-2 mt-3">
@@ -306,17 +336,28 @@ async function verContato(id) {
                 <a href="cadastro.php" class="btn btn-success">Cadastrar</a>
             </div>
         `;
-    } else {
-        const res = await fetch('owner_info.php?usuario_id=' + id);
-        const data = await res.json();
-        modalBody.innerHTML = `
-            <p><strong>Nome:</strong> ${data.nome}</p>
-            <p><strong>Telefone:</strong> ${data.telefone}</p>
-            <p><strong>Email:</strong> ${data.email}</p>
-            <div class="text-muted small mt-2">Respeite a privacidade ao contatar o responsável.</div>
-        `;
+        instanciaModal.show();
+        return; 
     }
-    new bootstrap.Modal(document.getElementById('contatoModal')).show();
+
+    // busca os dados de contato
+    modalBody.innerHTML = '<p>Carregando...</p>';
+    instanciaModal.show();
+
+    fetch('owner_info.php?usuario_id=' + id)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.error) {
+                modalBody.innerHTML = '<p class="text-danger">Erro ao carregar contato.</p>';
+            } else {
+                modalBody.innerHTML = `
+                    <p><strong>Nome:</strong> ${data.nome}</p>
+                    <p><strong>Telefone:</strong> ${data.telefone}</p>
+                    <p><strong>Email:</strong> ${data.email}</p>
+                    <div class="text-muted small mt-2">Respeite a privacidade ao contatar o responsável.</div>
+                `;
+            }
+        });
 }
 </script>
 </body>
