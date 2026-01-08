@@ -11,7 +11,6 @@ if (!isset($_SESSION['usuario_id'])) {
 $racas = [];
 $sql = "SELECT id, racas FROM racas ORDER BY racas";
 
-// --- LOGICA PROCEDURAL SIMPLES ---
 $res = mysqli_query($conexao, $sql); 
 while ($row = mysqli_fetch_assoc($res)) {
     $racas[] = $row;
@@ -80,7 +79,6 @@ while ($row = mysqli_fetch_assoc($res)) {
 const todasRacas = <?php echo json_encode($racas, JSON_UNESCAPED_UNICODE); ?>;
 const usuario_id = <?php echo $_SESSION['usuario_id']; ?>;
 
-// Grupos de raças para filtrar
 const racasCachorro = ['vira-lata', 'labrador', 'bulldog', 'pastor alemão', 'pincher', 'cimarron', 'husky', 'salsicha', 'golden'];
 const racasGato = ['persa', 'siamês', 'sphynx'];
 

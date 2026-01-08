@@ -2,7 +2,6 @@
 session_start();
 include('conecta.php');
 
-// Pega os dados da URL
 $email = isset($_GET['email']) ? $_GET['email'] : null;
 $token = isset($_GET['token']) ? $_GET['token'] : null;
 
@@ -10,7 +9,6 @@ if (!$email || !$token) {
     die("Link inválido. Parâmetros ausentes.");
 }
 
-// Verifica se o token é válido no banco (usando o estilo que você já tem)
 $sql = "SELECT * FROM recuperar_senha WHERE email='$email' AND token='$token' AND usado=0";
 $resultado = mysqli_query($conexao, $sql);
 $recuperar = mysqli_fetch_assoc($resultado);
@@ -19,7 +17,6 @@ if (!$recuperar) {
     die("Token inválido ou já utilizado.");
 }
 
-// Verifica validade (24h)
 date_default_timezone_set('America/Sao_Paulo');
 $agora = new DateTime('now');
 $data_criacao = new DateTime($recuperar['data']);
@@ -40,7 +37,6 @@ if ($agora > $data_criacao) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
-        /* ======= Estilos Gerais ======= */
         body {
             background-color: #f2f2f2; 
             min-height: 100vh;
@@ -49,11 +45,10 @@ if ($agora > $data_criacao) {
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            padding-top: 160px; /* Espaço para a navbar fixa */
-            padding-bottom: 70px; /* Espaço para o footer */
+            padding-top: 160px; 
+            padding-bottom: 70px;
         }
 
-        /* ======= Navbar (Padrão Index/Login) ======= */
         .navbar {
             background-color: #179e46ff;
             padding: 1rem;
@@ -77,7 +72,6 @@ if ($agora > $data_criacao) {
             opacity: 0.9;
         }
 
-        /* ======= Card de Redefinição ======= */
         .card-redefinir {
             width: 100%;
             max-width: 420px;
@@ -88,7 +82,6 @@ if ($agora > $data_criacao) {
             padding: 25px;
         }
 
-        /* ======= Footer ======= */
         .footer-rastreia {
             background-color: #179e46ff;
             color: #333;

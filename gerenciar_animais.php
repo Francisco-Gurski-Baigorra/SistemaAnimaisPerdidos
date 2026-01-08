@@ -2,17 +2,10 @@
 include('conecta.php');
 session_start();
 
-/* =========================
-    🔐 Apenas administradores
-========================= */
 if (!isset($_SESSION['tipo_usuario']) || $_SESSION['tipo_usuario'] !== 'administrador') {
-    echo "<script>alert('❌ Você não tem permissão para acessar esta área!'); window.location='index.php';</script>";
+    echo "<script>alert('Você não tem permissão para acessar esta área!'); window.location='index.php';</script>";
     exit;
 }
-
-/* =========================
-    🔍 Busca todos os animais (Procedural)
-========================= */
 $sql = "SELECT 
             a.id,
             a.usuario_id,
@@ -32,27 +25,19 @@ $sql = "SELECT
 
 $result = mysqli_query($conexao, $sql);
 
-/* =========================
-    📦 Agrupa por situação
-========================= */
 $animaisPorSituacao = [
     'perdido'    => [],
     'encontrado' => [],
     'resgatado'  => []
 ];
 
-// mysqli_fetch_assoc no lugar de ->fetch_assoc()
 if ($result) {
     while ($row = mysqli_fetch_assoc($result)) {
         $animaisPorSituacao[$row['situacao']][] = $row;
     }
 }
 
-/* =========================
-    📞 Formata telefone (Básico)
-========================= */
 function formatarTelefone($telefone) {
-    // Remove o que não é número
     $telefone = preg_replace('/\D/', '', $telefone);
 
     if (strlen($telefone) === 11) {

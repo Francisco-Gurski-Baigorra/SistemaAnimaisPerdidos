@@ -12,7 +12,6 @@ $usuario_id = $_SESSION['usuario_id'];
 
 $sql_animal = "SELECT * FROM animais WHERE id = $id AND usuario_id = $usuario_id";
 $resultado_animal = mysqli_query($conexao, $sql_animal);
-
 $animal = mysqli_fetch_assoc($resultado_animal);
 
 $sql_racas = "SELECT id, racas FROM racas ORDER BY racas ASC";
@@ -20,19 +19,19 @@ $lista_racas = mysqli_query($conexao, $sql_racas);
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-$nome = $_POST['nome'];
-$situacao = $_POST['situacao'];
-$especie = $_POST['especie'];
-$genero  = $_POST['genero'];
-$raca_id = $_POST['raca_id'];
-$cor_predominante = $_POST['cor_predominante'];
-$idade = $_POST['idade'];
-$descricao = $_POST['descricao'];
-$telefone_contato = $_POST['telefone_contato'];
-$data_ocorrido = $_POST['data_ocorrido'];
-$latitude = $_POST['latitude'];
-$longitude = $_POST['longitude'];
-
+    $nome = $_POST['nome'];
+    $situacao = $_POST['situacao'];
+    $especie = $_POST['especie'];
+    $genero  = $_POST['genero'];
+    $raca_id = $_POST['raca_id'];
+    $porte = $_POST['porte']; 
+    $cor_predominante = $_POST['cor_predominante'];
+    $idade = $_POST['idade'];
+    $descricao = $_POST['descricao'];
+    $telefone_contato = $_POST['telefone_contato'];
+    $data_ocorrido = $_POST['data_ocorrido'];
+    $latitude = $_POST['latitude'];
+    $longitude = $_POST['longitude'];
 
     if (!empty($_FILES["foto"]["name"])) {
         $foto_nome = uniqid() . "_" . basename($_FILES["foto"]["name"]);
@@ -42,27 +41,28 @@ $longitude = $_POST['longitude'];
     }
 
 $sql_update = "UPDATE animais SET 
-   nome = '$nome', 
+    nome = '$nome', 
     situacao = '$situacao', 
     especie = '$especie', 
     genero = '$genero', 
-    raca_id = $raca_sql,
+    raca_id = '$raca_id',
+    porte = '$porte',
     cor_predominante = '$cor_predominante', 
     idade = '$idade', 
     descricao = '$descricao', 
     telefone_contato = '$telefone_contato', 
-    data_ocorrido = $data_sql,
+    data_ocorrido = '$data_ocorrido',
     latitude = '$latitude', 
     longitude = '$longitude', 
     foto = '$foto_nome'
     WHERE id = $id AND usuario_id = $usuario_id";
 
-    if (mysqli_query($conexao, $sql_update)) {
+if (mysqli_query($conexao, $sql_update)) {
         echo "<script>alert('Animal atualizado com sucesso!'); window.location='perfil_animais.php';</script>";
-    } else {
+} else {
         echo "Erro ao atualizar: " . mysqli_error($conexao);
-    }
-    exit;
+}
+exit;
 }
 ?>
 
@@ -150,6 +150,15 @@ $sql_update = "UPDATE animais SET
                 </div>
 
                 <div class="col-md-4">
+                    <label class="form-label fw-bold">Porte</label>
+                    <select class="form-select" name="porte">
+                        <option value="Pequeno" <?php if($animal['porte']=='Pequeno') echo 'selected'; ?>>Pequeno</option>
+                        <option value="Médio" <?php if($animal['porte']=='Médio') echo 'selected'; ?>>Médio</option>
+                        <option value="Grande" <?php if($animal['porte']=='Grande') echo 'selected'; ?>>Grande</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
                     <label class="form-label fw-bold">Cor Predominante</label>
                     <select class="form-select" name="cor_predominante">
                         <option value="preto" <?php if($animal['cor_predominante']=='preto') echo 'selected'; ?>>Preto</option>
@@ -211,20 +220,16 @@ $sql_update = "UPDATE animais SET
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-//localizacao salva
-let lat = <?= $animal['latitude']?>;
-let lng = <?= $animal['longitude']?>;
+let lat = <?= $animal['latitude'] ?>;
+let lng = <?= $animal['longitude'] ?>;
 
-// cria o mapa e centraliza no animal
 const map = L.map('map').setView([lat, lng], 14);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// cria o marcador no animal e permite ser arrsatado
 let marcador = L.marker([lat, lng], { draggable: true }).addTo(map);
 
-// quando arrastar o marcadro atualiza
 marcador.on("dragend", function() {
-    let posicao = marcador.getLatLng(); // guarda a nova posição
+    let posicao = marcador.getLatLng();
     document.getElementById("latitude").value = posicao.lat;
     document.getElementById("longitude").value = posicao.lng;
 });
@@ -232,20 +237,13 @@ marcador.on("dragend", function() {
 document.getElementById('telefone_contato').addEventListener('input', function (e) {
     let num = e.target.value.replace(/\D/g, "");
     let formatado = "";
-
-    // faz a divisao se tiver mt numero 99999-4444
     if (num.length > 7) {
         formatado = "(" + num.substring(0, 2) + ") " + num.substring(2, 7) + "-" + num.substring(7, 11);
-    } 
-    // monta no comeco (11) 999
-    else if (num.length > 2) {
+    } else if (num.length > 2) {
         formatado = "(" + num.substring(0, 2) + ") " + num.substring(2);
-    } 
-    // coemando coloca so o parenteses (11
-    else if (num.length > 0) {
+    } else if (num.length > 0) {
         formatado = "(" + num;
     }
-
     e.target.value = formatado;
 });
 </script>

@@ -14,20 +14,16 @@ session_start();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
    <style>
-    /* Estilos Gerais */
     body {
         background-color: #ffffff;
-        min-height: 100vh; /* Ocupa no mínimo a altura total da tela */
+        min-height: 100vh;
         margin: 0;
         font-family: Arial, sans-serif;
-        
-        /* SOLUÇÃO: Flexbox para empurrar o footer para o fim e remover espaço branco */
         display: flex;
         flex-direction: column;
-        padding-bottom: 0; /* Removido o padding que causava o espaço em branco */
+        padding-bottom: 0;
     }
 
-    /* ======= Navbar ======= */
     .navbar {
         background-color: #179e46ff;
         padding: 1rem;
@@ -47,14 +43,10 @@ session_start();
         cursor: pointer;
         text-decoration: none;
     }
-
-    /* ======= Hero / Conteúdo Principal ======= */
     .hero {
         background-color: #fefefe;
         padding: 20px 5px;
         text-align: center;
-        
-        /* SOLUÇÃO: Faz o conteúdo principal crescer e ocupar o espaço restante */
         flex: 1;
     }
 
@@ -63,8 +55,6 @@ session_start();
         font-weight: 700;
         color: #212529;
     }
-
-    /* ======= Footer ======= */
     .footer-rastreia {
         background-color: #179e46ff;
         color: #333;
@@ -74,13 +64,9 @@ session_start();
         font-weight: 600;
         width: 100%;
         border-top: 2px solid #2e3531ff;
-        
-        /* Garante que ele fique no final sem sobrepor e sem deixar vácuo */
         position: relative;
         margin-top: auto; 
     }
-
-    /* Responsividade */
     @media (max-width: 480px) {
         .navbar-brand { font-size: 1.4rem; }
     }

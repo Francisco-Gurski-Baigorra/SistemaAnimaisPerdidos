@@ -2,30 +2,18 @@
 session_start();
 include("conecta.php");
 
-// 🔒 Verifica se é administrador
 if (!isset($_SESSION["tipo_usuario"]) || $_SESSION["tipo_usuario"] !== "administrador") {
-    echo "<script>alert('❌ Você não tem permissão para acessar esta área!'); window.location='index.php';</script>";
+    echo "<script>alert('Você não tem permissão para acessar esta área!'); window.location='index.php';</script>";
     exit;
 }
 
-// Verifica se recebeu o ID de forma simples
-if (isset($_GET["id"])) {
-    $id = (int)$_GET["id"];
-} else {
-    echo "<script>alert('ID inválido!'); window.location='gerenciar_usuarios.php';</script>";
-    exit;
-}
+$id = $_GET["id"];
 
-// Busca os dados do usuário usando estilo procedural
 $sql = "SELECT * FROM usuarios WHERE id = $id";
 $resultado = mysqli_query($conexao, $sql);
 
-if (mysqli_num_rows($resultado) == 0) {
-    echo "<script>alert('Usuário não encontrado!'); window.location='gerenciar_usuarios.php';</script>";
-    exit;
-}
-
 $usuario = mysqli_fetch_assoc($resultado);
+
 ?>
 
 <!DOCTYPE html>
@@ -104,7 +92,7 @@ $usuario = mysqli_fetch_assoc($resultado);
 </div>
 
 <script>
-// Máscara do telefone
+// mascra telefone
 document.getElementById('telefone').addEventListener('input', function (e) {
     let valor = e.target.value.replace(/\D/g, '');
     if (valor.length > 11) valor = valor.slice(0, 11);
@@ -114,28 +102,29 @@ document.getElementById('telefone').addEventListener('input', function (e) {
     e.target.value = valor;
 });
 
-// Validação geral do formulário
-document.getElementById('formEditarUsuario').addEventListener('submit', function (e) {
-    let erro = false;
-    const campos = this.querySelectorAll('input[required], select[required]');
-    campos.forEach(campo => {
-        if (!campo.value.trim()) {
-            campo.classList.add('is-invalid');
-            erro = true;
-        } else {
-            campo.classList.remove('is-invalid');
-        }
-    });
+// quando o adm salvar
+document.getElementById('formEditarUsuario').onsubmit = function (e) {
+    
+    let temErro = false;
 
-    const telefoneInput = document.getElementById('telefone');
-    const telefoneNumeros = telefoneInput.value.replace(/\D/g, '');
-    if (telefoneNumeros.length !== 11) {
-        telefoneInput.classList.add('is-invalid');
-        alert('O telefone deve conter exatamente 11 dígitos (DDD + celular).');
-        erro = true;
+    let campoNome = document.getElementById('nome');
+    let campoTelefone = document.getElementById('telefone');
+
+    if (campoNome.value == "") {
+        alert("Por favor, preencha o nome.");
+        campoNome.style.borderColor = "red";
+        temErro = true;
     }
-    if (erro) e.preventDefault();
-});
+    let apenasNumeros = campoTelefone.value.replace(/\D/g, '');
+    if (apenasNumeros.length != 11) {
+        alert("O telefone deve ter 11 números (DDD + celular).");
+        campoTelefone.style.borderColor = "red";
+        temErro = true;
+    }
+    if (temErro == true) {
+        e.preventDefault();
+    }
+};
 </script>
 
 <footer class="footer-rastreia">

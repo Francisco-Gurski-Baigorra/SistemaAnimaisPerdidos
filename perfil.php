@@ -2,16 +2,13 @@
 session_start();
 include("conecta.php");
 
-// 1. VERIFICA LOGIN
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit;
 }
 
-// Garantir que o ID seja um número inteiro
-$id = (int)$_SESSION['usuario_id'];
+$id = $_SESSION['usuario_id'];
 
-// 2. BUSCAR INFORMAÇÕES DO USUÁRIO (Estilo Procedural)
 $sql = "SELECT nome, email, telefone, endereco, data_nascimento FROM usuarios WHERE id = $id";
 $result = mysqli_query($conexao, $sql);
 $usuario = mysqli_fetch_assoc($result);
@@ -22,20 +19,13 @@ if (!$usuario) {
     exit;
 }
 
-// ==========================
-// 3. ATUALIZAÇÃO DE DADOS
-// ==========================
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-    // Limpeza e escape de strings para segurança
-    $nome       = mysqli_real_escape_string($conexao, trim($_POST["nome"] ?? ""));
-    $telefone   = preg_replace('/\D/', '', $_POST["telefone"] ?? "");
-    $endereco   = mysqli_real_escape_string($conexao, trim($_POST["endereco"] ?? ""));
-    $data_nasc  = mysqli_real_escape_string($conexao, $_POST["data_nascimento"] ?? "");
+    $nome      = $_POST["nome"] ?? "";
+    $telefone  = $_POST["telefone"] ?? "";
+    $endereco  = $_POST["endereco"] ?? "";
+    $data_nasc = $_POST["data_nascimento"] ?? "";
 
     $erros = [];
-
-    // Validações básicas
     if ($nome === "") $erros[] = "O nome não pode ser apagado.";
     if ($endereco === "") $erros[] = "O endereço não pode ser apagado.";
     if ($data_nasc === "") $erros[] = "A data de nascimento não pode ser apagada.";
@@ -47,7 +37,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
-    // UPDATE DOS DADOS (Procedural)
     $sqlUp = "UPDATE usuarios SET 
                 nome='$nome', 
                 telefone='$telefone', 
@@ -56,10 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
               WHERE id=$id";
     
     mysqli_query($conexao, $sqlUp);
+$msgParts = ["Dados atualizados!"];
 
-    $msgParts = ["Dados atualizados!"];
-
-    // TRATAMENTO DA SENHA
     if (!empty($_POST["senha"]) || !empty($_POST["confirmar_senha"])) {
         if (!empty($_POST["senha"]) && $_POST["senha"] === $_POST["confirmar_senha"]) {
             $senhaHash = password_hash($_POST["senha"], PASSWORD_DEFAULT);
@@ -177,12 +164,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <script>
 function confirmarExclusao() {
-    if (confirm("⚠️ Tem certeza que deseja excluir sua conta?\n\nTodos os seus animais registrados também serão removidos. Essa ação não pode ser desfeita.")) {
+    if (confirm(" Tem certeza que deseja excluir sua conta?\n\nTodos os seus animais registrados também serão removidos. Essa ação não pode ser desfeita.")) {
         window.location.href = "excluir_usuario.php";
     }
 }
 
-// Máscara de Telefone
 document.getElementById('telefone').addEventListener('input', function (e) {
     let valor = e.target.value.replace(/\D/g, '');
     if (valor.length > 11) valor = valor.slice(0, 11);

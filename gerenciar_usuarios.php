@@ -2,13 +2,11 @@
 session_start();
 include("conecta.php");
 
-// 🔒 Verifica se é administrador
 if (!isset($_SESSION["tipo_usuario"]) || $_SESSION["tipo_usuario"] !== "administrador") {
     echo "<script>alert('❌ Você não tem permissão para acessar esta área!'); window.location='index.php';</script>";
     exit;
 }
 
-// Busca todos os usuários usando estilo procedural
 $sql = "SELECT * FROM usuarios ORDER BY id DESC";
 $resultado = mysqli_query($conexao, $sql);
 
@@ -33,7 +31,6 @@ $resultado = mysqli_query($conexao, $sql);
             flex-direction: column;
         }
 
-        /* ======= Navbar ======= */
         .navbar {
             background-color: #179e46;
             padding: 1rem;

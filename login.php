@@ -12,7 +12,6 @@ session_start();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
-        /* ======= Estilos Gerais ======= */
         body {
             background-color: #f2f2f2; 
             min-height: 100vh;
@@ -21,11 +20,10 @@ session_start();
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            padding-top: 160px; /* Espaço para a navbar fixa */
-            padding-bottom: 70px; /* Espaço para o footer */
+            padding-top: 160px;
+            padding-bottom: 70px;
         }
 
-        /* ======= Navbar (Padrão Index) ======= */
         .navbar {
             background-color: #179e46ff;
             padding: 1rem;
@@ -66,7 +64,6 @@ session_start();
             transform: translateY(-2px);
         }
 
-        /* ======= Card de Login ======= */
         .card-login {
             width: 100%;
             max-width: 420px;
@@ -76,7 +73,6 @@ session_start();
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* ======= Footer ======= */
         .footer-rastreia {
             background-color: #179e46ff;
             color: #333;
@@ -136,9 +132,9 @@ session_start();
             <div class="alert alert-danger py-2 text-center">
                 <?php 
                 if ($_GET['erro'] == 1) {
-                    echo "❌ <strong>Email não encontrado.</strong>";
+                    echo " <strong>Email não encontrado.</strong>";
                 } elseif ($_GET['erro'] == 2) {
-                    echo "❌ <strong>Senha incorreta.</strong>";
+                    echo " <strong>Senha incorreta.</strong>";
                 } 
                 ?>
             </div>

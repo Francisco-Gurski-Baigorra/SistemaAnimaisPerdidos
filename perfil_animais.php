@@ -2,21 +2,17 @@
 session_start();
 include('conecta.php');
 
-// Se não estiver logado, redireciona
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: login.php');
     exit;
 }
 
-// Garantimos que o ID seja um número inteiro para segurança
-$id_usuario = (int)$_SESSION['usuario_id'];
+$id_usuario = $_SESSION['usuario_id'];
 
-// --- 1. BUSCAR INFORMAÇÕES DO USUÁRIO (Estilo Procedural) ---
 $sqlUsuario = "SELECT nome, email FROM usuarios WHERE id = $id_usuario"; 
 $queryUsuario = mysqli_query($conexao, $sqlUsuario);
 $usuario = mysqli_fetch_assoc($queryUsuario);
 
-// --- 2. BUSCAR ANIMAIS COM JOIN NAS RAÇAS (Estilo Procedural) ---
 $sqlAnimais = "
     SELECT 
         a.id, a.nome, a.situacao, a.especie, a.genero, a.cor_predominante, 
@@ -30,7 +26,6 @@ $sqlAnimais = "
 ";
 $resultAnimais = mysqli_query($conexao, $sqlAnimais);
 
-// Função para preencher N/A automaticamente
 function mostrar($valor) {
     return (!empty($valor) ? htmlspecialchars($valor) : "N/A");
 }
@@ -55,7 +50,6 @@ function mostrar($valor) {
             flex-direction: column;
         }
 
-        /* ======= Navbar ======= */
         .navbar {
             background-color: #179e46;
             padding: 1rem;
@@ -81,7 +75,6 @@ function mostrar($valor) {
             opacity: 0.9;
         }
 
-        /* ======= CARDS DOS ANIMAIS ======= */
         .card {
             border-radius: 12px;
             border: 2px solid #2e3531;
@@ -213,7 +206,7 @@ function mostrar($valor) {
                     </button>
 
                     <div id="confirmar<?= $animal['id'] ?>" class="d-none">
-                        <p class="text-danger fw-bold mt-2 small">Deseja excluir permanentemente?</p>
+                        <p class="text-danger fw-bold mt-2 small">Deseja excluir animal?</p>
                         <a href="excluir_animal.php?id=<?= $animal['id'] ?>" class="btn btn-danger btn-sm">Sim</a>
                         <button class="btn btn-secondary btn-sm" onclick="cancelarConfirmacaoExclusao(<?= $animal['id'] ?>)">Não</button>
                     </div>
@@ -294,8 +287,6 @@ function mostrarConfirmacaoResgate(id) {
 function cancelarConfirmacaoResgate(id) {
     document.getElementById("confirmarResgate" + id).classList.add("d-none");
 }
-
-// Inicialização do mapa no modal
 document.addEventListener('shown.bs.modal', function (e) {
     const mapDiv = e.target.querySelector('[id^="map"]');
     if (mapDiv && !mapDiv.dataset.loaded) {

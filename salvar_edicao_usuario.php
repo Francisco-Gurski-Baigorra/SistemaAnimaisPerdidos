@@ -1,7 +1,6 @@
 <?php
 include("conecta.php");
 
-// Recebe dados do POST
 $id = $_POST["id"];
 $nome = $_POST["nome"];
 $email = $_POST["email"];
@@ -11,13 +10,11 @@ $data_nascimento = $_POST["data_nascimento"];
 $tipo_usuario = $_POST["tipo_usuario"];
 $ativo = $_POST["ativo"];
 
-// Atualiza no banco
 $sql = "UPDATE usuarios 
         SET nome='$nome', email='$email', telefone='$telefone', endereco='$endereco',
             data_nascimento='$data_nascimento', tipo_usuario='$tipo_usuario', ativo='$ativo'
         WHERE id = $id";
 
-// Executa usando a função simples
 if (mysqli_query($conexao, $sql)) {
     echo "<script>alert('Usuário atualizado com sucesso!'); window.location='gerenciar_usuarios.php';</script>";
 } else {
