@@ -17,7 +17,8 @@ $sql = "UPDATE usuarios
             data_nascimento='$data_nascimento', tipo_usuario='$tipo_usuario', ativo='$ativo'
         WHERE id = $id";
 
-if ($conexao->query($sql)) {
+// Executa usando a função simples
+if (mysqli_query($conexao, $sql)) {
     echo "<script>alert('Usuário atualizado com sucesso!'); window.location='gerenciar_usuarios.php';</script>";
 } else {
     echo "<script>alert('Erro ao atualizar!'); window.location='gerenciar_usuarios.php';</script>";

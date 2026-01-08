@@ -133,12 +133,12 @@ if ($agora > $data_criacao) {
 
         <div class="mb-3">
             <label class="form-label"><strong>Nova senha:</strong></label>
-            <input type="password" name="senha" class="form-control" placeholder="Mínimo 6 caracteres" required>
+            <input type="password" name="senha" class="form-control" placeholder="Preencha a nova senha" required>
         </div>
 
         <div class="mb-3">
             <label class="form-label"><strong>Confirmar senha:</strong></label>
-            <input type="password" name="senha2" class="form-control" placeholder="Repita a senha" required>
+            <input type="password" name="senha2" class="form-control" placeholder="Confirme a nova senha" required>
         </div>
 
         <button type="submit" class="btn btn-success w-100 fw-bold">Salvar nova senha</button>

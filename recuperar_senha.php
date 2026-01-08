@@ -1,37 +1,32 @@
+<?php
+session_start();
+include("conecta.php");
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
-          <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recuperar Senha</title>
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <style>
         body {
-            background-color: #ffffffff;
+            background-color: #ffffff;
             min-height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
-
-            /* 🔹 Centraliza o card */
             display: flex;
             flex-direction: column;
         }
 
-        /* ======= Navbar igual ao index.php ======= */
         .navbar {
-            background-color: #179e46ff;
+            background-color: #179e46;
             padding: 1rem;
-            border-bottom: 3px solid #2e3531ff;
+            border-bottom: 3px solid #2e3531;
             box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
             width: 100%;
         }
@@ -40,11 +35,9 @@
             font-weight: bold;
             font-size: 1.7rem;
             color: #2b2b2b !important;
-
             display: inline-flex;
             align-items: center;
             gap: 6px;
-
             transition: transform 0.2s ease, opacity 0.2s ease;
             cursor: pointer;
         }
@@ -65,14 +58,11 @@
             border-radius: 8px;
             font-weight: 500;
             transition: 0.2s;
-
-            /* 🔹 Remove sublinhado dos botões */
             text-decoration: none !important;
         }
 
         .navbar .btn:hover {
             transform: translateY(-2px);
-            text-decoration: none !important;
         }
 
         .card-recuperar {
@@ -83,8 +73,6 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.15);
             background: white;
             text-align: center;
-
-            /* 🔹 Centralização perfeita */
             margin: 150px auto;
         }
 
@@ -97,7 +85,6 @@
 
         .btn-verde:hover {
             background-color: #218838;
-            text-decoration: none !important;
         }
 
         a {
@@ -107,14 +94,13 @@
         }
 
         a:hover {
-            text-decoration: none;
             color: #0b3d1e;
         }
 
         @media (max-width: 480px) {
-            .card-perfil {
+            .card-recuperar {
                 padding: 18px;
-                margin: 0 12px;
+                margin: 60px auto;
             }
         }
     </style>

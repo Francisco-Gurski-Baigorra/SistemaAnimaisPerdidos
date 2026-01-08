@@ -8,17 +8,15 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
-$id_usuario = $_SESSION['usuario_id'];
+// Garantimos que o ID seja um número inteiro para segurança
+$id_usuario = (int)$_SESSION['usuario_id'];
 
-// Buscar informações do usuário
-$sqlUsuario = "SELECT nome, email FROM usuarios WHERE id = ?"; 
+// --- 1. BUSCAR INFORMAÇÕES DO USUÁRIO (Estilo Procedural) ---
+$sqlUsuario = "SELECT nome, email FROM usuarios WHERE id = $id_usuario"; 
+$queryUsuario = mysqli_query($conexao, $sqlUsuario);
+$usuario = mysqli_fetch_assoc($queryUsuario);
 
-$stmt = $conexao->prepare($sqlUsuario);
-$stmt->bind_param("i", $id_usuario);
-$stmt->execute();
-$usuario = $stmt->get_result()->fetch_assoc();
-
-// Buscar animais com JOIN nas raças
+// --- 2. BUSCAR ANIMAIS COM JOIN NAS RAÇAS (Estilo Procedural) ---
 $sqlAnimais = "
     SELECT 
         a.id, a.nome, a.situacao, a.especie, a.genero, a.cor_predominante, 
@@ -27,13 +25,10 @@ $sqlAnimais = "
         r.racas AS nome_raca
     FROM animais a
     LEFT JOIN racas r ON a.raca_id = r.id
-    WHERE a.usuario_id = ?
+    WHERE a.usuario_id = $id_usuario
     AND a.situacao != 'resgatado'
 ";
-$stmt2 = $conexao->prepare($sqlAnimais);
-$stmt2->bind_param("i", $id_usuario);
-$stmt2->execute();
-$resultAnimais = $stmt2->get_result();
+$resultAnimais = mysqli_query($conexao, $sqlAnimais);
 
 // Função para preencher N/A automaticamente
 function mostrar($valor) {
@@ -43,168 +38,153 @@ function mostrar($valor) {
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Animais Registrados - Rastreia Bicho 🐾</title>
+    <meta charset="UTF-8">
+    <title>Animais Registrados - Rastreia Bicho 🐾</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<style>
+    <style>
+        body {
+            background-color: #ffffff;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
 
- body {
-    background-color: #ffffff;
-    min-height: 100vh;
-    margin: 0;
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-}
+        /* ======= Navbar ======= */
+        .navbar {
+            background-color: #179e46;
+            padding: 1rem;
+            border-bottom: 3px solid #2e3531;
+            box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
+            width: 100%;
+        }
 
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.7rem;
+            color: #2b2b2b !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
 
-/* ======= Navbar ======= */
-.navbar {
-    background-color: #179e46;
-    padding: 1rem;
-    border-bottom: 3px solid #2e3531;
-    box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
-    width: 100%;
-}
+        .navbar-brand:hover {
+            transform: translateY(-2px) scale(1.04);
+            opacity: 0.9;
+        }
 
+        /* ======= CARDS DOS ANIMAIS ======= */
+        .card {
+            border-radius: 12px;
+            border: 2px solid #2e3531;
+            background: #ffffff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+            transition: .2s;
+        }
 
-/* interação no rastreia bicho */
-.navbar-brand {
-    font-weight: bold;
-    font-size: 1.7rem;
-    color: #2b2b2b !important;
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.16);
+        }
 
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+        .card img {
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px 12px 0 0;
+        }
 
-    transition: transform 0.2s ease, opacity 0.2s ease;
-    cursor: pointer;
-}
+        [id^="map"] {
+            height: 200px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
 
-.navbar-brand:hover {
-    transform: translateY(-2px) scale(1.04);
-    opacity: 0.9;
-}
+        .descricao-box {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            color: #333;
+            max-height: 120px;
+            overflow-y: auto;
+            white-space: normal;
+            word-break: break-word;
+        }
 
-.navbar-brand {
-    font-weight: bold;
-    font-size: 1.7rem;
-    color: #2b2b2b !important;
-}
+        .modal img {
+            width: 100%;
+            max-height: 350px;
+            object-fit: contain;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
 
-/* ===============================
-   CARDS DOS ANIMAIS
-================================*/
-.card {
-    border-radius: 12px;
-    border: 2px solid #2e3531;
-    background: #ffffff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-    transition: .2s;
-}
-
-.card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.16);
-}
-
-/* Imagem */
-.card img {
-    height: 200px;
-    object-fit: cover;
-    border-radius: 12px 12px 0 0;
-}
-
-[id^="map"] {
-    height: 200px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-}
-
-.descricao-box {
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 0.95rem;
-    line-height: 1.4;
-    color: #333;
-
-    max-height: 120px;      /* controla o tamanho */
-    overflow-y: auto;       /* scroll só se precisar */
-
-    white-space: normal;    /* mantém padrão visual */
-    word-break: break-word; /* evita estouro */
-}
-
-/* ===== IMAGEM DO MODAL (PADRÃO E RESPONSIVA) ===== */
-.modal img {
-    width: 100%;
-    max-height: 350px;   /* altura ideal para visualização */
-    object-fit: contain; /* mostra a imagem inteira sem cortar */
-    background-color: #f8f9fa;
-    border-radius: 10px;
-}
-
-
-
-</style>
+        .footer-rastreia {
+            background-color: #179e46;
+            color: #333;
+            text-align: center;
+            padding: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            width: 100%;
+            border-top: 2px solid #2e3531;
+            margin-top: auto;
+        }
+    </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
         <a class="navbar-brand" href="index.php">
             <i class="fa-solid fa-paw me-2"></i> RASTREIA BICHO
         </a>
 
-        <div class="ms-auto">
-            <a href="registrar_animal.php" class="btn btn-dark me-2">
+        <div class="ms-auto d-flex gap-2">
+            <a href="registrar_animal.php" class="btn btn-dark">
                 <i class="bi bi-plus-circle"></i> Registrar Animal
             </a>
-
-            <a href="perfil.php" class="btn btn-dark me-2">
+            <a href="perfil.php" class="btn btn-dark">
                 <i class="bi bi-person-circle"></i> Perfil
             </a>
-
-            <a href="perfil_animais.php" class="btn btn-dark me-2">
+            <a href="perfil_animais.php" class="btn btn-dark">
                 <i class="fa-solid fa-paw"></i> Meus Animais
             </a>
-
             <?php if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'administrador'): ?>
-    <a href="admin.php" class="btn btn-primary me-2">
-        <i class="bi bi-gear-fill"></i> Administrador
-    </a>
-<?php endif; ?>
-
-<!-- 🔄 Botão Sair -->
-<a href="logout.php" class="btn btn-danger me-2">
-    <i class="bi bi-box-arrow-right"></i> Sair
-</a>
+                <a href="admin.php" class="btn btn-primary">
+                    <i class="bi bi-gear-fill"></i> Administrador
+                </a>
+            <?php endif; ?>
+            <a href="logout.php" class="btn btn-danger">
+                <i class="bi bi-box-arrow-right"></i> Sair
+            </a>
         </div>
     </div>
 </nav>
 
-<main class="container mb-5 flex-grow-1" style="padding-top: 90px;">
+<main class="container mb-5 flex-grow-1" style="padding-top: 110px;">
 
     <div class="text-center mb-4">
         <h2 class="fw-bold text-dark">Olá, <?= htmlspecialchars($usuario['nome']) ?>!</h2>
         <p class="text-muted">Aqui estão os animais que você registrou:</p>
     </div>
 
-    <?php if ($resultAnimais->num_rows > 0): ?>
+    <?php if (mysqli_num_rows($resultAnimais) > 0): ?>
     <div class="row justify-content-center g-4">
 
-        <?php while ($animal = $resultAnimais->fetch_assoc()): ?>
+        <?php while ($animal = mysqli_fetch_assoc($resultAnimais)): ?>
         <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex justify-content-center">
 
             <div class="card" style="width: 18rem;">
-
                 <?php if (!empty($animal['foto'])): ?>
                     <img src="uploads/<?= $animal['foto'] ?>" class="card-img-top">
                 <?php else: ?>
@@ -213,7 +193,7 @@ function mostrar($valor) {
 
                 <div class="card-body text-center">
                     <h5 class="card-title"><?= mostrar($animal['nome']) ?></h5>
-                    <p class="text-muted mb-2"><?= mostrar($animal['situacao']) ?></p>
+                    <p class="text-muted mb-2 text-capitalize"><?= mostrar($animal['situacao']) ?></p>
 
                     <button class="btn btn-success w-100 mb-2" data-bs-toggle="modal" data-bs-target="#modal<?= $animal['id'] ?>">
                         <i class="bi bi-info-circle"></i> Ver Detalhes
@@ -228,9 +208,9 @@ function mostrar($valor) {
                     </button>
 
                     <div id="confirmarResgate<?= $animal['id'] ?>" class="d-none">
-                        <p class="text-success fw-bold mt-2">Confirmar Resgate?</p>
+                        <p class="text-success fw-bold mt-2 small">Confirmar Resgate?</p>
                         <a href="resgatar_animal.php?id=<?= $animal['id'] ?>&resgate=1" class="btn btn-success btn-sm">Sim</a>
-                        <button class="btn btn-secondary btn-sm" onclick="cancelarConfirmacaoResgate(<?= $animal['id'] ?>)">Cancelar</button>
+                        <button class="btn btn-secondary btn-sm" onclick="cancelarConfirmacaoResgate(<?= $animal['id'] ?>)">Não</button>
                     </div>
 
                     <button class="btn btn-outline-danger w-100 mt-2" onclick="mostrarConfirmacaoExclusao(<?= $animal['id'] ?>)">
@@ -238,32 +218,28 @@ function mostrar($valor) {
                     </button>
 
                     <div id="confirmar<?= $animal['id'] ?>" class="d-none">
-                        <p class="text-danger fw-bold mt-2">Deseja excluir?</p>
+                        <p class="text-danger fw-bold mt-2 small">Deseja excluir permanentemente?</p>
                         <a href="excluir_animal.php?id=<?= $animal['id'] ?>" class="btn btn-danger btn-sm">Sim</a>
-                        <button class="btn btn-secondary btn-sm" onclick="cancelarConfirmacaoExclusao(<?= $animal['id'] ?>)">Cancelar</button>
+                        <button class="btn btn-secondary btn-sm" onclick="cancelarConfirmacaoExclusao(<?= $animal['id'] ?>)">Não</button>
                     </div>
-
                 </div>
             </div>
         </div>
 
-        <!-- MODAL DETALHES -->
         <div class="modal fade" id="modal<?= $animal['id'] ?>">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
-
                     <div class="modal-header bg-success text-white">
                         <h5 class="modal-title">Detalhes do Animal</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
 
                     <div class="modal-body">
-
                         <?php if (!empty($animal['foto'])): ?>
                             <img src="uploads/<?= $animal['foto'] ?>" class="img-fluid rounded mb-3">
                         <?php endif; ?>
 
-                        <ul class="list-group mb-3">
+                        <ul class="list-group mb-3 text-start">
                             <li class="list-group-item"><strong>Nome:</strong> <?= mostrar($animal['nome']) ?></li>
                             <li class="list-group-item"><strong>Situação:</strong> <?= mostrar($animal['situacao']) ?></li>
                             <li class="list-group-item"><strong>Espécie:</strong> <?= mostrar($animal['especie']) ?></li>
@@ -273,13 +249,9 @@ function mostrar($valor) {
                             <li class="list-group-item"><strong>Cor:</strong> <?= mostrar($animal['cor_predominante']) ?></li>
                             <li class="list-group-item"><strong>Idade:</strong> <?= mostrar($animal['idade']) ?></li>
                             <li class="list-group-item">
-                            <strong>Descrição:</strong>
-                            <div class="descricao-box mt-2">
-                            <?= mostrar($animal['descricao']) ?>
-                            </div>
+                                <strong>Descrição:</strong>
+                                <div class="descricao-box mt-2"><?= mostrar($animal['descricao']) ?></div>
                             </li>
-
-
                             <li class="list-group-item"><strong>Data do ocorrido:</strong> <?= mostrar($animal['data_ocorrido']) ?></li>
                         </ul>
 
@@ -294,20 +266,20 @@ function mostrar($valor) {
                 </div>
             </div>
         </div>
-
         <?php endwhile; ?>
 
     </div>
-
     <?php else: ?>
     <div class="alert alert-warning text-center">
-        Nenhum animal registrado.
+        Nenhum animal registrado no momento.
     </div>
     <?php endif; ?>
 
 </main>
 
-
+<footer class="footer-rastreia">
+    © 2025 Rastreia Bicho
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -328,6 +300,7 @@ function cancelarConfirmacaoResgate(id) {
     document.getElementById("confirmarResgate" + id).classList.add("d-none");
 }
 
+// Inicialização do mapa no modal
 document.addEventListener('shown.bs.modal', function (e) {
     const mapDiv = e.target.querySelector('[id^="map"]');
     if (mapDiv && !mapDiv.dataset.loaded) {
@@ -340,27 +313,6 @@ document.addEventListener('shown.bs.modal', function (e) {
     }
 });
 </script>
-
-
-<footer class="footer-rastreia">
-    © 2025 Rastreia Bicho
-</footer>
-
-<style>
-.footer-rastreia {
-    background-color: #179e46ff;
-    color: #333;
-    text-align: center;
-    padding: 12px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    width: 100%;
-    border-top: 2px solid #2e3531ff;
-}
-
-
-</style>
-
 
 </body>
 </html>
