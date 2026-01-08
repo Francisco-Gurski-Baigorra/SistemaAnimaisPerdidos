@@ -2,103 +2,84 @@
 session_start();
 include('conecta.php');
 
+// Verifica se está logado
 if (!isset($_SESSION['usuario_id'])) {
     echo "<script>alert('Você precisa estar logado para editar.'); window.location='login.php';</script>";
     exit;
 }
 
-$id = (int)($_GET['id'] ?? 0);
+// Pega o ID via GET de forma básica (sem ??)
+if (isset($_GET['id'])) {
+    $id = (int)$_GET['id'];
+} else {
+    $id = 0;
+}
 $usuario_id = (int)$_SESSION['usuario_id'];
 
-// Buscar o animal
-$sql = "SELECT * FROM animais WHERE id = ? AND usuario_id = ?";
-$stmt = $conexao->prepare($sql);
-$stmt->bind_param("ii", $id, $usuario_id);
-$stmt->execute();
-$resultado = $stmt->get_result();
+// BUSCAR O ANIMAL (SQL Direto)
+$sql_animal = "SELECT * FROM animais WHERE id = $id AND usuario_id = $usuario_id";
+$resultado_animal = mysqli_query($conexao, $sql_animal);
 
-if ($resultado->num_rows === 0) {
+if (mysqli_num_rows($resultado_animal) === 0) {
     echo "<script>alert('Animal não encontrado.'); window.location='perfil_animais.php';</script>";
     exit;
 }
+$animal = mysqli_fetch_assoc($resultado_animal);
 
-$animal = $resultado->fetch_assoc();
+// BUSCAR TODAS AS RAÇAS
+$sql_racas = "SELECT id, racas FROM racas ORDER BY racas ASC";
+$lista_racas = mysqli_query($conexao, $sql_racas);
 
-// Buscar todas as raças
-$lista_racas = $conexao->query("SELECT id, racas FROM racas ORDER BY racas ASC");
-
-// Atualização
+// PROCESSAR ATUALIZAÇÃO (POST)
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $nome = $_POST['nome'] ?? '';
-    $situacao = $_POST['situacao'] ?? '';
-    $especie = $_POST['especie'] ?? '';
-    $genero = $_POST['genero'] ?? '';
-    // receber raca_id como int ou 0 (0 -> NULL no banco via NULLIF)
-    $raca_id = isset($_POST['raca_id']) && $_POST['raca_id'] !== '' ? (int)$_POST['raca_id'] : 0;
-    $cor = $_POST['cor_predominante'] ?? '';
-    $idade = $_POST['idade'] ?? '';
-    $descricao = $_POST['descricao'] ?? '';
-    $telefone = $_POST['telefone_contato'] ?? '';
-    $data_ocorrido = $_POST['data_ocorrido'] ?? ''; // '' vai virar NULL via NULLIF
-    $latitude = isset($_POST['latitude']) && $_POST['latitude'] !== '' ? (float)$_POST['latitude'] : null;
-    $longitude = isset($_POST['longitude']) && $_POST['longitude'] !== '' ? (float)$_POST['longitude'] : null;
+    // Pegando os dados e limpando contra erros de aspas (mysqli_real_escape_string)
+    $nome             = mysqli_real_escape_string($conexao, $_POST['nome']);
+    $situacao         = mysqli_real_escape_string($conexao, $_POST['situacao']);
+    $especie          = mysqli_real_escape_string($conexao, $_POST['especie']);
+    $genero           = mysqli_real_escape_string($conexao, $_POST['genero']);
+    $raca_id          = (int)$_POST['raca_id'];
+    $cor_predominante = mysqli_real_escape_string($conexao, $_POST['cor_predominante']);
+    $idade            = mysqli_real_escape_string($conexao, $_POST['idade']);
+    $descricao        = mysqli_real_escape_string($conexao, $_POST['descricao']);
+    $telefone_contato = mysqli_real_escape_string($conexao, $_POST['telefone_contato']);
+    $data_ocorrido    = mysqli_real_escape_string($conexao, $_POST['data_ocorrido']);
+    $latitude         = $_POST['latitude'];
+    $longitude        = $_POST['longitude'];
 
-    // Foto (opcional)
-    if (!empty($_FILES["foto"]["name"]) && $_FILES["foto"]["error"] === UPLOAD_ERR_OK) {
+    // Tratamento básico para Raça e Data (se vazio vira NULL no SQL)
+    $raca_sql = ($raca_id > 0) ? $raca_id : "NULL";
+    $data_sql = (!empty($data_ocorrido)) ? "'$data_ocorrido'" : "NULL";
+
+    // FOTO (Lógica mantida)
+    if (!empty($_FILES["foto"]["name"])) {
         $foto_nome = uniqid() . "_" . basename($_FILES["foto"]["name"]);
-        move_uploaded_file($_FILES["foto"]["tmp_name"], __DIR__ . "/uploads/" . $foto_nome);
+        move_uploaded_file($_FILES["foto"]["tmp_name"], "uploads/" . $foto_nome);
     } else {
         $foto_nome = $animal['foto'];
     }
 
-    // Query: usamos NULLIF para raca_id (0 -> NULL) e para data_ocorrido ('' -> NULL)
-    $sql = "UPDATE animais SET 
-        nome = ?, situacao = ?, especie = ?, genero = ?, raca_id = NULLIF(?,0),
-        cor_predominante = ?, idade = ?, descricao = ?, telefone_contato = ?, data_ocorrido = NULLIF(?, ''),
-        latitude = ?, longitude = ?, foto = ?
-        WHERE id = ? AND usuario_id = ?";
+    // UPDATE DIRETO (Sem prepared statements)
+    $sql_update = "UPDATE animais SET 
+                    nome = '$nome', 
+                    situacao = '$situacao', 
+                    especie = '$especie', 
+                    genero = '$genero', 
+                    raca_id = $raca_sql,
+                    cor_predominante = '$cor_predominante', 
+                    idade = '$idade', 
+                    descricao = '$descricao', 
+                    telefone_contato = '$telefone_contato', 
+                    data_ocorrido = $data_sql,
+                    latitude = '$latitude', 
+                    longitude = '$longitude', 
+                    foto = '$foto_nome'
+                  WHERE id = $id AND usuario_id = $usuario_id";
 
-    $stmt = $conexao->prepare($sql);
-    if (!$stmt) {
-        die("Erro ao preparar query: " . $conexao->error);
-    }
-
-    // Tipos (15 parâmetros): 
-    // nome(s), situacao(s), especie(s), genero(s), raca_id(i), cor(s), idade(s), descricao(s), telefone(s), data_ocorrido(s), latitude(d), longitude(d), foto(s), id(i), usuario_id(i)
-    $types = "ssssisssssddsii";
-
-    // Para latitude/longitude: mysqli espera floats para 'd'; se forem null, convertemos para 0.0 (ou você pode garantir que venham preenchidos)
-    $lat_bind = $latitude === null ? 0.0 : $latitude;
-    $lng_bind = $longitude === null ? 0.0 : $longitude;
-
-    $bind_ok = $stmt->bind_param(
-        $types,
-        $nome,
-        $situacao,
-        $especie,
-        $genero,
-        $raca_id,
-        $cor,
-        $idade,
-        $descricao,
-        $telefone,
-        $data_ocorrido,
-        $lat_bind,
-        $lng_bind,
-        $foto_nome,
-        $id,
-        $usuario_id
-    );
-
-    if (!$bind_ok) {
-        die("Erro no bind_param: " . $stmt->error);
-    }
-
-    if ($stmt->execute()) {
+    if (mysqli_query($conexao, $sql_update)) {
         echo "<script>alert('Animal atualizado com sucesso!'); window.location='perfil_animais.php';</script>";
     } else {
-        echo "Erro ao atualizar: " . $stmt->error;
+        echo "Erro ao atualizar: " . mysqli_error($conexao);
     }
     exit;
 }
@@ -107,105 +88,36 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Editar Animal</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <title>Editar Animal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-
-
-<style>
-body {
-    background-color: #ffffff;
-    margin: 0;
-    font-family: Arial, sans-serif;
-}
-
-
-
-/* ======= Navbar ======= */
-.navbar {
-    background-color: #179e46;
-    padding: 1rem;
-    border-bottom: 3px solid #2e3531;
-    box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
-}
-
-
-/* interação no rastreia bicho */
-.navbar-brand {
-    font-weight: bold;
-    font-size: 1.7rem;
-    color: #2b2b2b !important;
-
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-
-    transition: transform 0.2s ease, opacity 0.2s ease;
-    cursor: pointer;
-}
-
-.navbar-brand:hover {
-    transform: translateY(-2px) scale(1.04);
-    opacity: 0.9;
-}
-
-.navbar-brand {
-    font-weight: bold;
-    font-size: 1.7rem;
-    color: #2b2b2b !important;
-}
-.card {
-    border-radius: 20px;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-}
-#map {
-    height: 300px;
-    border-radius: 12px;
-    border: 2px solid #2f8f46;
-}
-</style>
+    <style>
+        body { background-color: #ffffff; margin: 0; font-family: Arial, sans-serif; }
+        .navbar { background-color: #179e46; padding: 1rem; border-bottom: 3px solid #2e3531; box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15); }
+        .navbar-brand { font-weight: bold; font-size: 1.7rem; color: #2b2b2b !important; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; transition: 0.2s; }
+        .navbar-brand:hover { transform: translateY(-2px) scale(1.04); opacity: 0.9; }
+        .card { border-radius: 20px; box-shadow: 0 6px 14px rgba(0,0,0,0.2); }
+        #map { height: 300px; border-radius: 12px; border: 2px solid #2f8f46; }
+        .footer-rastreia { background-color: #179e46ff; color: #333; text-align: center; padding: 12px; font-size: 0.95rem; font-weight: 600; width: 100%; border-top: 2px solid #2e3531ff; margin-top: 20px; }
+    </style>
 </head>
-
 <body>
-
 
 <nav class="navbar navbar-expand-lg"> 
     <div class="container">
-        <a class="navbar-brand" href="index.php">
-            <i class="fa-solid fa-paw me-2"></i> RASTREIA BICHO
-        </a>
-
+        <a class="navbar-brand" href="index.php"><i class="fa-solid fa-paw me-2"></i> RASTREIA BICHO</a>
         <div class="ms-auto">
-            <a href="registrar_animal.php" class="btn btn-dark me-2">
-                <i class="bi bi-plus-circle"></i> Registrar Animal
-            </a>
-
-            <a href="perfil.php" class="btn btn-dark me-2">
-                <i class="bi bi-person-circle"></i> Perfil
-            </a>
-
-            <a href="perfil_animais.php" class="btn btn-dark me-2">
-                <i class="fa-solid fa-paw"></i> Meus Animais
-            </a>
-
-            <?php if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'administrador'): ?>
-    <a href="admin.php" class="btn btn-primary me-2">
-        <i class="bi bi-gear-fill"></i> Administrador
-    </a>
-<?php endif; ?>
-
-<a href="logout.php" class="btn btn-danger me-2">
-    <i class="bi bi-box-arrow-right"></i> Sair
-</a>
+            <a href="registrar_animal.php" class="btn btn-dark me-2"><i class="bi bi-plus-circle"></i> Registrar Animal</a>
+            <a href="perfil.php" class="btn btn-dark me-2"><i class="bi bi-person-circle"></i> Perfil</a>
+            <a href="perfil_animais.php" class="btn btn-dark me-2"><i class="fa-solid fa-paw"></i> Meus Animais</a>
+            <a href="logout.php" class="btn btn-danger"><i class="bi bi-box-arrow-right"></i> Sair</a>
         </div>
     </div>
 </nav>
-
 
 <div class="container mt-4 mb-5">
     <div class="card p-4">
@@ -213,36 +125,34 @@ body {
 
         <form method="post" enctype="multipart/form-data">
             <div class="row g-3">
-
                 <div class="col-md-6">
                     <label class="form-label fw-bold">Situação</label>
                     <select class="form-select" name="situacao" required>
-                        <option value="perdido" <?= $animal['situacao']=="perdido"?"selected":"" ?>>Perdido</option>
-                        <option value="encontrado" <?= $animal['situacao']=="encontrado"?"selected":"" ?>>Encontrado</option>
+                        <option value="perdido" <?php if($animal['situacao']=="perdido") echo "selected"; ?>>Perdido</option>
+                        <option value="encontrado" <?php if($animal['situacao']=="encontrado") echo "selected"; ?>>Encontrado</option>
                     </select>
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label fw-bold">Nome</label>
-                    <input type="text" class="form-control" name="nome" value="<?= htmlspecialchars($animal['nome'] ?? '') ?>" required
-                    maxlength="50">
+                    <input type="text" class="form-control" name="nome" value="<?php echo $animal['nome']; ?>" required maxlength="50">
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Espécie</label>
                     <select class="form-select" name="especie" required>
-                        <option value="cachorro" <?= $animal['especie']=="cachorro"?"selected":"" ?>>Cachorro</option>
-                        <option value="gato" <?= $animal['especie']=="gato"?"selected":"" ?>>Gato</option>
-                        <option value="outros" <?= $animal['especie']=="outros"?"selected":"" ?>>Outro</option>
+                        <option value="cachorro" <?php if($animal['especie']=="cachorro") echo "selected"; ?>>Cachorro</option>
+                        <option value="gato" <?php if($animal['especie']=="gato") echo "selected"; ?>>Gato</option>
+                        <option value="outros" <?php if($animal['especie']=="outros") echo "selected"; ?>>Outro</option>
                     </select>
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Gênero</label>
                     <select class="form-select" name="genero" required>
-                        <option value="macho" <?= $animal['genero']=="macho"?"selected":"" ?>>Macho</option>
-                        <option value="femea" <?= $animal['genero']=="femea"?"selected":"" ?>>Fêmea</option>
-                        <option value="nao_informado" <?= $animal['genero']=="nao_informado"?"selected":"" ?>>Não informado</option>
+                        <option value="macho" <?php if($animal['genero']=="macho") echo "selected"; ?>>Macho</option>
+                        <option value="femea" <?php if($animal['genero']=="femea") echo "selected"; ?>>Fêmea</option>
+                        <option value="nao_informado" <?php if($animal['genero']=="nao_informado") echo "selected"; ?>>Não informado</option>
                     </select>
                 </div>
 
@@ -250,9 +160,9 @@ body {
                     <label class="form-label fw-bold">Raça</label>
                     <select class="form-select" name="raca_id">
                         <option value="">Selecione...</option>
-                        <?php while ($r = $lista_racas->fetch_assoc()): ?>
-                            <option value="<?= $r['id'] ?>" <?= ($animal['raca_id']==$r['id']) ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($r['racas']) ?>
+                        <?php while ($r = mysqli_fetch_assoc($lista_racas)): ?>
+                            <option value="<?php echo $r['id']; ?>" <?php if($animal['raca_id']==$r['id']) echo 'selected'; ?>>
+                                <?php echo $r['racas']; ?>
                             </option>
                         <?php endwhile; ?>
                     </select>
@@ -261,44 +171,33 @@ body {
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Cor Predominante</label>
                     <select class="form-select" name="cor_predominante">
-                        <option value="">--</option>
-                        <option value="preto" <?= $animal['cor_predominante']=='preto'?'selected':'' ?>>Preto</option>
-                        <option value="branco" <?= $animal['cor_predominante']=='branco'?'selected':'' ?>>Branco</option>
-                        <option value="marrom" <?= $animal['cor_predominante']=='marrom'?'selected':'' ?>>Marrom</option>
-                        <option value="cinza" <?= $animal['cor_predominante']=='cinza'?'selected':'' ?>>Cinza</option>
-                        <option value="caramelo" <?= $animal['cor_predominante']=='caramelo'?'selected':'' ?>>Caramelo</option>
-                        <option value="preto e branco" <?= $animal['cor_predominante']=='preto e branco'?'selected':'' ?>>Preto e Branco</option>
-                        <option value="outros" <?= $animal['cor_predominante']=='outros'?'selected':'' ?>>Outros</option>
+                        <option value="preto" <?php if($animal['cor_predominante']=='preto') echo 'selected'; ?>>Preto</option>
+                        <option value="branco" <?php if($animal['cor_predominante']=='branco') echo 'selected'; ?>>Branco</option>
+                        <option value="marrom" <?php if($animal['cor_predominante']=='marrom') echo 'selected'; ?>>Marrom</option>
+                        <option value="cinza" <?php if($animal['cor_predominante']=='cinza') echo 'selected'; ?>>Cinza</option>
+                        <option value="caramelo" <?php if($animal['cor_predominante']=='caramelo') echo 'selected'; ?>>Caramelo</option>
+                        <option value="preto e branco" <?php if($animal['cor_predominante']=='preto e branco') echo 'selected'; ?>>Preto e Branco</option>
+                        <option value="outros" <?php if($animal['cor_predominante']=='outros') echo 'selected'; ?>>Outros</option>
                     </select>
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Idade</label>
                     <select class="form-select" name="idade">
-                        <option value="">--</option>
-                        <option value="Filhote" <?= $animal['idade']=='Filhote'?'selected':'' ?>>Filhote</option>
-                        <option value="Adulto" <?= $animal['idade']=='Adulto'?'selected':'' ?>>Adulto</option>
-                        <option value="Idoso" <?= $animal['idade']=='Idoso'?'selected':'' ?>>Idoso</option>
+                        <option value="Filhote" <?php if($animal['idade']=='Filhote') echo 'selected'; ?>>Filhote</option>
+                        <option value="Adulto" <?php if($animal['idade']=='Adulto') echo 'selected'; ?>>Adulto</option>
+                        <option value="Idoso" <?php if($animal['idade']=='Idoso') echo 'selected'; ?>>Idoso</option>
                     </select>
                 </div>
 
                 <div class="col-md-4">
-    <label class="form-label fw-bold">Telefone para contato</label>
-    <input type="text"
-           class="form-control"
-           name="telefone_contato"
-           id="telefone_contato"
-           maxlength="15"
-           minlength="14"
-           placeholder="(99) 99999-9999"
-           required
-           value="<?= htmlspecialchars($animal['telefone_contato'] ?? '') ?>">
-</div>
-
+                    <label class="form-label fw-bold">Telefone para contato</label>
+                    <input type="text" class="form-control" name="telefone_contato" id="telefone_contato" maxlength="15" required value="<?php echo $animal['telefone_contato']; ?>">
+                </div>
 
                 <div class="col-md-6">
                     <label class="form-label fw-bold">Data do ocorrido</label>
-                    <input type="date" class="form-control" name="data_ocorrido" value="<?= htmlspecialchars($animal['data_ocorrido'] ?? '') ?>">
+                    <input type="date" class="form-control" name="data_ocorrido" value="<?php echo $animal['data_ocorrido']; ?>">
                 </div>
 
                 <div class="col-md-6">
@@ -307,29 +206,21 @@ body {
                 </div>
 
                 <div class="col-12">
-    <label class="form-label fw-bold">Descrição</label>
-    <textarea
-        class="form-control"
-        name="descricao"
-        rows="3"
-        maxlength="150"
-        placeholder="Máx. 150 caracteres"><?= htmlspecialchars($animal['descricao'] ?? '') ?></textarea>
-</div>
-
+                    <label class="form-label fw-bold">Descrição</label>
+                    <textarea class="form-control" name="descricao" rows="3" maxlength="150"><?php echo $animal['descricao']; ?></textarea>
+                </div>
 
                 <div class="col-12">
-                    <label class="form-label fw-bold">Localização do animal</label>
+                    <label class="form-label fw-bold">Localização do animal (Arraste o marcador)</label>
                     <div id="map"></div>
-
-                    <input type="hidden" name="latitude" id="latitude" value="<?= htmlspecialchars($animal['latitude'] ?? '') ?>">
-                    <input type="hidden" name="longitude" id="longitude" value="<?= htmlspecialchars($animal['longitude'] ?? '') ?>">
+                    <input type="hidden" name="latitude" id="latitude" value="<?php echo $animal['latitude']; ?>">
+                    <input type="hidden" name="longitude" id="longitude" value="<?php echo $animal['longitude']; ?>">
                 </div>
 
                 <div class="col-12 text-center mt-3">
-                    <button class="btn btn-success px-4">Salvar Alterações</button>
+                    <button type="submit" class="btn btn-success px-4">Salvar Alterações</button>
                     <a href="perfil_animais.php" class="btn btn-secondary px-4 ms-2">Voltar</a>
                 </div>
-
             </div>
         </form>
     </div>
@@ -339,77 +230,33 @@ body {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-// Inicializa o mapa
-let lat = parseFloat("<?= $animal['latitude'] ?? '0' ?>");
-let lng = parseFloat("<?= $animal['longitude'] ?? '0' ?>");
-
-// se lat/lng zero, centraliza em coordenada padrão
-if (!lat || !lng) {
-  lat = -29.78;
-  lng = -57.10;
-}
+// Mapa Leaflet
+let lat = parseFloat("<?php echo $animal['latitude']; ?>") || -29.78;
+let lng = parseFloat("<?php echo $animal['longitude']; ?>") || -57.10;
 
 const map = L.map('map').setView([lat, lng], 14);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 18
-}).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 let marker = L.marker([lat, lng], { draggable: true }).addTo(map);
 
-// Atualiza ao mover o marcador
 marker.on("dragend", function(e) {
     const pos = e.target.getLatLng();
     document.getElementById("latitude").value = pos.lat;
     document.getElementById("longitude").value = pos.lng;
 });
+
+// Máscara Telefone
+document.getElementById('telefone_contato').addEventListener('input', function (e) {
+    let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+    if (v.length <= 2) e.target.value = '(' + v;
+    else if (v.length <= 7) e.target.value = '(' + v.slice(0, 2) + ') ' + v.slice(2);
+    else e.target.value = '(' + v.slice(0, 2) + ') ' + v.slice(2, 7) + '-' + v.slice(7);
+});
 </script>
-
-
 
 <footer class="footer-rastreia">
     © 2025 Rastreia Bicho
 </footer>
-
-<style>
-.footer-rastreia {
-    background-color: #179e46ff;
-    color: #333;
-    text-align: center;
-    padding: 12px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    width: 100%;
-    border-top: 2px solid #2e3531ff;
-}
-
-
-</style>
-
-<script>
-document.getElementById('telefone_contato').addEventListener('input', function (e) {
-    let valor = e.target.value.replace(/\D/g, '');
-
-    // limita a 11 dígitos numéricos
-    if (valor.length > 11) {
-        valor = valor.slice(0, 11);
-    }
-
-    // aplica máscara
-    if (valor.length <= 2) {
-        valor = '(' + valor;
-    } else if (valor.length <= 7) {
-        valor = '(' + valor.slice(0, 2) + ') ' + valor.slice(2);
-    } else {
-        valor = '(' + valor.slice(0, 2) + ') ' +
-                valor.slice(2, 7) + '-' +
-                valor.slice(7);
-    }
-
-    e.target.value = valor;
-});
-</script>
-
 
 </body>
 </html>

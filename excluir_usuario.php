@@ -1,21 +1,23 @@
 <?php
 session_start();
-require_once "conexao.php";
+include('conecta.php');
 
+// Verifica se o usuário está logado
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit();
 }
 
-$id = $_SESSION['usuario_id'];
+// Pega o ID da sessão de forma direta
+$id = (int)$_SESSION['usuario_id'];
 
-// Excluir usuário
-$sql = "DELETE FROM usuarios WHERE id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $id);
+// SQL DIRETO (Estilo básico, sem prepare ou bind_param)
+$sql = "DELETE FROM usuarios WHERE id = $id";
 
-if ($stmt->execute()) {
+// Executa a query usando a função mysqli_query
+if (mysqli_query($conexao, $sql)) {
 
+    // Se a conta foi excluída, precisamos limpar a sessão para o usuário sair do sistema
     session_unset();
     session_destroy();
 
@@ -28,6 +30,7 @@ if ($stmt->execute()) {
     exit();
 
 } else {
+    // Caso ocorra algum erro (ex: se o banco impedir a exclusão por segurança)
     echo "
         <script>
             alert('Erro ao excluir conta.');
@@ -36,6 +39,6 @@ if ($stmt->execute()) {
     ";
 }
 
-$stmt->close();
-$conn->close();
+// Fecha a conexão de forma básica
+mysqli_close($conexao);
 ?>

@@ -3,7 +3,7 @@ include('conecta.php');
 session_start();
 
 /* =========================
-   🔐 Apenas administradores
+    🔐 Apenas administradores
 ========================= */
 if (!isset($_SESSION['tipo_usuario']) || $_SESSION['tipo_usuario'] !== 'administrador') {
     echo "<script>alert('❌ Você não tem permissão para acessar esta área!'); window.location='index.php';</script>";
@@ -11,7 +11,7 @@ if (!isset($_SESSION['tipo_usuario']) || $_SESSION['tipo_usuario'] !== 'administ
 }
 
 /* =========================
-   🔍 Busca todos os animais
+    🔍 Busca todos os animais (Procedural)
 ========================= */
 $sql = "SELECT 
             a.id,
@@ -30,10 +30,10 @@ $sql = "SELECT
         LEFT JOIN racas r ON a.raca_id = r.id
         ORDER BY a.situacao, a.id DESC";
 
-$result = $conexao->query($sql);
+$result = mysqli_query($conexao, $sql);
 
 /* =========================
-   📦 Agrupa por situação
+    📦 Agrupa por situação
 ========================= */
 $animaisPorSituacao = [
     'perdido'    => [],
@@ -41,23 +41,25 @@ $animaisPorSituacao = [
     'resgatado'  => []
 ];
 
-while ($row = $result->fetch_assoc()) {
-    $animaisPorSituacao[$row['situacao']][] = $row;
+// mysqli_fetch_assoc no lugar de ->fetch_assoc()
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $animaisPorSituacao[$row['situacao']][] = $row;
+    }
 }
 
 /* =========================
-   📞 Formata telefone
+    📞 Formata telefone (Básico)
 ========================= */
 function formatarTelefone($telefone) {
+    // Remove o que não é número
     $telefone = preg_replace('/\D/', '', $telefone);
 
     if (strlen($telefone) === 11) {
-        return sprintf(
-            '(%s) %s-%s',
-            substr($telefone, 0, 2),
-            substr($telefone, 2, 5),
-            substr($telefone, 7)
-        );
+        $ddd   = substr($telefone, 0, 2);
+        $parte1 = substr($telefone, 2, 5);
+        $parte2 = substr($telefone, 7);
+        return "(" . $ddd . ") " . $parte1 . "-" . $parte2;
     }
     return 'N/A';
 }
@@ -65,124 +67,29 @@ function formatarTelefone($telefone) {
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <meta charset="UTF-8">
+    <title>Gerenciar Animais</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<meta charset="UTF-8">
-<title>Gerenciar Animais</title>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-<style>
-body {
-    background-color: #ffffff;
-    min-height: 100vh;
-    margin: 0;
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-}
-
-/* ======= Navbar ======= */
-.navbar {
-    background-color: #179e46;
-    padding: 1rem;
-    border-bottom: 3px solid #2e3531;
-    box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15);
-    width: 100%;
-}
-
-/* interação no rastreia bicho */
-.navbar-brand {
-    font-weight: bold;
-    font-size: 1.7rem;
-    color: #2b2b2b !important;
-
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-
-    transition: transform 0.2s ease, opacity 0.2s ease;
-    cursor: pointer;
-}
-
-.navbar-brand:hover {
-    transform: translateY(-2px) scale(1.04);
-    opacity: 0.9;
-}
-
-.navbar-brand {
-    font-weight: bold;
-    font-size: 1.7rem;
-    color: #2b2b2b !important;
-}
-
-/* ======= Títulos por situação ======= */
-.titulo-situacao {
-    padding: 10px 15px;
-    font-weight: bold;
-    margin-top: 30px;
-}
-
-.titulo-perdido,
-.titulo-encontrado {
-    background: #fff3cd;
-    border-left: 6px solid #ffc107;
-}
-
-.titulo-resgatado {
-    background: #e9f5ee;
-    border-left: 6px solid #179e46ff;
-}
-
-/* ======= Tabela ======= */
-.card {
-    border-radius: 15px;
-}
-.table img {
-    width: 70px;
-    height: 70px;
-    object-fit: cover;
-    border-radius: 8px;
-}
-.table thead {
-    background: #179e46ff;
-    color: white;
-}
-
-/* Impede quebra de dados importantes (telefone, tipo, status) */
-.no-break {
-    white-space: nowrap;
-}
-
-
-/* ======= Botões ======= */
-.btn-editar {
-    background-color: #f3f053ff;
-    color: black;
-}
-.btn-excluir {
-    background-color: #df4e5cff;
-    color: white;
-}
-.btn-voltar {
-    background-color: #179e46ff;
-    color: white;
-}
-
-/* ======= Footer ======= */
-.footer-rastreia {
-    background-color: #179e46ff;
-    color: #333;
-    text-align: center;
-    padding: 12px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    width: 100%;
-    border-top: 2px solid #2e3531ff;
-    margin-top: auto;
-}
-</style>
+    <style>
+        body { background-color: #ffffff; min-height: 100vh; margin: 0; font-family: Arial, sans-serif; display: flex; flex-direction: column; }
+        .navbar { background-color: #179e46; padding: 1rem; border-bottom: 3px solid #2e3531; box-shadow: 0 2px 6px rgba(54, 51, 51, 0.15); width: 100%; }
+        .navbar-brand { font-weight: bold; font-size: 1.7rem; color: #2b2b2b !important; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; transition: 0.2s; }
+        .navbar-brand:hover { transform: translateY(-2px) scale(1.04); opacity: 0.9; }
+        .titulo-situacao { padding: 10px 15px; font-weight: bold; margin-top: 30px; }
+        .titulo-perdido, .titulo-encontrado { background: #fff3cd; border-left: 6px solid #ffc107; }
+        .titulo-resgatado { background: #e9f5ee; border-left: 6px solid #179e46ff; }
+        .card { border-radius: 15px; }
+        .table img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; }
+        .table thead { background: #179e46ff; color: white; }
+        .no-break { white-space: nowrap; }
+        .btn-editar { background-color: #f3f053ff; color: black; }
+        .btn-excluir { background-color: #df4e5cff; color: white; }
+        .btn-voltar { background-color: #179e46ff; color: white; }
+        .footer-rastreia { background-color: #179e46ff; color: #333; text-align: center; padding: 12px; font-size: 0.95rem; font-weight: 600; width: 100%; border-top: 2px solid #2e3531ff; margin-top: auto; }
+    </style>
 </head>
 
 <body>
@@ -202,7 +109,7 @@ body {
         </h2>
 
         <div class="text-end mb-3">
-            <a href="admin.php" class="btn btn-voltar"><i class="bi bi-arrow-left-circle"></i>  Voltar</a>
+            <a href="admin.php" class="btn btn-voltar"><i class="bi bi-arrow-left-circle"></i> Voltar</a>
         </div>
 
         <?php
@@ -216,68 +123,70 @@ body {
             if (empty($lista)) continue;
         ?>
 
-        <div class="titulo-situacao <?= $situacao === 'resgatado' ? 'titulo-resgatado' : 'titulo-'.$situacao ?>">
-            <?= $labels[$situacao] ?>
+        <div class="titulo-situacao <?php echo ($situacao === 'resgatado' ? 'titulo-resgatado' : 'titulo-'.$situacao); ?>">
+            <?php echo $labels[$situacao]; ?>
         </div>
 
-        <table class="table table-bordered table-striped text-center mt-2">
-            <thead>
-                <tr>
-                    <th>ID Animal</th>
-                    <th>ID Usuário</th>
-                    <th>Foto</th>
-                    <th>Nome</th>
-                    <th>Situação</th>
-                    <th>Espécie</th>
-                    <th>Gênero</th>
-                    <th>Raça</th>
-                    <th>Porte</th>
-                    <th>Cor</th>
-                    <th>Idade</th>
-                    <th>Telefone</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped text-center mt-2">
+                <thead>
+                    <tr>
+                        <th>ID Animal</th>
+                        <th>ID Usuário</th>
+                        <th>Foto</th>
+                        <th>Nome</th>
+                        <th>Situação</th>
+                        <th>Espécie</th>
+                        <th>Gênero</th>
+                        <th>Raça</th>
+                        <th>Porte</th>
+                        <th>Cor</th>
+                        <th>Idade</th>
+                        <th>Telefone</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-            <?php foreach ($lista as $animal): ?>
-                <tr>
-                    <td><?= $animal['id'] ?></td>
-                    <td><?= $animal['usuario_id'] ?></td>
+                <tbody>
+                <?php foreach ($lista as $animal): ?>
+                    <tr>
+                        <td><?php echo $animal['id']; ?></td>
+                        <td><?php echo $animal['usuario_id']; ?></td>
 
-                    <td>
-                        <?php if (!empty($animal['foto'])): ?>
-                            <img src="uploads/<?= htmlspecialchars($animal['foto']) ?>">
-                        <?php else: ?>
-                            <span class="text-muted">N/A</span>
-                        <?php endif; ?>
-                    </td>
+                        <td>
+                            <?php if (!empty($animal['foto'])): ?>
+                                <img src="uploads/<?php echo $animal['foto']; ?>">
+                            <?php else: ?>
+                                <span class="text-muted">N/A</span>
+                            <?php endif; ?>
+                        </td>
 
-                    <td><?= $animal['nome'] ?: 'N/A' ?></td>
-                    <td><?= ucfirst($animal['situacao']) ?></td>
-                    <td><?= ucfirst($animal['especie']) ?></td>
-                    <td><?= ucfirst($animal['genero']) ?></td>
-                    <td><?= $animal['raca_nome'] ?: 'N/A' ?></td>
-                    <td><?= $animal['porte'] ? ucfirst($animal['porte']) : 'N/A' ?></td>
-                    <td><?= $animal['cor_predominante'] ? ucfirst($animal['cor_predominante']) : 'N/A' ?></td>
-                    <td><?= $animal['idade'] ?: 'N/A' ?></td>
-                    <td class="no-break"><?= formatarTelefone($animal['telefone_contato']) ?></td>
+                        <td><?php echo ($animal['nome'] ? $animal['nome'] : 'N/A'); ?></td>
+                        <td><?php echo ucfirst($animal['situacao']); ?></td>
+                        <td><?php echo ucfirst($animal['especie']); ?></td>
+                        <td><?php echo ucfirst($animal['genero']); ?></td>
+                        <td><?php echo ($animal['raca_nome'] ? $animal['raca_nome'] : 'N/A'); ?></td>
+                        <td><?php echo ($animal['porte'] ? ucfirst($animal['porte']) : 'N/A'); ?></td>
+                        <td><?php echo ($animal['cor_predominante'] ? ucfirst($animal['cor_predominante']) : 'N/A'); ?></td>
+                        <td><?php echo ($animal['idade'] ? $animal['idade'] : 'N/A'); ?></td>
+                        <td class="no-break"><?php echo formatarTelefone($animal['telefone_contato']); ?></td>
 
-                    <td>
-                        <a href="adm_editar_animal.php?id=<?= $animal['id'] ?>" class="btn btn-editar btn-sm">
-                            <i class="bi bi-pencil-square"></i> Editar
-                        </a>
+                        <td>
+                            <a href="adm_editar_animal.php?id=<?php echo $animal['id']; ?>" class="btn btn-editar btn-sm">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </a>
 
-                        <a href="adm_excluir_animal.php?id=<?= $animal['id'] ?>"
-                           class="btn btn-excluir btn-sm"
-                           onclick="return confirm('Tem certeza que deseja excluir este animal?')">
-                            <i class="bi bi-trash"></i> Excluir
-                        </a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
+                            <a href="adm_excluir_animal.php?id=<?php echo $animal['id']; ?>"
+                               class="btn btn-excluir btn-sm"
+                               onclick="return confirm('Tem certeza que deseja excluir este animal?')">
+                                <i class="bi bi-trash"></i> Excluir
+                            </a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
 
         <?php endforeach; ?>
 

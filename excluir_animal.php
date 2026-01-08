@@ -2,50 +2,49 @@
 session_start();
 include('conecta.php');
 
-// garante que não haja saída antes de headers
-// verifica usuário logado
+// Verifica se o usuário está logado
 if (!isset($_SESSION['usuario_id'])) {
     $_SESSION['mensagem'] = 'Você precisa estar logado para excluir.';
     header('Location: login.php');
     exit;
 }
 
-// parâmetros
-$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
-$usuario_id = (int) $_SESSION['usuario_id'];
-$resgate = (isset($_GET['resgate']) && $_GET['resgate'] === '1') ? true : false;
-
-// busca foto (para remover do disco)
-$sql = "SELECT foto FROM animais WHERE id = ? AND usuario_id = ?";
-$stmt = $conexao->prepare($sql);
-if (!$stmt) {
-    $_SESSION['mensagem'] = 'Erro interno (prepare).';
-    header('Location: perfil_animais.php');
-    exit;
+// Pega os parâmetros via GET de forma básica
+if (isset($_GET['id'])) {
+    $id = (int)$_GET['id'];
+} else {
+    $id = 0;
 }
-$stmt->bind_param("ii", $id, $usuario_id);
-$stmt->execute();
-$resultado = $stmt->get_result();
 
-if ($resultado && $resultado->num_rows > 0) {
-    $animal = $resultado->fetch_assoc();
+$usuario_id = (int)$_SESSION['usuario_id'];
 
+if (isset($_GET['resgate']) && $_GET['resgate'] === '1') {
+    $resgate = true;
+} else {
+    $resgate = false;
+}
+
+// BUSCA A FOTO (para remover o arquivo da pasta uploads)
+// Usando SQL direto e mysqli_query
+$sql_foto = "SELECT foto FROM animais WHERE id = $id AND usuario_id = $usuario_id";
+$resultado_foto = mysqli_query($conexao, $sql_foto);
+
+if ($resultado_foto && mysqli_num_rows($resultado_foto) > 0) {
+    $animal = mysqli_fetch_assoc($resultado_foto);
+
+    // Se houver foto cadastrada, apaga o arquivo físico
     if (!empty($animal['foto'])) {
-        $caminho = __DIR__ . '/uploads/' . $animal['foto'];
+        $caminho = 'uploads/' . $animal['foto'];
         if (file_exists($caminho)) {
-            @unlink($caminho);
+            unlink($caminho);
         }
     }
 
-    // exclui registro
-    $sqlDel = "DELETE FROM animais WHERE id = ? AND usuario_id = ?";
-    $stmtDel = $conexao->prepare($sqlDel);
-    if ($stmtDel) {
-        $stmtDel->bind_param("ii", $id, $usuario_id);
-        $stmtDel->execute();
-    }
+    // EXCLUI O REGISTRO DO BANCO
+    $sql_del = "DELETE FROM animais WHERE id = $id AND usuario_id = $usuario_id";
+    mysqli_query($conexao, $sql_del);
 
-    // só seta mensagem se NÃO for resgate
+    // Só define a mensagem de sucesso se não for um processo de "resgate"
     if (!$resgate) {
         $_SESSION['mensagem'] = 'Animal excluído com sucesso!';
     }
@@ -53,7 +52,12 @@ if ($resultado && $resultado->num_rows > 0) {
     header('Location: perfil_animais.php');
     exit;
 } else {
+    // Se o animal não pertencer ao usuário ou não existir
     $_SESSION['mensagem'] = 'Animal não encontrado.';
     header('Location: perfil_animais.php');
     exit;
 }
+
+// Fecha a conexão (estilo procedural)
+mysqli_close($conexao);
+?>
