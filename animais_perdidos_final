@@ -1,0 +1,182 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1:3306
+-- Tempo de geração: 08-Jan-2026 às 04:28
+-- Versão do servidor: 9.1.0
+-- versão do PHP: 8.3.14
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Banco de dados: `animais_perdidos`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `animais`
+--
+
+DROP TABLE IF EXISTS `animais`;
+CREATE TABLE IF NOT EXISTS `animais` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `usuario_id` int NOT NULL,
+  `situacao` enum('perdido','encontrado','resgatado') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `especie` enum('cachorro','gato','outros') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `genero` enum('macho','femea','nao_informado') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `foto` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `raca_id` int DEFAULT NULL,
+  `porte` enum('pequeno','medio','grande') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cor_predominante` enum('preto','branco','marrom','cinza','caramelo','preto e branco','outros') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `idade` enum('Filhote','Adulto','Idoso') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nome` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `descricao` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `latitude` decimal(10,8) DEFAULT NULL,
+  `longitude` decimal(11,8) DEFAULT NULL,
+  `data_ocorrido` date DEFAULT NULL,
+  `telefone_contato` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `data_cadastro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_animais_usuarios` (`usuario_id`),
+  KEY `fk_animais_racas` (`raca_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `animais`
+--
+
+INSERT INTO `animais` (`id`, `usuario_id`, `situacao`, `especie`, `genero`, `foto`, `raca_id`, `porte`, `cor_predominante`, `idade`, `nome`, `descricao`, `latitude`, `longitude`, `data_ocorrido`, `telefone_contato`, `data_cadastro`) VALUES
+(52, 10, 'perdido', 'cachorro', 'macho', 'animal_1767844797.jpg', 39, 'medio', 'preto', 'Adulto', 'Japeju', 'Cachorro muito peludo e carente.', -29.76907123, -57.08393097, '2026-01-08', '(55) 99995-7255', '2026-01-08 03:59:57'),
+(53, 10, 'encontrado', 'cachorro', 'femea', 'animal_1767844989.jpg', 27, 'pequeno', 'branco', '', 'Cadela Branca', 'Estava perto da Orla', -29.75919500, -57.07867400, '2026-01-05', '(67) 67676-7676', '2026-01-08 04:03:09'),
+(54, 10, 'perdido', 'cachorro', 'macho', 'animal_1767845262.jpg', 32, 'grande', 'cinza', 'Adulto', 'Juca', 'Se perdeu nas promoções de papel higienico do atacadão.', -29.77026100, -57.08585100, '2025-07-06', '(55) 12312-3231', '2026-01-08 04:07:42'),
+(55, 10, 'encontrado', 'outros', 'nao_informado', 'animal_1767845551.jfif', 39, 'pequeno', '', '', 'Periquito Azul', 'Achado perto da estatua do Barão.', -29.75669700, -57.08667800, '2026-01-07', '(55) 99995-2323', '2026-01-08 04:12:31'),
+(56, 10, 'perdido', 'gato', 'macho', 'animal_1767845764.jpg', 39, 'medio', 'marrom', 'Filhote', 'Jabuti', 'Gato muito mimoso que saiu correndo.', -29.77133800, -57.08427400, '2026-02-14', '(85) 85896-5485', '2026-01-08 04:16:04'),
+(57, 11, 'encontrado', 'cachorro', 'femea', 'animal_1767845993.jpg', 27, 'pequeno', 'preto', 'Idoso', 'Cadela bem velha', 'Achei perto da esquina da cohab.', -29.77102200, -57.05867500, '2025-01-12', '(55) 84293-2544', '2026-01-08 04:19:53'),
+(58, 11, 'perdido', 'gato', 'femea', 'animal_1767846212.jpg', 39, 'medio', 'marrom', 'Idoso', 'Rose', 'Saiu de casa e não voltou mais.', -29.77662200, -57.06745100, '2026-01-17', '(55) 84293-2544', '2026-01-08 04:23:32');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `racas`
+--
+
+DROP TABLE IF EXISTS `racas`;
+CREATE TABLE IF NOT EXISTS `racas` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `racas` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `racas`
+--
+
+INSERT INTO `racas` (`id`, `racas`) VALUES
+(27, 'Vira-lata'),
+(28, 'Labrador'),
+(29, 'Bulldog'),
+(30, 'Pastor Alemão'),
+(31, 'Pincher'),
+(32, 'Cimarron'),
+(33, 'Husky'),
+(34, 'Salsicha'),
+(35, 'Golden'),
+(36, 'Persa'),
+(37, 'Siamês'),
+(38, 'Sphynx'),
+(39, 'Outros');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `recuperar_senha`
+--
+
+DROP TABLE IF EXISTS `recuperar_senha`;
+CREATE TABLE IF NOT EXISTS `recuperar_senha` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `data` datetime DEFAULT CURRENT_TIMESTAMP,
+  `usado` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `recuperar_senha`
+--
+
+INSERT INTO `recuperar_senha` (`id`, `email`, `token`, `data`, `usado`) VALUES
+(1, 'francisco.2023318347@aluno.iffar.edu.br', 'ae3cd60b52124c731467850315875d10cf4344ec3ae06c7b12a3f650b46e9c34', '2025-10-27 14:07:58', 0),
+(2, 'francisco.2023318347@aluno.iffar.edu.br', '5616414a12f52f27c4e185505cd172cadc73aff6e0f809c3540d4534d306747d', '2025-10-27 14:14:22', 0),
+(3, 'francisco.2023318347@aluno.iffar.edu.br', '6087b55ccbb410f8b44da5f67925c96ea70964727466447d008f92511ea52467', '2025-10-27 14:17:33', 0),
+(4, 'francisco.2023318347@aluno.iffar.edu.br', 'a42185776ffc8d0ebc866e9886ba3e65a3ed8e30b035969ba39cd1db906b02fb', '2025-10-27 14:21:37', 0),
+(5, 'francisco.2023318347@aluno.iffar.edu.br', 'ce068234969d1c418ca197d333ef52ba9730b7a028308e7eb6bbb2c93f3f31a8', '2025-10-27 15:02:48', 1),
+(6, 'francisco.2023318347@aluno.iffar.edu.br', '996ed36a30b46b1ca88453d2c80f5f2f0eaae05362446c2731c206cb57da4d59', '2025-11-24 20:39:18', 0),
+(7, 'francisco.2023318347@aluno.iffar.edu.br', '0e11a1e98b561432adafec0ccc7aea8a4d6885031ae3c1eb2d1acbddda6c9a78', '2025-11-24 20:39:20', 0),
+(8, 'franciscobaigorra@gmail.com', '084171957203252bfce7b8ccd48e68c1b395385de7f5c190526fbaad19ce090f', '2025-11-24 20:42:57', 0),
+(9, 'franciscobaigorra@gmail.com', 'a1d800a9f2b6177264e44c05c7da0488c9a2cc8cebcc2625e8166a99aa493b63', '2025-11-24 20:49:24', 0),
+(10, 'franciscobaigorra@gmail.com', 'aa19dc1d3d2f5c5f4369089174c5b88bbe7edfe91ea40f6da8d6756e791bc7b6', '2025-11-24 20:52:11', 0),
+(11, 'franciscobaigorra@gmail.com', 'e80518266eb4f63eb134742098dbd7253b53475bd31c8353e31dc9e521a68f9d', '2025-11-24 20:55:21', 1),
+(12, 'franciscobaigorra@gmail.com', '70a3bedcf73a5bc7d5a74217bd0892ca6293865e6b6c41d1e31524ad05e5d193', '2026-01-07 11:12:44', 1),
+(13, 'francisco.2023318347@aluno.iffar.edu.br', '3d3a8cb1778a1323c44f632a146ba2a8e34483d75964481119f0f16b986e5cc4', '2026-01-07 11:16:06', 1),
+(14, 'francisco.2023318347@aluno.iffar.edu.br', 'fd8a546c593ab0a8e071818b416ab004b8b7aac299395a3f658b9a43e82212c3', '2026-01-07 11:16:29', 1),
+(15, 'franciscobaigorra@gmail.com', 'e7d0a8747578e0ec893b284dfdae6a04b7a13e7a6665a20e6f5008bef6b0040c', '2026-01-07 22:41:29', 1),
+(16, 'franciscobaigorra@gmail.com', '375d2b6de10280ee9f6a979a8615b2c40676bee79f5f6b6458e561e2628af9b5', '2026-01-07 22:43:21', 1),
+(17, 'franciscobaigorra@gmail.com', '533c52ac39d829628be2a6855c6fa6c45d8a28193c469593a31b18939cb20e7b', '2026-01-07 22:46:40', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `usuarios`
+--
+
+DROP TABLE IF EXISTS `usuarios`;
+CREATE TABLE IF NOT EXISTS `usuarios` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nome` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `senha` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `telefone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `endereco` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `data_nascimento` date DEFAULT NULL,
+  `tipo_usuario` enum('usuario','administrador') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'usuario',
+  `ativo` enum('sim','nao') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'sim',
+  `data_cadastro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `usuarios`
+--
+
+INSERT INTO `usuarios` (`id`, `nome`, `email`, `senha`, `telefone`, `endereco`, `data_nascimento`, `tipo_usuario`, `ativo`, `data_cadastro`) VALUES
+(10, 'Chico', 'francisco.2023318347@aluno.iffar.edu.br', '$2y$10$gi1wbekwkfzovQ1Rqka8jOA/RKg7IUEJbVas7jj0MV1./Gh5Jidoa', '(55) 99995-7255', '1152', '2007-08-06', '', 'sim', '2025-10-27 18:02:38'),
+(11, 'francisco ', 'franciscobaigorra@gmail.com', '$2y$10$v3luVQZjdPlTJTUb297XJuOAOW7JbnVTafK67wvjbjUTF0AX4X46S', '55999957255', '1152', '2007-08-06', 'administrador', 'sim', '2025-11-13 23:14:39');
+
+--
+-- Restrições para despejos de tabelas
+--
+
+--
+-- Limitadores para a tabela `animais`
+--
+ALTER TABLE `animais`
+  ADD CONSTRAINT `fk_animais_racas` FOREIGN KEY (`raca_id`) REFERENCES `racas` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_animais_usuarios` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
